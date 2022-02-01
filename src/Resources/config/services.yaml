@@ -1,0 +1,30 @@
+services:
+  Dbp\Relay\CourseConnectorCampusonlineBundle\Command\TestCommand:
+    autowire: true
+    autoconfigure: true
+
+  Dbp\Relay\CourseConnectorCampusonlineBundle\Controller\:
+    resource: '../../Controller'
+    autoconfigure: true
+    autowire: true
+
+  Dbp\Relay\CourseConnectorCampusonlineBundle\DataPersister\:
+    resource: '../../DataPersister'
+    autowire: true
+    autoconfigure: true
+
+  Dbp\Relay\CourseConnectorCampusonlineBundle\DataProvider\:
+    resource: '../../DataProvider'
+    autowire: true
+    autoconfigure: true
+
+  Dbp\Relay\CourseConnectorCampusonlineBundle\Service\ExternalApi:
+    autowire: true
+    autoconfigure: true
+
+  Dbp\Relay\CourseConnectorCampusonlineBundle\Service\MyCustomService:
+    autowire: true
+    autoconfigure: true
+
+  Dbp\Relay\CourseConnectorCampusonlineBundle\Service\RemovemeProviderInterface:
+    '@Dbp\Relay\CourseConnectorCampusonlineBundle\Service\ExternalApi'
