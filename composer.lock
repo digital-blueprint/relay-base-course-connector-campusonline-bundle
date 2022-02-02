@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "db61c2249bc8c4ee921893e623472e9a",
+    "content-hash": "24fba224da4a240cc577b7a9d96d8e5a",
     "packages": [
         {
             "name": "api-platform/core",
@@ -232,6 +232,74 @@
                 "AGPL-3.0-or-later"
             ],
             "time": "2022-01-10T15:43:13+00:00"
+        },
+        {
+            "name": "dbp/relay-course-bundle",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-course-bundle.git",
+                "reference": "2224026f74abdd46ffbc972f833565e2dfcfb5da"
+            },
+            "require": {
+                "api-platform/core": "^2.6",
+                "dbp/relay-core-bundle": "^0.1.11",
+                "ext-json": "*",
+                "php": ">=7.3",
+                "symfony/framework-bundle": "^5.4"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "phpstan/phpstan": "^1.0.0",
+                "phpstan/phpstan-phpunit": "^1.0.0",
+                "phpunit/phpunit": "^9",
+                "symfony/browser-kit": "^5.4",
+                "symfony/http-client": "^5.4",
+                "symfony/monolog-bundle": "^3.7",
+                "symfony/phpunit-bridge": "^5.4",
+                "vimeo/psalm": "^4.2.1"
+            },
+            "default-branch": true,
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Dbp\\Relay\\CourseBundle\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Dbp\\Relay\\CourseBundle\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "@php vendor/bin/phpunit"
+                ],
+                "phpstan": [
+                    "@php vendor/bin/phpstan analyze --ansi"
+                ],
+                "psalm": [
+                    "@php vendor/bin/psalm"
+                ],
+                "lint": [
+                    "@composer run cs",
+                    "@composer run phpstan",
+                    "@composer run psalm"
+                ],
+                "cs-fix": [
+                    "@php vendor/bin/php-cs-fixer --ansi fix"
+                ],
+                "cs": [
+                    "@php vendor/bin/php-cs-fixer --ansi fix --dry-run --diff"
+                ],
+                "coverage": [
+                    "@php vendor/bin/phpunit --coverage-html _coverage"
+                ]
+            },
+            "license": [
+                "AGPL-3.0-or-later"
+            ],
+            "time": "2022-02-01T09:54:40+00:00"
         },
         {
             "name": "doctrine/annotations",
@@ -9917,7 +9985,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "dbp/relay-course-bundle": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
