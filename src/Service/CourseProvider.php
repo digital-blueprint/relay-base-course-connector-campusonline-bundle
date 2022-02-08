@@ -4,41 +4,61 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\CourseConnectorCampusonlineBundle\Service;
 
+use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Dbp\Relay\CourseBundle\API\CourseProviderInterface;
 use Dbp\Relay\CourseBundle\Entity\Course;
 
 class CourseProvider implements CourseProviderInterface
 {
-    public function getCourseById(string $identifier, array $options = []): ?Course
-    {
-        return null;
-    }
+    private const LANGUAGE_OPTION_NAME = 'lang';
 
-    public function getCourses(array $options = []): array
-    {
-        return [];
-    }
+    /*
+     * @var CourseApi
+     */
+    private $courseApi;
 
-    public function getCoursesByOrganization(string $orgUnitId, array $options = []): array
+    public function __construct(CourseApi $courseApi)
     {
-        return [];
-    }
-
-    public function getCoursesByPerson(string $personId, array $options = []): array
-    {
-        return [];
+        $this->courseApi = $courseApi;
     }
 
     /*
-     * @return CourseAttendee[]
+     * @throws ApiError
      */
-    public function getStudentsByCourse(string $courseId, array $options = []): array
+    public function getCourseById(string $identifier, array $options = []): ?Course
     {
-        return [];
+        try {
+            return $this->courseApi->getCourseById($identifier, $options);
+        } catch (\Exception $e) {
+            throw new ApiError($e->getCode(), $e->getMessage());
+        }
     }
 
-    public function getExamsByCourse(string $courseId, array $options = []): array
+    /*
+     * @return Course[]
+     *
+     * @throws ApiError
+     */
+    public function getCourses(array $options = []): array
     {
-        return [];
+        try {
+            return $this->courseApi->getCourses($options);
+        } catch (\Exception $e) {
+            throw new ApiError($e->getCode(), $e->getMessage());
+        }
+    }
+
+    /*
+    * @return Course[]
+     *
+     * @throws ApiError
+    */
+    public function getCoursesByOrganization(string $orgUnitId, array $options = []): array
+    {
+        try {
+            return $this->courseApi->getCoursesByOrganization($orgUnitId, $options);
+        } catch (\Exception $e) {
+            throw new ApiError($e->getCode(), $e->getMessage());
+        }
     }
 }
