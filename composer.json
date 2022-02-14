@@ -6,7 +6,7 @@
         "php": ">=7.3",
         "ext-json": "*",
         "api-platform/core": "^2.6",
-        "dbp/campusonline-api": "dev-main as 0.2.2",
+        "dbp/campusonline-api": "dev-main",
         "dbp/relay-base-course-bundle": "dev-main",
         "dbp/relay-base-person-bundle": "dev-main",
         "dbp/relay-core-bundle": "^0.1.11",
