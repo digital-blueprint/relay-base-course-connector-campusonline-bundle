@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Dbp\Relay\CourseConnectorCampusonlineBundle\Tests;
+namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Tests;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle;
+use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\DbpRelayBaseCourseConnectorCampusonlineBundle;
 use Dbp\Relay\CoreBundle\DbpRelayCoreBundle;
-use Dbp\Relay\CourseConnectorCampusonlineBundle\DbpRelayCourseConnectorCampusonlineBundle;
 use Nelmio\CorsBundle\NelmioCorsBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
@@ -30,7 +30,7 @@ class Kernel extends BaseKernel
         yield new NelmioCorsBundle();
         yield new MonologBundle();
         yield new ApiPlatformBundle();
-        yield new DbpRelayCourseConnectorCampusonlineBundle();
+        yield new DbpRelayBaseCourseConnectorCampusonlineBundle();
         yield new DbpRelayCoreBundle();
     }
 
@@ -45,10 +45,6 @@ class Kernel extends BaseKernel
         $container->extension('framework', [
             'test' => true,
             'secret' => '',
-        ]);
-
-        $container->extension('dbp_relay_course_connector_campusonline', [
-            'example_config' => 'test-42',
         ]);
     }
 }

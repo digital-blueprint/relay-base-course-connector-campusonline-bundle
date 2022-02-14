@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Dbp\Relay\CourseConnectorCampusonlineBundle;
+namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class DbpRelayCourseConnectorCampusonlineBundle extends Bundle
+class DbpRelayBaseCourseConnectorCampusonlineBundle extends Bundle
 {
     public function build(ContainerBuilder $container)
     {

@@ -1,4 +1,4 @@
-# DbpRelayCourseConnectorCampusonlineBundle
+# DbpRelayBaseCourseConnectorCampusonlineBundle
 
 This Symfony bundle can be used as a template for creating new bundles for the
 DBP Relay project.
@@ -22,7 +22,7 @@ See [Generate DBP Symfony bundle](https://dbp-demo.tugraz.at/dev-guide/relay/nam
 * Copy the repo contents
 * Adjust the package name in `composer.json`, in this example we'll pretend you named your bundle `dbp/relay-your-bundle`
 * Invent a new PHP namespace and adjust it in all PHP files
-* Rename `src/DbpRelayCourseConnectorCampusonlineBundle` and `DependencyInjection/DbpRelayCourseConnectorCampusonlineExtension` to match the new project name
+* Rename `src/DbpRelayBaseCourseConnectorCampusonlineBundle` and `DependencyInjection/DbpRelayCourseConnectorCampusonlineExtension` to match the new project name
 
 ## Integration into the API Server
 

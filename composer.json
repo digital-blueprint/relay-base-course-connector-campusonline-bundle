@@ -31,12 +31,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "Dbp\\Relay\\CourseConnectorCampusonlineBundle\\": "src/"
+            "Dbp\\Relay\\BaseCourseConnectorCampusonlineBundle\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Dbp\\Relay\\CourseConnectorCampusonlineBundle\\Tests\\": "tests/"
+            "Dbp\\Relay\\BaseCourseConnectorCampusonlineBundle\\Tests\\": "tests/"
         }
     },
     "config": {

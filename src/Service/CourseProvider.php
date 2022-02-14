@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Dbp\Relay\CourseConnectorCampusonlineBundle\Service;
+namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service;
 
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Dbp\Relay\CourseBundle\API\CourseProviderInterface;

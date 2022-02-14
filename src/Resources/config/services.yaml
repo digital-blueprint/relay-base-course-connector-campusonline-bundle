@@ -1,11 +1,11 @@
 services:
- Dbp\Relay\CourseConnectorCampusonlineBundle\Service\CourseProvider:
+ Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider:
     autowire: true
     autoconfigure: true
 
- Dbp\Relay\CourseConnectorCampusonlineBundle\Service\CourseApi:
+ Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseApi:
    autowire: true
    autoconfigure: true
 
- Dbp\Relay\CourseBundle\API\CourseProviderInterface:
-    '@Dbp\Relay\CourseConnectorCampusonlineBundle\Service\CourseProvider'
+ Dbp\Relay\BaseCourseBundle\API\CourseProviderInterface:
+    '@Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider'

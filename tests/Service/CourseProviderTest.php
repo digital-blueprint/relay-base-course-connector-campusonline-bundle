@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Dbp\Relay\CourseConnectorCampusonlineBundle\Tests\Service;
+namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Tests\Service;
 
+use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseApi;
+use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
-use Dbp\Relay\CourseConnectorCampusonlineBundle\Service\CourseApi;
-use Dbp\Relay\CourseConnectorCampusonlineBundle\Service\CourseProvider;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
