@@ -1,5 +1,5 @@
 {
-    "name": "dbp/relay-course-connector-campusonline-bundle",
+    "name": "dbp/relay-base-course-connector-campusonline-bundle",
     "type": "symfony-bundle",
     "license": "AGPL-3.0-or-later",
     "require": {
