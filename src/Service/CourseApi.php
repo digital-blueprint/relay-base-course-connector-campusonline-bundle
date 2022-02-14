@@ -7,7 +7,9 @@ namespace Dbp\Relay\CourseConnectorCampusonlineBundle\Service;
 use Dbp\CampusonlineApi\LegacyWebService\Api;
 use Dbp\CampusonlineApi\LegacyWebService\ApiException;
 use Dbp\CampusonlineApi\LegacyWebService\Course\CourseData;
+use Dbp\CampusonlineApi\LegacyWebService\Person\PersonData;
 use Dbp\Relay\CourseBundle\Entity\Course;
+use Dbp\Relay\CourseBundle\Entity\CourseAttendee;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
@@ -112,6 +114,32 @@ class CourseApi implements LoggerAwareInterface
         return $courses;
     }
 
+    /**
+     * @return Course[]
+     */
+    public function getCoursesByPerson(string $personId, array $options = []): array
+    {
+        $courses = [];
+        foreach ($this->getApi()->Course()->getCoursesByPersons($personId, $options) as $courseData) {
+            $courses[] = self::createCourseFromCourseData($courseData);
+        }
+
+        return $courses;
+    }
+
+    /**
+     * @return CourseAttendee[]
+     */
+    public function getAttendeesByCourse(string $courseId, array $options = []): array
+    {
+        $attendees = [];
+        foreach ($this->getApi()->Course()->getStudentsByCourse($courseId, $options) as $personData) {
+            $attendees[] = self::createCourseAttendeeFromPersonData($personData);
+        }
+
+        return $attendees;
+    }
+
     private function getApi(): Api
     {
         if ($this->api === null) {
@@ -135,5 +163,16 @@ class CourseApi implements LoggerAwareInterface
         $course->setType($courseData->getType());
 
         return $course;
+    }
+
+    private static function createCourseAttendeeFromPersonData(PersonData $personData): CourseAttendee
+    {
+        $attendee = new CourseAttendee();
+        $attendee->setIdentifier($personData->getIdentifier());
+        $attendee->setGivenName($personData->getGivenName());
+        $attendee->setFamilyName($personData->getFamilyName());
+        $attendee->setEmail($personData->getEmail());
+
+        return $attendee;
     }
 }

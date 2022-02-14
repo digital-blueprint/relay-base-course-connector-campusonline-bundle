@@ -7,6 +7,7 @@ namespace Dbp\Relay\CourseConnectorCampusonlineBundle\Service;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Dbp\Relay\CourseBundle\API\CourseProviderInterface;
 use Dbp\Relay\CourseBundle\Entity\Course;
+use Dbp\Relay\CourseBundle\Entity\CourseAttendee;
 
 class CourseProvider implements CourseProviderInterface
 {
@@ -57,6 +58,30 @@ class CourseProvider implements CourseProviderInterface
     {
         try {
             return $this->courseApi->getCoursesByOrganization($orgUnitId, $options);
+        } catch (\Exception $e) {
+            throw new ApiError($e->getCode(), $e->getMessage());
+        }
+    }
+
+    /**
+     * @return Course[]
+     */
+    public function getCoursesByPerson(string $personId, array $options = []): array
+    {
+        try {
+            return $this->courseApi->getCoursesByPerson($personId, $options);
+        } catch (\Exception $e) {
+            throw new ApiError($e->getCode(), $e->getMessage());
+        }
+    }
+
+    /**
+     * @return CourseAttendee[]
+     */
+    public function getAttendeesByCourse(string $courseId, array $options = []): array
+    {
+        try {
+            return $this->courseApi->getAttendeesByCourse($courseId, $options);
         } catch (\Exception $e) {
             throw new ApiError($e->getCode(), $e->getMessage());
         }
