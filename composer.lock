@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3e339f100cdf764e2e48fba14b88662b",
+    "content-hash": "d495bead6d225d54cffa9b36cee01fb9",
     "packages": [
         {
             "name": "api-platform/core",
@@ -173,7 +173,7 @@
             "source": {
                 "type": "git",
                 "url": "https://gitlab.tugraz.at/dbp/campus-online/dbp-campusonline-api",
-                "reference": "4ce3a88237b3b4a6158a5e98c9ac8c2cffbfdc31"
+                "reference": "44d77a9959d8951d2123c12d48471c14fdd1a387"
             },
             "require": {
                 "ext-json": "*",
@@ -202,7 +202,57 @@
             "license": [
                 "AGPL-3.0-or-later"
             ],
-            "time": "2022-02-08T12:04:35+00:00"
+            "time": "2022-02-14T09:26:35+00:00"
+        },
+        {
+            "name": "dbp/relay-base-person-bundle",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-person-bundle",
+                "reference": "07a2a3c24f4f84a093ce204cf5230891b1fe14bb"
+            },
+            "require": {
+                "api-platform/core": "^2.6.3",
+                "dbp/relay-core-bundle": "^0.1.25",
+                "ext-json": "*",
+                "guzzlehttp/guzzle": "^7.0",
+                "nelmio/cors-bundle": "^2.1.0",
+                "php": ">=7.3",
+                "phpdocumentor/reflection-docblock": "^3.0 || ^4.0 || ^5.0",
+                "symfony/config": "^5.2",
+                "symfony/expression-language": "^5.2",
+                "symfony/framework-bundle": "^5.2",
+                "symfony/security-bundle": "^5.2",
+                "symfony/security-core": "^5.2",
+                "symfony/security-guard": "^5.2",
+                "symfony/twig-bundle": "^5.2",
+                "symfony/validator": "^5.2",
+                "symfony/yaml": "^5.2"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "phpstan/phpstan": "^1.0.0",
+                "phpstan/phpstan-phpunit": "^1.0.0",
+                "phpunit/phpunit": "^9",
+                "symfony/browser-kit": "^5.2",
+                "symfony/http-client": "^5.2",
+                "symfony/monolog-bundle": "^3.7",
+                "symfony/phpunit-bridge": "^5.2",
+                "vimeo/psalm": "^4.4"
+            },
+            "default-branch": true,
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Dbp\\Relay\\BasePersonBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "AGPL-3.0-or-later"
+            ],
+            "time": "2022-02-14T00:21:44+00:00"
         },
         {
             "name": "dbp/relay-core-bundle",
@@ -10354,6 +10404,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "dbp/campusonline-api": 20,
+        "dbp/relay-base-person-bundle": 20,
         "dbp/relay-course-bundle": 20
     },
     "prefer-stable": false,
