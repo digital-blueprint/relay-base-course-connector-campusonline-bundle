@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service;
 
+use Dbp\Relay\BaseCourseBundle\API\CourseProviderInterface;
+use Dbp\Relay\BaseCourseBundle\Entity\Course;
+use Dbp\Relay\BaseCourseBundle\Entity\CourseAttendee;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
-use Dbp\Relay\CourseBundle\API\CourseProviderInterface;
-use Dbp\Relay\CourseBundle\Entity\Course;
-use Dbp\Relay\CourseBundle\Entity\CourseAttendee;
 
 class CourseProvider implements CourseProviderInterface
 {
