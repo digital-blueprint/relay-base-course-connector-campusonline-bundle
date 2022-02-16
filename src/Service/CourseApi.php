@@ -168,10 +168,14 @@ class CourseApi implements LoggerAwareInterface
     private static function createCourseAttendeeFromPersonData(PersonData $personData): CourseAttendee
     {
         $attendee = new CourseAttendee();
-        $attendee->setIdentifier($personData->getIdentifier());
+        if (strlen($personData->getEmail()) > 0) {
+            $subStrings = explode('@', $personData->getEmail());
+            $attendee->setIdentifier($subStrings[0]);
+        }
         $attendee->setGivenName($personData->getGivenName());
         $attendee->setFamilyName($personData->getFamilyName());
         $attendee->setEmail($personData->getEmail());
+        $attendee->setExtraData('co-person-id', $personData->getIdentifier());
 
         return $attendee;
     }
