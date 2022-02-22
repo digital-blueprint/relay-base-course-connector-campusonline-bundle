@@ -20,6 +20,7 @@ class Configuration implements ConfigurationInterface
             ->scalarNode('api_token')->end()
             ->scalarNode('org_root_id')->end()
             ->end()
+            ->end()
             ->end();
 
         return $treeBuilder;
