@@ -210,12 +210,12 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-base-course-bundle.git",
-                "reference": "114aa5ce44c7f5540869e91ff35cf8e34f3ed14e"
+                "reference": "a48cd8cbcd47d71897511475fab26497d5812481"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-base-course-bundle/repository/archive.zip?sha=114aa5ce44c7f5540869e91ff35cf8e34f3ed14e",
-                "reference": "114aa5ce44c7f5540869e91ff35cf8e34f3ed14e",
+                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-base-course-bundle/repository/archive.zip?sha=a48cd8cbcd47d71897511475fab26497d5812481",
+                "reference": "a48cd8cbcd47d71897511475fab26497d5812481",
                 "shasum": ""
             },
             "require": {
@@ -281,7 +281,7 @@
                 "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle/-/tree/main",
                 "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle/-/issues"
             },
-            "time": "2022-02-28T01:11:35+01:00"
+            "time": "2022-02-28T01:52:55+01:00"
         },
         {
             "name": "dbp/relay-base-person-bundle",
