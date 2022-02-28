@@ -210,12 +210,12 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-base-course-bundle.git",
-                "reference": "78354eda94331e1b67afd779474d44ccd45a1900"
+                "reference": "114aa5ce44c7f5540869e91ff35cf8e34f3ed14e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-base-course-bundle/repository/archive.zip?sha=78354eda94331e1b67afd779474d44ccd45a1900",
-                "reference": "78354eda94331e1b67afd779474d44ccd45a1900",
+                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-base-course-bundle/repository/archive.zip?sha=114aa5ce44c7f5540869e91ff35cf8e34f3ed14e",
+                "reference": "114aa5ce44c7f5540869e91ff35cf8e34f3ed14e",
                 "shasum": ""
             },
             "require": {
@@ -281,7 +281,7 @@
                 "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle/-/tree/main",
                 "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle/-/issues"
             },
-            "time": "2022-02-26T01:12:30+01:00"
+            "time": "2022-02-28T01:11:35+01:00"
         },
         {
             "name": "dbp/relay-base-person-bundle",
@@ -289,7 +289,7 @@
             "source": {
                 "type": "git",
                 "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-person-bundle",
-                "reference": "1a4688a9ea3b1f6d1ee969d57b86509119990402"
+                "reference": "003581b370018bb13a67d2d9a28fc21d914569f6"
             },
             "require": {
                 "api-platform/core": "^2.6.3",
@@ -331,7 +331,7 @@
             "license": [
                 "AGPL-3.0-or-later"
             ],
-            "time": "2022-02-26T00:20:15+00:00"
+            "time": "2022-02-28T00:23:32+00:00"
         },
         {
             "name": "dbp/relay-core-bundle",
