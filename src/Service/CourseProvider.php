@@ -11,8 +11,6 @@ use Dbp\Relay\CoreBundle\Exception\ApiError;
 
 class CourseProvider implements CourseProviderInterface
 {
-    private const LANGUAGE_OPTION_NAME = 'lang';
-
     /*
      * @var CourseApi
      */
