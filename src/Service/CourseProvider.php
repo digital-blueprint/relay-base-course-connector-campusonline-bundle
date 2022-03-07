@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service;
 
+use Dbp\CampusonlineApi\LegacyWebService\ApiException;
 use Dbp\Relay\BaseCourseBundle\API\CourseProviderInterface;
 use Dbp\Relay\BaseCourseBundle\Entity\Course;
 use Dbp\Relay\BaseCourseBundle\Entity\CourseAttendee;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
+use Symfony\Component\HttpFoundation\Response;
 
 class CourseProvider implements CourseProviderInterface
 {
@@ -26,11 +28,14 @@ class CourseProvider implements CourseProviderInterface
      */
     public function getCourseById(string $identifier, array $options = []): ?Course
     {
+        $course = null;
         try {
-            return $this->courseApi->getCourseById($identifier, $options);
+            $course = $this->courseApi->getCourseById($identifier, $options);
         } catch (\Exception $e) {
-            throw new ApiError($e->getCode(), $e->getMessage());
+            self::dispatchException($e, $identifier);
         }
+
+        return $course;
     }
 
     /*
@@ -42,8 +47,8 @@ class CourseProvider implements CourseProviderInterface
     {
         try {
             return $this->courseApi->getCourses($options);
-        } catch (\Exception $e) {
-            throw new ApiError($e->getCode(), $e->getMessage());
+        } catch (ApiException $e) {
+            throw new ApiError(Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
         }
     }
 
@@ -54,11 +59,15 @@ class CourseProvider implements CourseProviderInterface
     */
     public function getCoursesByOrganization(string $orgUnitId, array $options = []): array
     {
+        $courses = [];
+
         try {
-            return $this->courseApi->getCoursesByOrganization($orgUnitId, $options);
-        } catch (\Exception $e) {
-            throw new ApiError($e->getCode(), $e->getMessage());
+            $courses = $this->courseApi->getCoursesByOrganization($orgUnitId, $options);
+        } catch (ApiException $e) {
+            self::dispatchException($e, $orgUnitId);
         }
+
+        return $courses;
     }
 
     /**
@@ -66,11 +75,15 @@ class CourseProvider implements CourseProviderInterface
      */
     public function getCoursesByPerson(string $personId, array $options = []): array
     {
+        $courses = [];
+
         try {
-            return $this->courseApi->getCoursesByPerson($personId, $options);
-        } catch (\Exception $e) {
-            throw new ApiError($e->getCode(), $e->getMessage());
+            $courses = $this->courseApi->getCoursesByPerson($personId, $options);
+        } catch (ApiException $e) {
+            self::dispatchException($e, $personId);
         }
+
+        return $courses;
     }
 
     /**
@@ -78,10 +91,35 @@ class CourseProvider implements CourseProviderInterface
      */
     public function getAttendeesByCourse(string $courseId, array $options = []): array
     {
+        $courses = [];
+
         try {
-            return $this->courseApi->getAttendeesByCourse($courseId, $options);
-        } catch (\Exception $e) {
-            throw new ApiError($e->getCode(), $e->getMessage());
+            $courses = $this->courseApi->getAttendeesByCourse($courseId, $options);
+        } catch (ApiException $e) {
+            self::dispatchException($e, $courseId);
         }
+
+        return $courses;
+    }
+
+    /**
+     * NOTE: Comfortonline returns '401 unauthorized' for some resources that are not found. So we can't
+     * safely return '404' in all cases.
+     */
+    private static function dispatchException(ApiException $e, string $identifier)
+    {
+        if ($e->isHttpResponseCode()) {
+            switch ($e->getCode()) {
+                case Response::HTTP_NOT_FOUND:
+                    throw new ApiError(Response::HTTP_NOT_FOUND, sprintf("Id '%s' could not be found!", $identifier));
+                    break;
+                case Response::HTTP_UNAUTHORIZED:
+                    throw new ApiError(Response::HTTP_INTERNAL_SERVER_ERROR, sprintf("Id '%s' could not be found or access denied!", $identifier));
+                    break;
+                default:
+                    break;
+            }
+        }
+        throw new ApiError(Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
     }
 }

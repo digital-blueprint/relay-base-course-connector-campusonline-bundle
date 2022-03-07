@@ -120,7 +120,7 @@ class CourseApi implements LoggerAwareInterface
     public function getCoursesByPerson(string $personId, array $options = []): array
     {
         $courses = [];
-        foreach ($this->getApi()->Course()->getCoursesByPersons($personId, $options) as $courseData) {
+        foreach ($this->getApi()->Course()->getCoursesByPerson($personId, $options) as $courseData) {
             $courses[] = self::createCourseFromCourseData($courseData);
         }
 
@@ -168,14 +168,12 @@ class CourseApi implements LoggerAwareInterface
     private static function createCourseAttendeeFromPersonData(PersonData $personData): CourseAttendee
     {
         $attendee = new CourseAttendee();
-        if (strlen($personData->getEmail()) > 0) {
-            $subStrings = explode('@', $personData->getEmail());
-            $attendee->setIdentifier($subStrings[0]);
-        }
+        // note: CO person ID is not the same as LDAP person ID,
+        // which is normally used as identifier in base Person entity
+        $attendee->setIdentifier($personData->getIdentifier());
         $attendee->setGivenName($personData->getGivenName());
         $attendee->setFamilyName($personData->getFamilyName());
         $attendee->setEmail($personData->getEmail());
-        $attendee->setExtraData('co-person-id', $personData->getIdentifier());
 
         return $attendee;
     }
