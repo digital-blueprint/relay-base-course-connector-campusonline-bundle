@@ -8,8 +8,6 @@ use Dbp\CampusonlineApi\LegacyWebService\Api;
 use Dbp\CampusonlineApi\LegacyWebService\ApiException;
 use Dbp\CampusonlineApi\LegacyWebService\Course\CourseData;
 use Dbp\CampusonlineApi\LegacyWebService\Person\PersonData;
-use Dbp\Relay\BaseCourseBundle\Entity\Course;
-use Dbp\Relay\BaseCourseBundle\Entity\CourseAttendee;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
@@ -72,72 +70,49 @@ class CourseApi implements LoggerAwareInterface
     /**
      * @throws ApiException
      */
-    public function getCourseById(string $identifier, array $options = []): ?Course
+    public function getCourseById(string $identifier, array $options = []): ?CourseData
     {
-        $courseData = $this->getApi()->Course()->getCourseById($identifier, $options);
-
-        $course = null;
-        if ($courseData !== null) {
-            $course = self::createCourseFromCourseData($courseData);
-        }
-
-        return $course;
+        return $this->getApi()->Course()->getCourseById($identifier, $options);
     }
 
     /**
-     * @return Course[]
+     * @return CourseData[]
      *
      * @throws ApiException
      */
     public function getCourses(array $options = []): array
     {
-        $courses = [];
-        foreach ($this->getApi()->Course()->getCourses($options) as $courseData) {
-            $courses[] = self::createCourseFromCourseData($courseData);
-        }
-
-        return $courses;
+        return $this->getApi()->Course()->getCourses($options);
     }
 
     /**
-     * @return Course[]
+     * @return CourseData[]
      *
      * @throws ApiException
      */
     public function getCoursesByOrganization(string $orgUnitId, array $options = []): array
     {
-        $courses = [];
-        foreach ($this->getApi()->Course()->getCoursesByOrganization($orgUnitId, $options) as $courseData) {
-            $courses[] = self::createCourseFromCourseData($courseData);
-        }
-
-        return $courses;
+        return $this->getApi()->Course()->getCoursesByOrganization($orgUnitId, $options);
     }
 
     /**
-     * @return Course[]
+     * @return CourseData[]
+     *
+     * @throws ApiException
      */
     public function getCoursesByPerson(string $personId, array $options = []): array
     {
-        $courses = [];
-        foreach ($this->getApi()->Course()->getCoursesByPerson($personId, $options) as $courseData) {
-            $courses[] = self::createCourseFromCourseData($courseData);
-        }
-
-        return $courses;
+        return $this->getApi()->Course()->getCoursesByPerson($personId, $options);
     }
 
     /**
-     * @return CourseAttendee[]
+     * @return PersonData[]
+     *
+     * @throws ApiException
      */
     public function getAttendeesByCourse(string $courseId, array $options = []): array
     {
-        $attendees = [];
-        foreach ($this->getApi()->Course()->getStudentsByCourse($courseId, $options) as $personData) {
-            $attendees[] = self::createCourseAttendeeFromPersonData($personData);
-        }
-
-        return $attendees;
+        return $this->getApi()->Course()->getStudentsByCourse($courseId, $options);
     }
 
     private function getApi(): Api
@@ -152,29 +127,5 @@ class CourseApi implements LoggerAwareInterface
         }
 
         return $this->api;
-    }
-
-    private static function createCourseFromCourseData(CourseData $courseData): Course
-    {
-        $course = new Course();
-        $course->setIdentifier($courseData->getIdentifier());
-        $course->setName($courseData->getName());
-        $course->setDescription($courseData->getDescription());
-        $course->setType($courseData->getType());
-
-        return $course;
-    }
-
-    private static function createCourseAttendeeFromPersonData(PersonData $personData): CourseAttendee
-    {
-        $attendee = new CourseAttendee();
-        // note: CO person ID is not the same as LDAP person ID,
-        // which is normally used as identifier in base Person entity
-        $attendee->setIdentifier($personData->getIdentifier());
-        $attendee->setGivenName($personData->getGivenName());
-        $attendee->setFamilyName($personData->getFamilyName());
-        $attendee->setEmail($personData->getEmail());
-
-        return $attendee;
     }
 }

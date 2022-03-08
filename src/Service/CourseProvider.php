@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service;
 
 use Dbp\CampusonlineApi\LegacyWebService\ApiException;
+use Dbp\CampusonlineApi\LegacyWebService\Course\CourseData;
+use Dbp\CampusonlineApi\LegacyWebService\Person\PersonData;
 use Dbp\Relay\BaseCourseBundle\API\CourseProviderInterface;
 use Dbp\Relay\BaseCourseBundle\Entity\Course;
 use Dbp\Relay\BaseCourseBundle\Entity\CourseAttendee;
+use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CourseProviderPostEvent;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 class CourseProvider implements CourseProviderInterface
@@ -18,9 +22,13 @@ class CourseProvider implements CourseProviderInterface
      */
     private $courseApi;
 
-    public function __construct(CourseApi $courseApi)
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
+    public function __construct(CourseApi $courseApi, EventDispatcherInterface $eventDispatcher)
     {
         $this->courseApi = $courseApi;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /*
@@ -28,14 +36,14 @@ class CourseProvider implements CourseProviderInterface
      */
     public function getCourseById(string $identifier, array $options = []): ?Course
     {
-        $course = null;
+        $courseData = null;
         try {
-            $course = $this->courseApi->getCourseById($identifier, $options);
+            $courseData = $this->courseApi->getCourseById($identifier, $options);
         } catch (\Exception $e) {
             self::dispatchException($e, $identifier);
         }
 
-        return $course;
+        return $courseData ? $this->createCourseFromCourseData($courseData) : null;
     }
 
     /*
@@ -45,11 +53,16 @@ class CourseProvider implements CourseProviderInterface
      */
     public function getCourses(array $options = []): array
     {
+        $courses = [];
         try {
-            return $this->courseApi->getCourses($options);
+            foreach ($this->courseApi->getCourses($options) as $courseData) {
+                $courses[] = $this->createCourseFromCourseData($courseData);
+            }
         } catch (ApiException $e) {
             throw new ApiError(Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
         }
+
+        return $courses;
     }
 
     /*
@@ -62,7 +75,9 @@ class CourseProvider implements CourseProviderInterface
         $courses = [];
 
         try {
-            $courses = $this->courseApi->getCoursesByOrganization($orgUnitId, $options);
+            foreach ($this->courseApi->getCoursesByOrganization($orgUnitId, $options) as $courseData) {
+                $courses[] = $this->createCourseFromCourseData($courseData);
+            }
         } catch (ApiException $e) {
             self::dispatchException($e, $orgUnitId);
         }
@@ -78,7 +93,9 @@ class CourseProvider implements CourseProviderInterface
         $courses = [];
 
         try {
-            $courses = $this->courseApi->getCoursesByPerson($personId, $options);
+            foreach ($this->courseApi->getCoursesByPerson($personId, $options) as $courseData) {
+                $courses[] = $this->createCourseFromCourseData($courseData);
+            }
         } catch (ApiException $e) {
             self::dispatchException($e, $personId);
         }
@@ -91,19 +108,48 @@ class CourseProvider implements CourseProviderInterface
      */
     public function getAttendeesByCourse(string $courseId, array $options = []): array
     {
-        $courses = [];
+        $attendees = [];
 
         try {
-            $courses = $this->courseApi->getAttendeesByCourse($courseId, $options);
+            foreach ($this->courseApi->getAttendeesByCourse($courseId, $options) as $attendeeData) {
+                $attendees[] = self::createCourseAttendeeFromPersonData($attendeeData);
+            }
         } catch (ApiException $e) {
             self::dispatchException($e, $courseId);
         }
 
-        return $courses;
+        return $attendees;
+    }
+
+    private function createCourseFromCourseData(CourseData $courseData): Course
+    {
+        $course = new Course();
+        $course->setIdentifier($courseData->getIdentifier());
+        $course->setName($courseData->getName());
+        $course->setDescription($courseData->getDescription());
+        $course->setType($courseData->getType());
+
+        $postEvent = new CourseProviderPostEvent($course, $courseData);
+        $this->eventDispatcher->dispatch($postEvent, CourseProviderPostEvent::NAME);
+
+        return $course;
+    }
+
+    private static function createCourseAttendeeFromPersonData(PersonData $personData): CourseAttendee
+    {
+        $attendee = new CourseAttendee();
+        // note: CO person ID is not the same as LDAP person ID,
+        // which is normally used as identifier in base-Person entity
+        $attendee->setIdentifier($personData->getIdentifier());
+        $attendee->setGivenName($personData->getGivenName());
+        $attendee->setFamilyName($personData->getFamilyName());
+        $attendee->setEmail($personData->getEmail());
+
+        return $attendee;
     }
 
     /**
-     * NOTE: Comfortonline returns '401 unauthorized' for some resources that are not found. So we can't
+     * NOTE: Campusonline returns '401 unauthorized' for some resources that are not found. So we can't
      * safely return '404' in all cases.
      */
     private static function dispatchException(ApiException $e, string $identifier)

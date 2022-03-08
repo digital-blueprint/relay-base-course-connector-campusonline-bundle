@@ -11,6 +11,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CourseProviderTest extends TestCase
 {
@@ -26,7 +27,7 @@ class CourseProviderTest extends TestCase
 
         $this->service = new CourseApi();
         $this->service->setConfig(['org_root_id' => '1']); // some value is required
-        $this->api = new CourseProvider($this->service);
+        $this->api = new CourseProvider($this->service, new EventDispatcher());
         $this->mockResponses([]);
     }
 
