@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6f04896f1d2a4212c2c8eec6f25f5251",
+    "content-hash": "b041e6288372c34bb9e2f9280513c003",
     "packages": [
         {
             "name": "api-platform/core",
@@ -211,11 +211,11 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-base-course-bundle.git",
-                "reference": "a0499e7c719a86ed53e2661e9eef11434c15dfde"
+                "reference": "2afbddafea71031b20415766e09550083b33f95b"
             },
             "require": {
                 "api-platform/core": "^2.6",
-                "dbp/relay-base-person-bundle": "dev-main",
+                "dbp/relay-base-person-bundle": "^0.1.3",
                 "dbp/relay-core-bundle": "^0.1.11",
                 "ext-json": "*",
                 "php": ">=7.3",
@@ -272,15 +272,15 @@
             "license": [
                 "AGPL-3.0-or-later"
             ],
-            "time": "2022-03-02T08:55:08+00:00"
+            "time": "2022-03-08T09:04:51+00:00"
         },
         {
             "name": "dbp/relay-base-person-bundle",
-            "version": "dev-main",
+            "version": "v0.1.6",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-person-bundle",
-                "reference": "003581b370018bb13a67d2d9a28fc21d914569f6"
+                "reference": "aaae7b2cb9e6fbb22c116b777fde800312ad10ea"
             },
             "require": {
                 "api-platform/core": "^2.6.3",
@@ -311,7 +311,6 @@
                 "symfony/phpunit-bridge": "^5.2",
                 "vimeo/psalm": "^4.4"
             },
-            "default-branch": true,
             "type": "symfony-bundle",
             "autoload": {
                 "psr-4": {
@@ -322,7 +321,7 @@
             "license": [
                 "AGPL-3.0-or-later"
             ],
-            "time": "2022-02-28T00:23:32+00:00"
+            "time": "2022-02-02T15:46:45+00:00"
         },
         {
             "name": "dbp/relay-core-bundle",
@@ -10418,8 +10417,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "dbp/campusonline-api": 20,
-        "dbp/relay-base-course-bundle": 20,
-        "dbp/relay-base-person-bundle": 20
+        "dbp/relay-base-course-bundle": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
