@@ -9,6 +9,7 @@
         "dbp/campusonline-api": "dev-main as 0.2.2",
         "dbp/relay-base-course-bundle": "dev-main",
         "dbp/relay-core-bundle": "^0.1.11",
+        "symfony/event-dispatcher": "^5.4",
         "symfony/framework-bundle": "^5.4"
     },
     "require-dev": {
