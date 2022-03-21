@@ -173,7 +173,7 @@
             "source": {
                 "type": "git",
                 "url": "https://gitlab.tugraz.at/dbp/campus-online/dbp-campusonline-api",
-                "reference": "56c9514bdb30be1c7fbbabaed62e80b396c88d5e"
+                "reference": "bc4a730a64f44e5ef14a4fba6e96293d4b6dd60a"
             },
             "require": {
                 "ext-json": "*",
@@ -203,7 +203,7 @@
             "license": [
                 "AGPL-3.0-or-later"
             ],
-            "time": "2022-03-20T14:38:48+00:00"
+            "time": "2022-03-21T00:17:59+00:00"
         },
         {
             "name": "dbp/relay-base-course-bundle",
@@ -211,12 +211,12 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-base-course-bundle.git",
-                "reference": "c68ed7243661d6951ea3d8c348227b946a0aaacc"
+                "reference": "45ee85eb4e363ee56ae23973a5d5e97264328cdd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-base-course-bundle/repository/archive.zip?sha=c68ed7243661d6951ea3d8c348227b946a0aaacc",
-                "reference": "c68ed7243661d6951ea3d8c348227b946a0aaacc",
+                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-base-course-bundle/repository/archive.zip?sha=45ee85eb4e363ee56ae23973a5d5e97264328cdd",
+                "reference": "45ee85eb4e363ee56ae23973a5d5e97264328cdd",
                 "shasum": ""
             },
             "require": {
@@ -282,7 +282,7 @@
                 "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle/-/tree/main",
                 "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle/-/issues"
             },
-            "time": "2022-03-19T01:12:50+01:00"
+            "time": "2022-03-21T01:10:49+01:00"
         },
         {
             "name": "dbp/relay-base-person-bundle",
