@@ -43,7 +43,7 @@ class CourseProvider implements CourseProviderInterface
             self::dispatchException($e, $identifier);
         }
 
-        return $courseData ? $this->createCourseFromCourseData($courseData) : null;
+        return $courseData ? $this->createCourseFromCourseData($courseData, self::checkIncludeLocalData($options)) : null;
     }
 
     /*
@@ -56,7 +56,7 @@ class CourseProvider implements CourseProviderInterface
         $courses = [];
         try {
             foreach ($this->courseApi->getCourses($options) as $courseData) {
-                $courses[] = $this->createCourseFromCourseData($courseData);
+                $courses[] = $this->createCourseFromCourseData($courseData, self::checkIncludeLocalData($options));
             }
         } catch (ApiException $e) {
             throw new ApiError(Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
@@ -76,7 +76,7 @@ class CourseProvider implements CourseProviderInterface
 
         try {
             foreach ($this->courseApi->getCoursesByOrganization($orgUnitId, $options) as $courseData) {
-                $courses[] = $this->createCourseFromCourseData($courseData);
+                $courses[] = $this->createCourseFromCourseData($courseData, self::checkIncludeLocalData($options));
             }
         } catch (ApiException $e) {
             self::dispatchException($e, $orgUnitId);
@@ -94,7 +94,7 @@ class CourseProvider implements CourseProviderInterface
 
         try {
             foreach ($this->courseApi->getCoursesByPerson($personId, $options) as $courseData) {
-                $courses[] = $this->createCourseFromCourseData($courseData);
+                $courses[] = $this->createCourseFromCourseData($courseData, self::checkIncludeLocalData($options));
             }
         } catch (ApiException $e) {
             self::dispatchException($e, $personId);
@@ -121,7 +121,7 @@ class CourseProvider implements CourseProviderInterface
         return $attendees;
     }
 
-    private function createCourseFromCourseData(CourseData $courseData): Course
+    private function createCourseFromCourseData(CourseData $courseData, bool $includeLocalData): Course
     {
         $course = new Course();
         $course->setIdentifier($courseData->getIdentifier());
@@ -129,8 +129,11 @@ class CourseProvider implements CourseProviderInterface
         $course->setDescription($courseData->getDescription());
         $course->setType($courseData->getType());
 
-        $postEvent = new CourseProviderPostEvent($course, $courseData);
-        $this->eventDispatcher->dispatch($postEvent, CourseProviderPostEvent::NAME);
+        if ($includeLocalData) {
+            $postEvent = new CourseProviderPostEvent($course, $courseData);
+            $this->eventDispatcher->dispatch($postEvent, CourseProviderPostEvent::NAME);
+            $course = $postEvent->getCourse();
+        }
 
         return $course;
     }
@@ -146,6 +149,11 @@ class CourseProvider implements CourseProviderInterface
         $attendee->setEmail($personData->getEmail());
 
         return $attendee;
+    }
+
+    private static function checkIncludeLocalData(array $options): bool
+    {
+        return ($options['includeLocalData'] ?? false) === true;
     }
 
     /**
