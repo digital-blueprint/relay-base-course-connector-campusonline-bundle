@@ -1,92 +1,83 @@
 # DbpRelayBaseCourseConnectorCampusonlineBundle
+[GitLab](https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-connector-campusonline-bundle)
 
-This Symfony bundle can be used as a template for creating new bundles for the
-DBP Relay project.
 
-When including this bundle into your API server it will gain the following
-features:
-
-* A custom `./bin/console` command
-* An example entity
-* Various HTTP methods implemented for that entity
-
-## TL;DR
-
-The quickest way to make use of this template bundle is to feed your desired names
-to one command and generate a ready-to-use bundle with the correct naming.
-
-See [Generate DBP Symfony bundle](https://dbp-demo.tugraz.at/dev-guide/relay/naming/#generate-dbp-symfony-bundle) for more information.
-
-## Using the Bundle as a Template
-
-* Copy the repo contents
-* Adjust the package name in `composer.json`, in this example we'll pretend you named your bundle `dbp/relay-your-bundle`
-* Invent a new PHP namespace and adjust it in all PHP files
-* Rename `src/DbpRelayBaseCourseConnectorCampusonlineBundle` and `DependencyInjection/DbpRelayCourseConnectorCampusonlineExtension` to match the new project name
-
-## Integration into the API Server
-
-* Push your bundle on a git server, in this example we'll use `git@gitlab.tugraz.at:dbp/relay/dbp-relay-your-bundle.git`
-* Add the repository to your composer.json (as soon as you published your bundle to [Packagist](https://packagist.org/)
-  you can remove that block again):
-
-```json
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-your-bundle.git"
-        }
-    ],
-```
+## Integration into the Relay API Server
 
 * Add the bundle package as a dependency:
 
-```bash
-composer require dbp/relay-your-bundle=dev-main
+```
+composer require dbp/relay-base-course-connector-campusonline-bundle
 ```
 
 * Add the bundle to your `config/bundles.php`:
 
 ```php
 ...
-Dbp\Relay\YourBundle\DbpRelayYourBundle::class => ['all' => true],
-DBP\API\CoreBundle\DbpCoreBundle::class => ['all' => true],
-];
+Dbp\Relay\BasePersonBundle\DbpRelayBaseCourseBundle::class => ['all' => true],
+Dbp\Relay\BasePersonBundle\DbpRelayBaseCourseConnectorCampusonlineBundle::class => ['all' => true],
+...
 ```
 
 * Run `composer install` to clear caches
 
 ## Configuration
 
-The bundle has a `example_config` configuration value that you can specify in your
+The bundle has some configuration values that you can specify in your
 app, either by hard-coding it, or by referencing an environment variable.
 
-For this create `config/packages/dbp_relay_course_connector_campusonline.yaml` in the app with the following
+For this create `config/packages/dbp_relay_base_course_connector_ldap.yaml` in the app with the following
 content:
 
 ```yaml
-dbp_relay_course_connector_campusonline:
-  example_config: 42
-  # example_config: '%env(EXAMPLE_CONFIG)%'
+dbp_relay_base_course_connector_campusonline:
+  campus_online:
+    api_token: '%env(CAMPUS_ONLINE_API_TOKEN)%'
+    api_url: '%env(CAMPUS_ONLINE_API_URL)%'
+    org_root_id: '%env(ORGANIZATION_ROOT_ID)%'
 ```
 
-The value gets read in `DbpRelayCourseConnectorCampusonlineExtension` (your extension will be named differently)
-and passed when creating the `MyCustomService` service.
+For more info on bundle configuration see
+https://symfony.com/doc/current/bundles/configuration.html
 
-For more info on bundle configuration see [Symfony bundles configuration](https://symfony.com/doc/current/bundles/configuration.html).
+## Events
 
-## Development & Testing
+### CourseProviderPostEvent
 
-* Install dependencies: `composer install`
-* Run tests: `composer test`
-* Run linters: `composer run lint`
-* Run cs-fixer: `composer run cs-fix`
+This event allows you to add additional attributes ("local data") to the `\Dbp\Relay\BaseCourseBundle\Entity\Course` base-entity that you want to be included in responses to `Course` entity requests.
+Event subscribers receive a `\Dbp\Relay\RelayBaseCourseConnectorCampusonlineBundle\Event\CourseProviderPostEvent` instance containing the `Course` base-entity and the course data provided by Campusonline. Additional attributes are stored in the `localData`-map of the base-entity.
 
-## Bundle dependencies
+For example, create an event subscriber `src/EventSubscriber/CourseProviderSubscriber.php`:
 
-Don't forget you need to pull down your dependencies in your main application if you are installing packages in a bundle.
+```php
+<?php
+namespace App\EventSubscriber;
 
-```bash
-# updates and installs dependencies from dbp/relay-your-bundle
-composer update dbp/relay-your-bundle
+use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CourseProviderPostEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+class CourseProviderSubscriber implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            CourseProviderPostEvent::NAME => 'onPost',
+    ];
+    }
+
+    public function onPost(CourseProviderPostEvent $event)
+    {
+        $course = $event->getCourse();
+        $courseData = $event->getCourseData();
+        $course->setLocalDataValue('code', $courseData->getCode());
+    }
+}
+```
+
+And add it to your `src/Resources/config/services.yaml`:
+
+```yaml
+App\EventSubscriber\CourseProviderSubscriber:
+  autowire: true
+  autoconfigure: true
 ```
