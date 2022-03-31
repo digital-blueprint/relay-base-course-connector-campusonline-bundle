@@ -17,9 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CourseProvider implements CourseProviderInterface
 {
-    /*
-     * @var CourseApi
-     */
+    /** @var CourseApi */
     private $courseApi;
 
     /** @var EventDispatcherInterface */

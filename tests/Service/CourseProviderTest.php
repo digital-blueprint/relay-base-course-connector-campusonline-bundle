@@ -15,9 +15,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CourseProviderTest extends TestCase
 {
-    /**
-     * @var RoomProvider
-     */
+    /** @var CourseProvider */
     private $api;
     private $service;
 
