@@ -173,7 +173,7 @@
             "source": {
                 "type": "git",
                 "url": "https://gitlab.tugraz.at/dbp/campus-online/dbp-campusonline-api",
-                "reference": "c6aaa7be188bc4c4531889270e96fe0e807560e0"
+                "reference": "bfb83585e1e0e16b0a908cef2f2db086f55af070"
             },
             "require": {
                 "ext-json": "*",
@@ -203,7 +203,7 @@
             "license": [
                 "AGPL-3.0-or-later"
             ],
-            "time": "2022-04-04T00:13:51+00:00"
+            "time": "2022-04-11T00:12:55+00:00"
         },
         {
             "name": "dbp/relay-base-course-bundle",
@@ -211,12 +211,12 @@
             "source": {
                 "type": "git",
                 "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle.git",
-                "reference": "c47fd7d210fe10e28f7f694b6835fb90070be574"
+                "reference": "27f783e87dccfae9b65519c228099a214c47e468"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-base-course-bundle/repository/archive.zip?sha=c47fd7d210fe10e28f7f694b6835fb90070be574",
-                "reference": "c47fd7d210fe10e28f7f694b6835fb90070be574",
+                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-base-course-bundle/repository/archive.zip?sha=27f783e87dccfae9b65519c228099a214c47e468",
+                "reference": "27f783e87dccfae9b65519c228099a214c47e468",
                 "shasum": ""
             },
             "require": {
@@ -288,7 +288,7 @@
                 "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle/-/tree/main",
                 "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle/-/issues"
             },
-            "time": "2022-04-04T02:08:23+02:00"
+            "time": "2022-04-11T02:08:09+02:00"
         },
         {
             "name": "dbp/relay-base-person-bundle",
