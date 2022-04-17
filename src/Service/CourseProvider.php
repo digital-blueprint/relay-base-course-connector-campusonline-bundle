@@ -10,8 +10,9 @@ use Dbp\CampusonlineApi\LegacyWebService\Person\PersonData;
 use Dbp\Relay\BaseCourseBundle\API\CourseProviderInterface;
 use Dbp\Relay\BaseCourseBundle\Entity\Course;
 use Dbp\Relay\BaseCourseBundle\Entity\CourseAttendee;
-use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CourseProviderPostEvent;
+use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CoursePostEvent;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
+use Dbp\Relay\CoreBundle\Service\LocalDataAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,13 +21,13 @@ class CourseProvider implements CourseProviderInterface
     /** @var CourseApi */
     private $courseApi;
 
-    /** @var EventDispatcherInterface */
+    /** @var LocalDataAwareEventDispatcher */
     private $eventDispatcher;
 
     public function __construct(CourseApi $courseApi, EventDispatcherInterface $eventDispatcher)
     {
         $this->courseApi = $courseApi;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->eventDispatcher = new LocalDataAwareEventDispatcher(Course::class, $eventDispatcher, CoursePostEvent::NAME);
     }
 
     /*
@@ -34,14 +35,16 @@ class CourseProvider implements CourseProviderInterface
      */
     public function getCourseById(string $identifier, array $options = []): ?Course
     {
+        $this->eventDispatcher->initRequestedLocalDataAttributes($options['include'] ?? '');
+
         $courseData = null;
         try {
             $courseData = $this->courseApi->getCourseById($identifier, $options);
         } catch (\Exception $e) {
-            self::dispatchException($e, $identifier);
+            self::dispatchCampusonlineException($e, $identifier);
         }
 
-        return $courseData ? $this->createCourseFromCourseData($courseData, self::checkIncludeLocalData($options)) : null;
+        return $courseData ? $this->createCourseFromCourseData($courseData) : null;
     }
 
     /*
@@ -51,10 +54,12 @@ class CourseProvider implements CourseProviderInterface
      */
     public function getCourses(array $options = []): array
     {
+        $this->eventDispatcher->initRequestedLocalDataAttributes($options['include'] ?? '');
+
         $courses = [];
         try {
             foreach ($this->courseApi->getCourses($options) as $courseData) {
-                $courses[] = $this->createCourseFromCourseData($courseData, self::checkIncludeLocalData($options));
+                $courses[] = $this->createCourseFromCourseData($courseData);
             }
         } catch (ApiException $e) {
             throw new ApiError(Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
@@ -70,14 +75,15 @@ class CourseProvider implements CourseProviderInterface
     */
     public function getCoursesByOrganization(string $orgUnitId, array $options = []): array
     {
-        $courses = [];
+        $this->eventDispatcher->initRequestedLocalDataAttributes($options['include'] ?? '');
 
+        $courses = [];
         try {
             foreach ($this->courseApi->getCoursesByOrganization($orgUnitId, $options) as $courseData) {
-                $courses[] = $this->createCourseFromCourseData($courseData, self::checkIncludeLocalData($options));
+                $courses[] = $this->createCourseFromCourseData($courseData);
             }
         } catch (ApiException $e) {
-            self::dispatchException($e, $orgUnitId);
+            self::dispatchCampusonlineException($e, $orgUnitId);
         }
 
         return $courses;
@@ -88,14 +94,15 @@ class CourseProvider implements CourseProviderInterface
      */
     public function getCoursesByPerson(string $personId, array $options = []): array
     {
-        $courses = [];
+        $this->eventDispatcher->initRequestedLocalDataAttributes($options['include'] ?? '');
 
+        $courses = [];
         try {
             foreach ($this->courseApi->getCoursesByPerson($personId, $options) as $courseData) {
-                $courses[] = $this->createCourseFromCourseData($courseData, self::checkIncludeLocalData($options));
+                $courses[] = $this->createCourseFromCourseData($courseData);
             }
         } catch (ApiException $e) {
-            self::dispatchException($e, $personId);
+            self::dispatchCampusonlineException($e, $personId);
         }
 
         return $courses;
@@ -113,27 +120,23 @@ class CourseProvider implements CourseProviderInterface
                 $attendees[] = self::createCourseAttendeeFromPersonData($attendeeData);
             }
         } catch (ApiException $e) {
-            self::dispatchException($e, $courseId);
+            self::dispatchCampusonlineException($e, $courseId);
         }
 
         return $attendees;
     }
 
-    private function createCourseFromCourseData(CourseData $courseData, bool $includeLocalData): Course
+    private function createCourseFromCourseData(CourseData $courseData): Course
     {
         $course = new Course();
         $course->setIdentifier($courseData->getIdentifier());
         $course->setName($courseData->getName());
-        $course->setDescription($courseData->getDescription());
         $course->setType($courseData->getType());
 
-        if ($includeLocalData) {
-            $postEvent = new CourseProviderPostEvent($course, $courseData);
-            $this->eventDispatcher->dispatch($postEvent, CourseProviderPostEvent::NAME);
-            $course = $postEvent->getCourse();
-        }
+        $postEvent = new CoursePostEvent($course, $courseData);
+        $this->eventDispatcher->dispatch($postEvent);
 
-        return $course;
+        return $postEvent->getCourse();
     }
 
     private static function createCourseAttendeeFromPersonData(PersonData $personData): CourseAttendee
@@ -149,16 +152,11 @@ class CourseProvider implements CourseProviderInterface
         return $attendee;
     }
 
-    private static function checkIncludeLocalData(array $options): bool
-    {
-        return ($options['includeLocalData'] ?? false) === true;
-    }
-
     /**
      * NOTE: Campusonline returns '401 unauthorized' for some resources that are not found. So we can't
      * safely return '404' in all cases.
      */
-    private static function dispatchException(ApiException $e, string $identifier)
+    private static function dispatchCampusonlineException(ApiException $e, string $identifier)
     {
         if ($e->isHttpResponseCode()) {
             switch ($e->getCode()) {

@@ -6,18 +6,20 @@ namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event;
 
 use Dbp\CampusonlineApi\LegacyWebService\Course\CourseData;
 use Dbp\Relay\BaseCourseBundle\Entity\Course;
-use Symfony\Contracts\EventDispatcher\Event;
+use Dbp\Relay\CoreBundle\Event\LocalDataAwareEvent;
 
-class CourseProviderPostEvent extends Event
+class CoursePostEvent extends LocalDataAwareEvent
 {
-    public const NAME = 'dbp.relay.relay_base_course_connector_campusonline.course_provider.post';
+    public const NAME = 'dbp.relay.relay_base_course_connector_campusonline.course_event.post';
 
-    private $baseCourse;
+    private $course;
     private $courseData;
 
-    public function __construct(Course $baseCourse, CourseData $courseData)
+    public function __construct(Course $course, CourseData $courseData)
     {
-        $this->baseCourse = $baseCourse;
+        parent::__construct($course);
+
+        $this->course = $course;
         $this->courseData = $courseData;
     }
 
@@ -28,6 +30,6 @@ class CourseProviderPostEvent extends Event
 
     public function getCourse(): Course
     {
-        return $this->baseCourse;
+        return $this->course;
     }
 }
