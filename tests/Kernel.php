@@ -30,6 +30,7 @@ class Kernel extends BaseKernel
         yield new NelmioCorsBundle();
         yield new MonologBundle();
         yield new ApiPlatformBundle();
+        yield new DbpRelayCourseBundle();
         yield new DbpRelayBaseCourseConnectorCampusonlineBundle();
         yield new DbpRelayCoreBundle();
     }

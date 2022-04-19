@@ -47,7 +47,6 @@ class CourseProviderTest extends TestCase
         $this->assertSame('241333', $course->getIdentifier());
         $this->assertSame('Technische Informatik 1', $course->getName());
         $this->assertSame('VO', $course->getType());
-        $this->assertSame('', $course->getDescription());
     }
 
     public function testGetCourses500()
@@ -82,7 +81,7 @@ class CourseProviderTest extends TestCase
         $this->assertSame('240759', $course->getIdentifier());
         $this->assertSame('Computational Intelligence', $course->getName());
         $this->assertSame('UE', $course->getType());
-        $this->assertSame('Anwendungen der wichtigsten Methoden aus den Bereichen Maschinelles Lernen und Neuronale Netzwerke. Praxis-orientierte Probleme des Maschinellen Lernens im Allgemeinen und der einzelnen Ansätze im speziellen werden aufgezeigt und die entsprechende Lösungsansätze präsentiert.', $course->getDescription());
+        //$this->assertSame('Anwendungen der wichtigsten Methoden aus den Bereichen Maschinelles Lernen und Neuronale Netzwerke. Praxis-orientierte Probleme des Maschinellen Lernens im Allgemeinen und der einzelnen Ansätze im speziellen werden aufgezeigt und die entsprechende Lösungsansätze präsentiert.', $course->getDescription());
     }
 
     public function testGetCourseByIdNotFound()
@@ -118,6 +117,5 @@ class CourseProviderTest extends TestCase
         $this->assertSame('241333', $course->getIdentifier());
         $this->assertSame('Technische Informatik 1', $course->getName());
         $this->assertSame('VO', $course->getType());
-        $this->assertSame('', $course->getDescription());
     }
 }
