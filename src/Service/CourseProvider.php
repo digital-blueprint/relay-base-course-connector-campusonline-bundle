@@ -12,7 +12,7 @@ use Dbp\Relay\BaseCourseBundle\Entity\Course;
 use Dbp\Relay\BaseCourseBundle\Entity\CourseAttendee;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CoursePostEvent;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
-use Dbp\Relay\CoreBundle\Service\LocalDataAwareEventDispatcher;
+use Dbp\Relay\CoreBundle\LocalData\LocalDataAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -27,7 +27,7 @@ class CourseProvider implements CourseProviderInterface
     public function __construct(CourseApi $courseApi, EventDispatcherInterface $eventDispatcher)
     {
         $this->courseApi = $courseApi;
-        $this->eventDispatcher = new LocalDataAwareEventDispatcher(Course::class, $eventDispatcher, CoursePostEvent::NAME);
+        $this->eventDispatcher = new LocalDataAwareEventDispatcher(Course::class, $eventDispatcher);
     }
 
     /*
@@ -134,7 +134,7 @@ class CourseProvider implements CourseProviderInterface
         $course->setType($courseData->getType());
 
         $postEvent = new CoursePostEvent($course, $courseData);
-        $this->eventDispatcher->dispatch($postEvent);
+        $this->eventDispatcher->dispatch($postEvent, CoursePostEvent::NAME);
 
         return $postEvent->getCourse();
     }
