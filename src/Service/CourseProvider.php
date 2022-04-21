@@ -136,7 +136,7 @@ class CourseProvider implements CourseProviderInterface
         $postEvent = new CoursePostEvent($course, $courseData);
         $this->eventDispatcher->dispatch($postEvent, CoursePostEvent::NAME);
 
-        return $postEvent->getCourse();
+        return $postEvent->getEntity();
     }
 
     private static function createCourseAttendeeFromPersonData(PersonData $personData): CourseAttendee

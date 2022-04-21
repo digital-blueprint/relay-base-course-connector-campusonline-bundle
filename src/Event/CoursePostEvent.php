@@ -12,8 +12,11 @@ class CoursePostEvent extends LocalDataAwareEvent
 {
     public const NAME = 'dbp.relay.relay_base_course_connector_campusonline.course_event.post';
 
-    private $course;
+    /** @var CourseData */
     private $courseData;
+
+    /** @var Course */
+    private $course;
 
     public function __construct(Course $course, CourseData $courseData)
     {
@@ -23,12 +26,12 @@ class CoursePostEvent extends LocalDataAwareEvent
         $this->courseData = $courseData;
     }
 
-    public function getCourseData(): CourseData
+    public function getSourceData(): CourseData
     {
         return $this->courseData;
     }
 
-    public function getCourse(): Course
+    public function getEntity(): Course
     {
         return $this->course;
     }
