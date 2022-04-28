@@ -11,10 +11,13 @@ use Dbp\Relay\BaseCourseBundle\API\CourseProviderInterface;
 use Dbp\Relay\BaseCourseBundle\Entity\Course;
 use Dbp\Relay\BaseCourseBundle\Entity\CourseAttendee;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CoursePostEvent;
+use Dbp\Relay\BasePersonBundle\API\PersonProviderInterface;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
+use Dbp\Relay\CoreBundle\LocalData\LocalData;
 use Dbp\Relay\CoreBundle\LocalData\LocalDataAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CourseProvider implements CourseProviderInterface
 {
@@ -24,10 +27,14 @@ class CourseProvider implements CourseProviderInterface
     /** @var LocalDataAwareEventDispatcher */
     private $eventDispatcher;
 
-    public function __construct(CourseApi $courseApi, EventDispatcherInterface $eventDispatcher)
+    /** @var PersonProviderInterface */
+    private $personProvider;
+
+    public function __construct(CourseApi $courseApi, EventDispatcherInterface $eventDispatcher, PersonProviderInterface $personProvider)
     {
         $this->courseApi = $courseApi;
         $this->eventDispatcher = new LocalDataAwareEventDispatcher(Course::class, $eventDispatcher);
+        $this->personProvider = $personProvider;
     }
 
     /*
@@ -35,7 +42,7 @@ class CourseProvider implements CourseProviderInterface
      */
     public function getCourseById(string $identifier, array $options = []): ?Course
     {
-        $this->eventDispatcher->initRequestedLocalDataAttributes($options['include'] ?? '');
+        $this->eventDispatcher->initRequestedLocalDataAttributes(LocalData::getIncludeParameter($options));
 
         $courseData = null;
         try {
@@ -54,7 +61,7 @@ class CourseProvider implements CourseProviderInterface
      */
     public function getCourses(array $options = []): array
     {
-        $this->eventDispatcher->initRequestedLocalDataAttributes($options['include'] ?? '');
+        $this->eventDispatcher->initRequestedLocalDataAttributes(LocalData::getIncludeParameter($options));
 
         $courses = [];
         try {
@@ -75,7 +82,7 @@ class CourseProvider implements CourseProviderInterface
     */
     public function getCoursesByOrganization(string $orgUnitId, array $options = []): array
     {
-        $this->eventDispatcher->initRequestedLocalDataAttributes($options['include'] ?? '');
+        $this->eventDispatcher->initRequestedLocalDataAttributes(LocalData::getIncludeParameter($options));
 
         $courses = [];
         try {
@@ -92,17 +99,23 @@ class CourseProvider implements CourseProviderInterface
     /**
      * @return Course[]
      */
-    public function getCoursesByPerson(string $personId, array $options = []): array
+    public function getCoursesByLecturer(string $lecturerId, array $options = []): array
     {
-        $this->eventDispatcher->initRequestedLocalDataAttributes($options['include'] ?? '');
+        $this->eventDispatcher->initRequestedLocalDataAttributes(LocalData::getIncludeParameter($options));
+
+        $lecturer = $this->personProvider->getPerson($lecturerId);
+        $coEmployeeId = $lecturer->getExtraData('coEmployeeId');
+        if (empty($coEmployeeId)) {
+            throw new NotFoundHttpException(sprintf("lecturer with id '%s' not found", $lecturerId));
+        }
 
         $courses = [];
         try {
-            foreach ($this->courseApi->getCoursesByPerson($personId, $options) as $courseData) {
+            foreach ($this->courseApi->getCoursesByLecturer($coEmployeeId, $options) as $courseData) {
                 $courses[] = $this->createCourseFromCourseData($courseData);
             }
         } catch (ApiException $e) {
-            self::dispatchCampusonlineException($e, $personId);
+            self::dispatchCampusonlineException($e, $lecturerId);
         }
 
         return $courses;

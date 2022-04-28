@@ -100,9 +100,9 @@ class CourseApi implements LoggerAwareInterface
      *
      * @throws ApiException
      */
-    public function getCoursesByPerson(string $personId, array $options = []): array
+    public function getCoursesByLecturer(string $personId, array $options = []): array
     {
-        return $this->getApi()->Course()->getCoursesByPerson($personId, $options);
+        return $this->getApi()->Course()->getCoursesByLecturer($personId, $options);
     }
 
     /**

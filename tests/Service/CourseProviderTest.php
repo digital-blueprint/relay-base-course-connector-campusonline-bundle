@@ -6,6 +6,7 @@ namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Tests\Service;
 
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseApi;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider;
+use Dbp\Relay\BasePersonBundle\Service\DummyPersonProvider;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -25,7 +26,7 @@ class CourseProviderTest extends TestCase
 
         $this->service = new CourseApi();
         $this->service->setConfig(['org_root_id' => '1']); // some value is required
-        $this->api = new CourseProvider($this->service, new EventDispatcher());
+        $this->api = new CourseProvider($this->service, new EventDispatcher(), new DummyPersonProvider());
         $this->mockResponses([]);
     }
 
