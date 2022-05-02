@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ccdce399110e956740f0b363fe7048c8",
+    "content-hash": "4551ffa0a21b3728a1770efa21e1f5c2",
     "packages": [
         {
             "name": "api-platform/core",
@@ -210,18 +210,12 @@
             "version": "dev-main",
             "source": {
                 "type": "git",
-                "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle.git",
-                "reference": "b2b399bad3f7d6895621c01a764e5df2df01da8b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-base-course-bundle/repository/archive.zip?sha=b2b399bad3f7d6895621c01a764e5df2df01da8b",
-                "reference": "b2b399bad3f7d6895621c01a764e5df2df01da8b",
-                "shasum": ""
+                "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-base-course-bundle.git",
+                "reference": "3da3ec44822f8768b740eb6baf57fc15ea6bd396"
             },
             "require": {
                 "api-platform/core": "^2.6",
-                "dbp/relay-core-bundle": "dev-main as 0.1.34",
+                "dbp/relay-core-bundle": "^0.1.35",
                 "ext-json": "*",
                 "php": ">=7.3",
                 "symfony/config": "^5.4",
@@ -283,29 +277,19 @@
             "license": [
                 "AGPL-3.0-or-later"
             ],
-            "support": {
-                "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle/-/tree/main",
-                "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle/-/issues"
-            },
-            "time": "2022-05-02T02:09:24+02:00"
+            "time": "2022-05-02T07:18:50+00:00"
         },
         {
             "name": "dbp/relay-base-person-bundle",
             "version": "dev-main",
             "source": {
                 "type": "git",
-                "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-person-bundle.git",
-                "reference": "fb4dc5f6e5d34bf344730b09a881781fe6fef3d5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-base-person-bundle/repository/archive.zip?sha=fb4dc5f6e5d34bf344730b09a881781fe6fef3d5",
-                "reference": "fb4dc5f6e5d34bf344730b09a881781fe6fef3d5",
-                "shasum": ""
+                "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-base-person-bundle.git",
+                "reference": "b304723071831c2e5e01ffbd254106fc868e825f"
             },
             "require": {
                 "api-platform/core": "^2.6.3",
-                "dbp/relay-core-bundle": "dev-main as 0.1.34",
+                "dbp/relay-core-bundle": "^0.1.35",
                 "ext-json": "*",
                 "guzzlehttp/guzzle": "^7.0",
                 "nelmio/cors-bundle": "^2.1.0",
@@ -372,25 +356,15 @@
             "license": [
                 "AGPL-3.0-or-later"
             ],
-            "support": {
-                "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-person-bundle/-/tree/main",
-                "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-person-bundle/-/issues"
-            },
-            "time": "2022-05-02T02:39:58+02:00"
+            "time": "2022-05-02T07:24:36+00:00"
         },
         {
             "name": "dbp/relay-core-bundle",
-            "version": "dev-main",
+            "version": "v0.1.35",
             "source": {
                 "type": "git",
-                "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-core-bundle.git",
-                "reference": "da6e66a7676a9b8c16d611b3a83ca9072ee4ef77"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-core-bundle/repository/archive.zip?sha=da6e66a7676a9b8c16d611b3a83ca9072ee4ef77",
-                "reference": "da6e66a7676a9b8c16d611b3a83ca9072ee4ef77",
-                "shasum": ""
+                "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-core-bundle.git",
+                "reference": "79d1b52f65989ee2285a9219c4a552f2cbc9bab2"
             },
             "require": {
                 "api-platform/core": "^2.6.6",
@@ -432,7 +406,6 @@
                 "symfony/phpunit-bridge": "^5.3",
                 "vimeo/psalm": "^4.4"
             },
-            "default-branch": true,
             "type": "symfony-bundle",
             "extra": {
                 "hooks": {
@@ -486,11 +459,7 @@
                 "AGPL-3.0-or-later"
             ],
             "description": "The core bundle of the Relay API gateway",
-            "support": {
-                "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-core-bundle/-/tree/main",
-                "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-core-bundle/-/issues"
-            },
-            "time": "2022-05-02T02:46:25+02:00"
+            "time": "2022-05-02T07:07:30+00:00"
         },
         {
             "name": "doctrine/annotations",
@@ -10506,20 +10475,13 @@
             "version": "dev-main",
             "alias": "0.2.2",
             "alias_normalized": "0.2.2.0"
-        },
-        {
-            "package": "dbp/relay-core-bundle",
-            "version": "dev-main",
-            "alias": "0.1.32",
-            "alias_normalized": "0.1.32.0"
         }
     ],
     "minimum-stability": "stable",
     "stability-flags": {
         "dbp/campusonline-api": 20,
         "dbp/relay-base-course-bundle": 20,
-        "dbp/relay-base-person-bundle": 20,
-        "dbp/relay-core-bundle": 20
+        "dbp/relay-base-person-bundle": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
@@ -10531,5 +10493,5 @@
     "platform-overrides": {
         "php": "7.3"
     },
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.2.0"
 }
