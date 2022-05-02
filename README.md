@@ -42,12 +42,12 @@ https://symfony.com/doc/current/bundles/configuration.html
 
 ## Events
 
-### CourseProviderPostEvent
+### CoursePostEvent
 
 This event allows you to add additional attributes ("local data") to the `\Dbp\Relay\BaseCourseBundle\Entity\Course` base-entity that you want to be included in responses to `Course` entity requests.
-Event subscribers receive a `\Dbp\Relay\RelayBaseCourseConnectorCampusonlineBundle\Event\CourseProviderPostEvent` instance containing the `Course` base-entity and the course data provided by Campusonline. Additional attributes are stored in the `localData`-map of the base-entity.
+Event subscribers receive a `\Dbp\Relay\RelayBaseCourseConnectorCampusonlineBundle\Event\CourseProviderPostEvent` instance containing the `Course` base-entity and the course data provided by Campusonline.
 
-For example, create an event subscriber `src/EventSubscriber/CourseProviderSubscriber.php`:
+For example, create an event subscriber `src/EventSubscriber/CourseEventSubscriber.php`:
 
 ```php
 <?php
@@ -56,7 +56,7 @@ namespace App\EventSubscriber;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CoursePostEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CourseProviderSubscriber implements EventSubscriberInterface
+class CourseEventSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {
@@ -69,7 +69,7 @@ class CourseProviderSubscriber implements EventSubscriberInterface
     {
         $course = $event->getCourse();
         $courseData = $event->getCourseData();
-        $course->setLocalDataValue('code', $courseData->getCode());
+        $course->trySetLocalDataValue('code', $courseData->getCode());
     }
 }
 ```
@@ -77,7 +77,7 @@ class CourseProviderSubscriber implements EventSubscriberInterface
 And add it to your `src/Resources/config/services.yaml`:
 
 ```yaml
-App\EventSubscriber\CourseProviderSubscriber:
+App\EventSubscriber\CourseEventSubscriber:
   autowire: true
   autoconfigure: true
 ```
