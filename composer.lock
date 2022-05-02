@@ -295,12 +295,12 @@
             "source": {
                 "type": "git",
                 "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-person-bundle.git",
-                "reference": "8cb6b94b26724265ab0fde8665783cfc6c622683"
+                "reference": "fb4dc5f6e5d34bf344730b09a881781fe6fef3d5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-base-person-bundle/repository/archive.zip?sha=8cb6b94b26724265ab0fde8665783cfc6c622683",
-                "reference": "8cb6b94b26724265ab0fde8665783cfc6c622683",
+                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-base-person-bundle/repository/archive.zip?sha=fb4dc5f6e5d34bf344730b09a881781fe6fef3d5",
+                "reference": "fb4dc5f6e5d34bf344730b09a881781fe6fef3d5",
                 "shasum": ""
             },
             "require": {
@@ -376,7 +376,7 @@
                 "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-person-bundle/-/tree/main",
                 "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-person-bundle/-/issues"
             },
-            "time": "2022-04-30T02:16:22+02:00"
+            "time": "2022-05-02T02:39:58+02:00"
         },
         {
             "name": "dbp/relay-core-bundle",
@@ -384,12 +384,12 @@
             "source": {
                 "type": "git",
                 "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-core-bundle.git",
-                "reference": "f2f855d4c54d0743007e2d6c1994778d0b6bf62d"
+                "reference": "da6e66a7676a9b8c16d611b3a83ca9072ee4ef77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-core-bundle/repository/archive.zip?sha=f2f855d4c54d0743007e2d6c1994778d0b6bf62d",
-                "reference": "f2f855d4c54d0743007e2d6c1994778d0b6bf62d",
+                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-core-bundle/repository/archive.zip?sha=da6e66a7676a9b8c16d611b3a83ca9072ee4ef77",
+                "reference": "da6e66a7676a9b8c16d611b3a83ca9072ee4ef77",
                 "shasum": ""
             },
             "require": {
@@ -490,7 +490,7 @@
                 "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-core-bundle/-/tree/main",
                 "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-core-bundle/-/issues"
             },
-            "time": "2022-05-01T02:22:41+02:00"
+            "time": "2022-05-02T02:46:25+02:00"
         },
         {
             "name": "doctrine/annotations",
@@ -10343,16 +10343,16 @@
         },
         {
             "name": "vimeo/psalm",
-            "version": "4.22.0",
+            "version": "4.23.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vimeo/psalm.git",
-                "reference": "fc2c6ab4d5fa5d644d8617089f012f3bb84b8703"
+                "reference": "f1fe6ff483bf325c803df9f510d09a03fd796f88"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vimeo/psalm/zipball/fc2c6ab4d5fa5d644d8617089f012f3bb84b8703",
-                "reference": "fc2c6ab4d5fa5d644d8617089f012f3bb84b8703",
+                "url": "https://api.github.com/repos/vimeo/psalm/zipball/f1fe6ff483bf325c803df9f510d09a03fd796f88",
+                "reference": "f1fe6ff483bf325c803df9f510d09a03fd796f88",
                 "shasum": ""
             },
             "require": {
@@ -10377,6 +10377,7 @@
                 "php": "^7.1|^8",
                 "sebastian/diff": "^3.0 || ^4.0",
                 "symfony/console": "^3.4.17 || ^4.1.6 || ^5.0 || ^6.0",
+                "symfony/polyfill-php80": "^1.25",
                 "webmozart/path-util": "^2.3"
             },
             "provide": {
@@ -10443,9 +10444,9 @@
             ],
             "support": {
                 "issues": "https://github.com/vimeo/psalm/issues",
-                "source": "https://github.com/vimeo/psalm/tree/4.22.0"
+                "source": "https://github.com/vimeo/psalm/tree/4.23.0"
             },
-            "time": "2022-02-24T20:34:05+00:00"
+            "time": "2022-04-28T17:35:49+00:00"
         },
         {
             "name": "webmozart/path-util",
