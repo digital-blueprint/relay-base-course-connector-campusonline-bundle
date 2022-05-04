@@ -40,7 +40,7 @@ class CourseProvider implements CourseProviderInterface
     /*
      * @throws ApiError
      */
-    public function getCourseById(string $identifier, array $options = []): ?Course
+    public function getCourseById(string $identifier, array $options = []): Course
     {
         $this->eventDispatcher->initRequestedLocalDataAttributes(LocalData::getIncludeParameter($options));
 
@@ -51,7 +51,7 @@ class CourseProvider implements CourseProviderInterface
             self::dispatchCampusonlineException($e, $identifier);
         }
 
-        return $courseData ? $this->createCourseFromCourseData($courseData) : null;
+        return $this->createCourseFromCourseData($courseData);
     }
 
     /*

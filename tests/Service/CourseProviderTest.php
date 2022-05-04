@@ -91,8 +91,12 @@ class CourseProviderTest extends TestCase
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/course_by_id_response.xml')),
         ]);
 
-        $course = $this->api->getCourseById('123');
-        $this->assertNull($course);
+        try {
+            $this->api->getCourseById('---');
+        } catch (\Throwable $exception) {
+            $this->assertInstanceOf(ApiError::class, $exception);
+            $this->assertEquals(404, $exception->getStatusCode());
+        }
     }
 
     public function testGetCourseById500()
@@ -101,8 +105,12 @@ class CourseProviderTest extends TestCase
             new Response(500, ['Content-Type' => 'text/xml;charset=utf-8'], ''),
         ]);
 
-        $this->expectException(ApiError::class);
-        $this->api->getCourseById('123');
+        try {
+            $this->api->getCourseById('240759');
+        } catch (\Throwable $exception) {
+            $this->assertInstanceOf(ApiError::class, $exception);
+            $this->assertEquals(500, $exception->getStatusCode());
+        }
     }
 
     public function testGetCoursesByOrganization()
