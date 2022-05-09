@@ -209,8 +209,14 @@
             "version": "v0.1.0",
             "source": {
                 "type": "git",
-                "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-base-course-bundle.git",
+                "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle.git",
                 "reference": "59f28b27889efb1e31985733b72f7838b3f85ac1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-base-course-bundle/repository/archive.zip?sha=59f28b27889efb1e31985733b72f7838b3f85ac1",
+                "reference": "59f28b27889efb1e31985733b72f7838b3f85ac1",
+                "shasum": ""
             },
             "require": {
                 "api-platform/core": "^2.6",
@@ -275,15 +281,25 @@
             "license": [
                 "AGPL-3.0-or-later"
             ],
-            "time": "2022-05-04T07:05:57+00:00"
+            "support": {
+                "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle/-/tree/v0.1.0",
+                "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle/-/issues"
+            },
+            "time": "2022-05-04T09:05:57+02:00"
         },
         {
             "name": "dbp/relay-base-person-bundle",
             "version": "v0.2.1",
             "source": {
                 "type": "git",
-                "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-base-person-bundle.git",
+                "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-person-bundle.git",
                 "reference": "b304723071831c2e5e01ffbd254106fc868e825f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-base-person-bundle/repository/archive.zip?sha=b304723071831c2e5e01ffbd254106fc868e825f",
+                "reference": "b304723071831c2e5e01ffbd254106fc868e825f",
+                "shasum": ""
             },
             "require": {
                 "api-platform/core": "^2.6.3",
@@ -353,15 +369,25 @@
             "license": [
                 "AGPL-3.0-or-later"
             ],
-            "time": "2022-05-02T07:24:36+00:00"
+            "support": {
+                "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-person-bundle/-/tree/v0.2.1",
+                "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-person-bundle/-/issues"
+            },
+            "time": "2022-05-02T09:24:36+02:00"
         },
         {
             "name": "dbp/relay-core-bundle",
             "version": "v0.1.35",
             "source": {
                 "type": "git",
-                "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-core-bundle.git",
+                "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-core-bundle.git",
                 "reference": "79d1b52f65989ee2285a9219c4a552f2cbc9bab2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-core-bundle/repository/archive.zip?sha=79d1b52f65989ee2285a9219c4a552f2cbc9bab2",
+                "reference": "79d1b52f65989ee2285a9219c4a552f2cbc9bab2",
+                "shasum": ""
             },
             "require": {
                 "api-platform/core": "^2.6.6",
@@ -456,7 +482,11 @@
                 "AGPL-3.0-or-later"
             ],
             "description": "The core bundle of the Relay API gateway",
-            "time": "2022-05-02T07:07:30+00:00"
+            "support": {
+                "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-core-bundle/-/tree/v0.1.35",
+                "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-core-bundle/-/issues"
+            },
+            "time": "2022-05-02T09:07:30+02:00"
         },
         {
             "name": "doctrine/annotations",
