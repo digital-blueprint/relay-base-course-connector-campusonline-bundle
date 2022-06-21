@@ -8,7 +8,6 @@ use Dbp\CampusonlineApi\Helpers\Paginator;
 use Dbp\CampusonlineApi\LegacyWebService\Api;
 use Dbp\CampusonlineApi\LegacyWebService\ApiException;
 use Dbp\CampusonlineApi\LegacyWebService\Course\CourseData;
-use Dbp\CampusonlineApi\LegacyWebService\Person\PersonData;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;

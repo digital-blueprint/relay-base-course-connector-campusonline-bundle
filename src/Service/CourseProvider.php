@@ -8,6 +8,7 @@ use Dbp\CampusonlineApi\Helpers\FullPaginator as CoFullPaginator;
 use Dbp\CampusonlineApi\LegacyWebService\ApiException;
 use Dbp\CampusonlineApi\LegacyWebService\Course\CourseData;
 use Dbp\CampusonlineApi\LegacyWebService\Person\PersonData;
+use Dbp\CampusonlineApi\LegacyWebService\ResourceData;
 use Dbp\Relay\BaseCourseBundle\API\CourseProviderInterface;
 use Dbp\Relay\BaseCourseBundle\Entity\Course;
 use Dbp\Relay\BaseCourseBundle\Entity\CourseAttendee;
@@ -68,6 +69,7 @@ class CourseProvider implements CourseProviderInterface
         $this->addFilterOptions($options);
 
         $courses = [];
+
         try {
             $paginator = $this->courseApi->getCourses($options);
             foreach ($paginator->getItems() as $courseData) {
@@ -96,7 +98,9 @@ class CourseProvider implements CourseProviderInterface
         $this->eventDispatcher->initRequestedLocalDataAttributes(LocalData::getIncludeParameter($options));
         $this->addFilterOptions($options);
 
+        $paginator = null;
         $courses = [];
+
         try {
             $paginator = $this->courseApi->getCoursesByOrganization($orgUnitId, $options);
             foreach ($paginator->getItems() as $courseData) {
@@ -128,7 +132,9 @@ class CourseProvider implements CourseProviderInterface
             throw new NotFoundHttpException(sprintf("lecturer with id '%s' not found", $lecturerId));
         }
 
+        $paginator = null;
         $courses = [];
+
         try {
             $paginator = $this->courseApi->getCoursesByLecturer($coEmployeeId, $options);
             foreach ($paginator->getItems() as $courseData) {
@@ -151,6 +157,7 @@ class CourseProvider implements CourseProviderInterface
 
     public function getAttendeesByCourse(string $courseId, array $options = []): Paginator
     {
+        $paginator = null;
         $attendees = [];
 
         try {
