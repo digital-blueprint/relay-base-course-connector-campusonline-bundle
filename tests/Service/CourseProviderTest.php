@@ -8,6 +8,7 @@ use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseApi;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider;
 use Dbp\Relay\BasePersonBundle\Service\DummyPersonProvider;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
+use Dbp\Relay\CoreBundle\Pagination\FullPaginator;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
@@ -43,8 +44,9 @@ class CourseProviderTest extends TestCase
         ]);
 
         $courses = $this->api->getCourses();
-        $this->assertSame(34, count($courses));
-        $course = $courses[0];
+        $this->assertTrue($courses instanceof FullPaginator);
+        $this->assertSame(34.0, $courses->getTotalItems());
+        $course = $courses->current();
         $this->assertSame('241333', $course->getIdentifier());
         $this->assertSame('Technische Informatik 1', $course->getName());
         $this->assertSame('VO', $course->getType());
@@ -120,9 +122,9 @@ class CourseProviderTest extends TestCase
         ]);
 
         $courses = $this->api->getCoursesByOrganization('abc');
-        $this->assertSame(34, count($courses));
-
-        $course = $courses[0];
+        $this->assertTrue($courses instanceof FullPaginator);
+        $this->assertSame(34.0, $courses->getTotalItems());
+        $course = $courses->current();
         $this->assertSame('241333', $course->getIdentifier());
         $this->assertSame('Technische Informatik 1', $course->getName());
         $this->assertSame('VO', $course->getType());

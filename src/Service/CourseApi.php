@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service;
 
+use Dbp\CampusonlineApi\Helpers\Paginator;
 use Dbp\CampusonlineApi\LegacyWebService\Api;
 use Dbp\CampusonlineApi\LegacyWebService\ApiException;
 use Dbp\CampusonlineApi\LegacyWebService\Course\CourseData;
@@ -76,43 +77,35 @@ class CourseApi implements LoggerAwareInterface
     }
 
     /**
-     * @return CourseData[]
-     *
      * @throws ApiException
      */
-    public function getCourses(array $options = []): array
+    public function getCourses(array $options = []): Paginator
     {
         return $this->getApi()->Course()->getCourses($options);
     }
 
     /**
-     * @return CourseData[]
-     *
      * @throws ApiException
      */
-    public function getCoursesByOrganization(string $orgUnitId, array $options = []): array
+    public function getCoursesByOrganization(string $orgUnitId, array $options = []): Paginator
     {
         return $this->getApi()->Course()->getCoursesByOrganization($orgUnitId, $options);
     }
 
     /**
-     * @return CourseData[]
-     *
      * @throws ApiException
      */
-    public function getCoursesByLecturer(string $personId, array $options = []): array
+    public function getCoursesByLecturer(string $personId, array $options = []): Paginator
     {
         return $this->getApi()->Course()->getCoursesByLecturer($personId, $options);
     }
 
     /**
-     * @return PersonData[]
-     *
      * @throws ApiException
      */
-    public function getAttendeesByCourse(string $courseId, array $options = []): array
+    public function getStudentsByCourse(string $courseId, array $options = []): Paginator
     {
-        return $this->getApi()->Course()->getStudentsByCourse($courseId, $options);
+        return $this->getApi()->Person()->getStudentsByCourse($courseId, $options);
     }
 
     private function getApi(): Api
