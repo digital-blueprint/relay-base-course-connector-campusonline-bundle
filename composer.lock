@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5b430233c8d9e1c9da519c10ec243b5d",
+    "content-hash": "dcca2ab0d6af99075240dc061cece372",
     "packages": [
         {
             "name": "api-platform/core",
@@ -169,11 +169,11 @@
         },
         {
             "name": "dbp/campusonline-api",
-            "version": "v0.2.5",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.tugraz.at/dbp/campus-online/dbp-campusonline-api",
-                "reference": "dd6955153c6b2ce7712b609f057c34d1d62a722d"
+                "reference": "5fbb5e98ec9d53556fbbe9cdecedb8d1811c1a90"
             },
             "require": {
                 "ext-json": "*",
@@ -192,6 +192,7 @@
                 "symfony/phpunit-bridge": "^5.2",
                 "vimeo/psalm": "^4.2.1"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -202,25 +203,19 @@
             "license": [
                 "AGPL-3.0-or-later"
             ],
-            "time": "2022-06-22T09:09:33+00:00"
+            "time": "2022-08-10T08:49:40+00:00"
         },
         {
             "name": "dbp/relay-base-course-bundle",
-            "version": "v0.1.1",
+            "version": "dev-main",
             "source": {
                 "type": "git",
-                "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle.git",
-                "reference": "d4817585d69f1ef5db9e4ee5a4af7d4cb4329ed2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-base-course-bundle/repository/archive.zip?sha=d4817585d69f1ef5db9e4ee5a4af7d4cb4329ed2",
-                "reference": "d4817585d69f1ef5db9e4ee5a4af7d4cb4329ed2",
-                "shasum": ""
+                "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-base-course-bundle.git",
+                "reference": "250d059e78617c3d703563f24d42c98db683318a"
             },
             "require": {
                 "api-platform/core": "^2.6",
-                "dbp/relay-core-bundle": "^0.1.37",
+                "dbp/relay-core-bundle": "dev-main as 0.1.37",
                 "ext-json": "*",
                 "php": ">=7.3",
                 "symfony/config": "^5.4",
@@ -242,6 +237,7 @@
                 "symfony/phpunit-bridge": "^5.4",
                 "vimeo/psalm": "^4.2.1"
             },
+            "default-branch": true,
             "type": "symfony-bundle",
             "autoload": {
                 "psr-4": {
@@ -281,11 +277,7 @@
             "license": [
                 "AGPL-3.0-or-later"
             ],
-            "support": {
-                "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle/-/tree/v0.1.1",
-                "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle/-/issues"
-            },
-            "time": "2022-06-23T09:33:19+02:00"
+            "time": "2022-08-16T08:04:29+00:00"
         },
         {
             "name": "dbp/relay-base-person-bundle",
@@ -377,17 +369,11 @@
         },
         {
             "name": "dbp/relay-core-bundle",
-            "version": "0.1.37",
+            "version": "dev-main",
             "source": {
                 "type": "git",
-                "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-core-bundle.git",
-                "reference": "b58c833026de0aa0572a38684d0b0f2107e46aee"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-core-bundle/repository/archive.zip?sha=b58c833026de0aa0572a38684d0b0f2107e46aee",
-                "reference": "b58c833026de0aa0572a38684d0b0f2107e46aee",
-                "shasum": ""
+                "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-core-bundle.git",
+                "reference": "d4686f81efdec53c082808c1c827c3d2912dabac"
             },
             "require": {
                 "api-platform/core": "^2.6.6",
@@ -396,6 +382,8 @@
                 "ext-fileinfo": "*",
                 "ext-json": "*",
                 "guzzlehttp/guzzle": "^7.0",
+                "kevinrob/guzzle-cache-middleware": "^4.0",
+                "league/uri": "^6.5",
                 "nelmio/cors-bundle": "^2.1.0",
                 "php": "^7.3 || ^8.0",
                 "phpdocumentor/reflection-docblock": "^3.0 || ^4.0 || ^5.0",
@@ -423,12 +411,14 @@
                 "friendsofphp/php-cs-fixer": "^3.0",
                 "phpstan/phpstan": "^1.0.0",
                 "phpstan/phpstan-phpunit": "^1.0.0",
+                "phpstan/phpstan-symfony": "^1.2",
                 "phpunit/phpunit": "^9",
                 "symfony/browser-kit": "^5.3",
                 "symfony/http-client": "^5.3",
                 "symfony/phpunit-bridge": "^5.3",
                 "vimeo/psalm": "^4.4"
             },
+            "default-branch": true,
             "type": "symfony-bundle",
             "extra": {
                 "hooks": {
@@ -482,11 +472,7 @@
                 "AGPL-3.0-or-later"
             ],
             "description": "The core bundle of the Relay API gateway",
-            "support": {
-                "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-core-bundle/-/tree/0.1.37",
-                "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-core-bundle/-/issues"
-            },
-            "time": "2022-06-22T11:04:47+02:00"
+            "time": "2022-08-16T08:35:41+00:00"
         },
         {
             "name": "doctrine/annotations",
@@ -10499,9 +10485,32 @@
             "time": "2015-12-17T08:42:14+00:00"
         }
     ],
-    "aliases": [],
+    "aliases": [
+        {
+            "package": "dbp/campusonline-api",
+            "version": "dev-main",
+            "alias": "0.2.5",
+            "alias_normalized": "0.2.5.0"
+        },
+        {
+            "package": "dbp/relay-base-course-bundle",
+            "version": "dev-main",
+            "alias": "0.1.1",
+            "alias_normalized": "0.1.1.0"
+        },
+        {
+            "package": "dbp/relay-core-bundle",
+            "version": "dev-main",
+            "alias": "0.1.37",
+            "alias_normalized": "0.1.37.0"
+        }
+    ],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "dbp/campusonline-api": 20,
+        "dbp/relay-base-course-bundle": 20,
+        "dbp/relay-core-bundle": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
@@ -10512,5 +10521,5 @@
     "platform-overrides": {
         "php": "7.3"
     },
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.2.0"
 }

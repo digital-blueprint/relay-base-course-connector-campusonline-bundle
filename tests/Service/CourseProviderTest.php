@@ -75,7 +75,6 @@ class CourseProviderTest extends TestCase
     public function testGetCourseById()
     {
         $this->mockResponses([
-            // new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/RoomsResponse.xml')),
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/course_by_id_response.xml')),
         ]);
 
@@ -121,7 +120,7 @@ class CourseProviderTest extends TestCase
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
         ]);
 
-        $courses = $this->api->getCoursesByOrganization('abc');
+        $courses = $this->api->getCourses(['queryLocal' => 'organization:2337']);
         $this->assertTrue($courses instanceof FullPaginator);
         $this->assertSame(34.0, $courses->getTotalItems());
         $course = $courses->current();

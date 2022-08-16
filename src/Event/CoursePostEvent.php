@@ -6,9 +6,9 @@ namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event;
 
 use Dbp\CampusonlineApi\LegacyWebService\Course\CourseData;
 use Dbp\Relay\BaseCourseBundle\Entity\Course;
-use Dbp\Relay\CoreBundle\LocalData\LocalDataAwareEvent;
+use Dbp\Relay\CoreBundle\LocalData\LocalDataAwarePostEvent;
 
-class CoursePostEvent extends LocalDataAwareEvent
+class CoursePostEvent extends LocalDataAwarePostEvent
 {
     public const NAME = 'dbp.relay.relay_base_course_connector_campusonline.course_event.post';
 
