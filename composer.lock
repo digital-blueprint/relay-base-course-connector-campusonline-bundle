@@ -377,16 +377,16 @@
         },
         {
             "name": "dbp/relay-core-bundle",
-            "version": "v0.1.41",
+            "version": "v0.1.42",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-core-bundle.git",
-                "reference": "656136f5ed70450683a5c0251fd071e607bd2c81"
+                "reference": "6ae27634574cff5f08ef2ff6cbb3cf72c155cf20"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-core-bundle/repository/archive.zip?sha=656136f5ed70450683a5c0251fd071e607bd2c81",
-                "reference": "656136f5ed70450683a5c0251fd071e607bd2c81",
+                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-core-bundle/repository/archive.zip?sha=6ae27634574cff5f08ef2ff6cbb3cf72c155cf20",
+                "reference": "6ae27634574cff5f08ef2ff6cbb3cf72c155cf20",
                 "shasum": ""
             },
             "require": {
@@ -486,10 +486,10 @@
             ],
             "description": "The core bundle of the Relay API gateway",
             "support": {
-                "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-core-bundle/-/tree/v0.1.41",
+                "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-core-bundle/-/tree/v0.1.42",
                 "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-core-bundle/-/issues"
             },
-            "time": "2022-09-08T12:58:52+02:00"
+            "time": "2022-09-14T12:25:56+02:00"
         },
         {
             "name": "doctrine/annotations",
