@@ -170,8 +170,8 @@ class CourseProvider implements CourseProviderInterface
 
     private function getCoursesByLecturer(string $lecturerId, array $options = []): CoPaginator
     {
-        //$lecturer = $this->personProvider->getPerson($lecturerId);
-        $coEmployeeId = 'E6E1D21423F528EC'; //$lecturer->getExtraData('coEmployeeId');
+        $lecturer = $this->personProvider->getPerson($lecturerId);
+        $coEmployeeId = $lecturer->getExtraData('coEmployeeId');
         if (Tools::isNullOrEmpty($coEmployeeId)) {
             throw new NotFoundHttpException(sprintf("Employee with id '%s' not found", $lecturerId));
         }
