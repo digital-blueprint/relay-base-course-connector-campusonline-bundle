@@ -28,14 +28,6 @@
         {
             "type": "vcs",
             "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-base-course-bundle.git"
-        },
-        {
-            "type": "vcs",
-            "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-core-bundle.git"
-        },
-        {
-            "type": "vcs",
-            "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-base-person-bundle.git"
         }
     ],
     "autoload": {

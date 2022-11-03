@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "40f2c098fe5bdde26c0471f63013e836",
+    "content-hash": "234e621669917337eddc6b93c072e669",
     "packages": [
         {
             "name": "api-platform/core",
@@ -209,14 +209,8 @@
             "version": "v0.1.3",
             "source": {
                 "type": "git",
-                "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle.git",
+                "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-base-course-bundle.git",
                 "reference": "3c96509db198050faccd1d778820c04b3b487046"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-base-course-bundle/repository/archive.zip?sha=3c96509db198050faccd1d778820c04b3b487046",
-                "reference": "3c96509db198050faccd1d778820c04b3b487046",
-                "shasum": ""
             },
             "require": {
                 "api-platform/core": "^2.6",
@@ -281,10 +275,6 @@
             "license": [
                 "AGPL-3.0-or-later"
             ],
-            "support": {
-                "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle/-/tree/v0.1.3",
-                "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle/-/issues"
-            },
             "time": "2022-10-25T08:53:16+02:00"
         },
         {
@@ -292,14 +282,8 @@
             "version": "v0.2.4",
             "source": {
                 "type": "git",
-                "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-person-bundle.git",
+                "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-person-bundle",
                 "reference": "493ecdb1f18867ffffd9fc5a24de13ee9661e929"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-base-person-bundle/repository/archive.zip?sha=493ecdb1f18867ffffd9fc5a24de13ee9661e929",
-                "reference": "493ecdb1f18867ffffd9fc5a24de13ee9661e929",
-                "shasum": ""
             },
             "require": {
                 "api-platform/core": "^2.6.3",
@@ -336,43 +320,10 @@
                     "Dbp\\Relay\\BasePersonBundle\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Dbp\\Relay\\BasePersonBundle\\Tests\\": "tests/"
-                }
-            },
-            "scripts": {
-                "test": [
-                    "@php vendor/bin/phpunit"
-                ],
-                "phpstan": [
-                    "@php vendor/bin/phpstan analyze --ansi"
-                ],
-                "psalm": [
-                    "@php vendor/bin/psalm"
-                ],
-                "lint": [
-                    "@composer run cs",
-                    "@composer run phpstan",
-                    "@composer run psalm"
-                ],
-                "cs-fix": [
-                    "@php vendor/bin/php-cs-fixer --ansi fix"
-                ],
-                "cs": [
-                    "@php vendor/bin/php-cs-fixer --ansi fix --dry-run --diff"
-                ],
-                "coverage": [
-                    "@php -dxdebug.mode=coverage vendor/bin/simple-phpunit --coverage-html _coverage"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "AGPL-3.0-or-later"
             ],
-            "support": {
-                "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-person-bundle/-/tree/v0.2.4",
-                "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-person-bundle/-/issues"
-            },
             "time": "2022-10-27T11:56:57+02:00"
         },
         {
@@ -380,7 +331,7 @@
             "version": "v0.1.49",
             "source": {
                 "type": "git",
-                "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-core-bundle.git",
+                "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-core-bundle",
                 "reference": "227239bebba7645338e4c445ae399ada21b92ee4"
             },
             "require": {
@@ -439,42 +390,7 @@
                     "Dbp\\Relay\\CoreBundle\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Dbp\\Relay\\CoreBundle\\Tests\\": "tests/"
-                }
-            },
-            "scripts": {
-                "post-install-cmd": [
-                    "cghooks add --ignore-lock"
-                ],
-                "post-update-cmd": [
-                    "cghooks update"
-                ],
-                "test": [
-                    "@php vendor/bin/phpunit"
-                ],
-                "phpstan": [
-                    "@php vendor/bin/phpstan analyze --ansi"
-                ],
-                "psalm": [
-                    "@php vendor/bin/psalm"
-                ],
-                "lint": [
-                    "@composer run cs",
-                    "@composer run phpstan",
-                    "@composer run psalm"
-                ],
-                "cs-fix": [
-                    "@php vendor/bin/php-cs-fixer --ansi fix"
-                ],
-                "cs": [
-                    "@php vendor/bin/php-cs-fixer --ansi fix --dry-run --diff"
-                ],
-                "coverage": [
-                    "@php -dxdebug.mode=coverage vendor/bin/phpunit --coverage-html _coverage"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "AGPL-3.0-or-later"
             ],
