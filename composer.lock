@@ -169,11 +169,11 @@
         },
         {
             "name": "dbp/campusonline-api",
-            "version": "v0.2.11",
+            "version": "v0.2.13",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.tugraz.at/dbp/campus-online/dbp-campusonline-api",
-                "reference": "e6f5608f738d455f75a2eaf86bd8672d12717463"
+                "reference": "0cef92a1c9314f1a658bf3158678e5457101e5d2"
             },
             "require": {
                 "ext-json": "*",
@@ -202,7 +202,7 @@
             "license": [
                 "AGPL-3.0-or-later"
             ],
-            "time": "2022-10-25T10:24:00+00:00"
+            "time": "2022-11-03T10:50:32+00:00"
         },
         {
             "name": "dbp/relay-base-course-bundle",
