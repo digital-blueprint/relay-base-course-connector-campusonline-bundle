@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8efa24b7526074e579794c8e439ab8ed",
+    "content-hash": "4a2e771ebdd9b6f49568b72f92681bc9",
     "packages": [
         {
             "name": "api-platform/core",
@@ -169,11 +169,11 @@
         },
         {
             "name": "dbp/campusonline-api",
-            "version": "v0.2.13",
+            "version": "v0.2.17",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.tugraz.at/dbp/campus-online/dbp-campusonline-api",
-                "reference": "0cef92a1c9314f1a658bf3158678e5457101e5d2"
+                "reference": "27377e6f0560e8f6656b03b5dea2106e19f6a2ea"
             },
             "require": {
                 "ext-json": "*",
@@ -202,45 +202,35 @@
             "license": [
                 "AGPL-3.0-or-later"
             ],
-            "time": "2022-11-03T10:50:32+00:00"
+            "time": "2022-11-15T11:09:38+00:00"
         },
         {
             "name": "dbp/relay-base-course-bundle",
-            "version": "v0.1.4",
+            "version": "v0.2.0",
             "source": {
                 "type": "git",
-                "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle.git",
-                "reference": "60158d6fc3f08a306a971fdf96b977cd826427af"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-base-course-bundle/repository/archive.zip?sha=60158d6fc3f08a306a971fdf96b977cd826427af",
-                "reference": "60158d6fc3f08a306a971fdf96b977cd826427af",
-                "shasum": ""
+                "url": "git@gitlab.tugraz.at:dbp/relay/dbp-relay-base-course-bundle.git",
+                "reference": "4b805849419f05202023fbeb0969a7d0834b4941"
             },
             "require": {
-                "api-platform/core": "^2.6",
+                "api-platform/core": "^2.6.8",
                 "dbp/relay-core-bundle": "^0.1.48",
                 "ext-json": "*",
                 "php": ">=7.3",
                 "symfony/config": "^5.4",
                 "symfony/framework-bundle": "^5.4",
-                "symfony/security-bundle": "^5.4",
-                "symfony/security-core": "^5.4",
-                "symfony/security-guard": "^5.4",
-                "symfony/validator": "^5.4",
                 "symfony/yaml": "^5.4"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.0",
-                "phpstan/phpstan": "^1.0.0",
-                "phpstan/phpstan-phpunit": "^1.0.0",
-                "phpunit/phpunit": "^9",
-                "symfony/browser-kit": "^5.4",
-                "symfony/http-client": "^5.4",
-                "symfony/monolog-bundle": "^3.7",
-                "symfony/phpunit-bridge": "^5.4",
-                "vimeo/psalm": "^4.2.1"
+                "friendsofphp/php-cs-fixer": "^3.4",
+                "phpstan/phpstan": "^1.8.11",
+                "phpstan/phpstan-phpunit": "^1.2.2",
+                "phpunit/phpunit": "^9.5.26",
+                "symfony/browser-kit": "^5.4.11",
+                "symfony/http-client": "^5.4.15",
+                "symfony/monolog-bundle": "^3.8",
+                "symfony/phpunit-bridge": "^5.4.14",
+                "vimeo/psalm": "^4.29"
             },
             "type": "symfony-bundle",
             "autoload": {
@@ -281,11 +271,7 @@
             "license": [
                 "AGPL-3.0-or-later"
             ],
-            "support": {
-                "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle/-/tree/v0.1.4",
-                "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle/-/issues"
-            },
-            "time": "2022-10-27T11:29:20+02:00"
+            "time": "2022-11-15T09:09:13+00:00"
         },
         {
             "name": "dbp/relay-base-person-bundle",
@@ -338,11 +324,11 @@
         },
         {
             "name": "dbp/relay-core-bundle",
-            "version": "v0.1.55",
+            "version": "v0.1.56",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-core-bundle",
-                "reference": "b1d1eaa5e9efc58a09e6176215c243041df168f3"
+                "reference": "0183be15e0c582d935420fb558ea293ab6af1b8b"
             },
             "require": {
                 "api-platform/core": "^2.6.8 <2.7.0",
@@ -406,7 +392,7 @@
                 "AGPL-3.0-or-later"
             ],
             "description": "The core bundle of the Relay API gateway",
-            "time": "2022-11-10T10:15:38+00:00"
+            "time": "2022-11-15T08:43:56+00:00"
         },
         {
             "name": "doctrine/annotations",
@@ -1103,16 +1089,16 @@
         },
         {
             "name": "kevinrob/guzzle-cache-middleware",
-            "version": "v4.0.1",
+            "version": "v4.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Kevinrob/guzzle-cache-middleware.git",
-                "reference": "0a61532ee8bf278a0d875a86a536aeeab592da5a"
+                "reference": "24b93edc942f2eaaeb17f7ae0d6db0f77f4ed4ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Kevinrob/guzzle-cache-middleware/zipball/0a61532ee8bf278a0d875a86a536aeeab592da5a",
-                "reference": "0a61532ee8bf278a0d875a86a536aeeab592da5a",
+                "url": "https://api.github.com/repos/Kevinrob/guzzle-cache-middleware/zipball/24b93edc942f2eaaeb17f7ae0d6db0f77f4ed4ea",
+                "reference": "24b93edc942f2eaaeb17f7ae0d6db0f77f4ed4ea",
                 "shasum": ""
             },
             "require": {
@@ -1181,9 +1167,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Kevinrob/guzzle-cache-middleware/issues",
-                "source": "https://github.com/Kevinrob/guzzle-cache-middleware/tree/v4.0.1"
+                "source": "https://github.com/Kevinrob/guzzle-cache-middleware/tree/v4.0.2"
             },
-            "time": "2022-03-15T21:47:10+00:00"
+            "time": "2022-10-02T13:13:18+00:00"
         },
         {
             "name": "league/uri",
@@ -10379,5 +10365,5 @@
     "platform-overrides": {
         "php": "7.3"
     },
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.2.0"
 }

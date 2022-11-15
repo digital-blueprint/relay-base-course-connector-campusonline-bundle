@@ -8,7 +8,6 @@ use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseApi;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider;
 use Dbp\Relay\BasePersonBundle\Service\DummyPersonProvider;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
-use Dbp\Relay\CoreBundle\Pagination\FullPaginator;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
@@ -43,10 +42,9 @@ class CourseProviderTest extends TestCase
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
         ]);
 
-        $courses = $this->api->getCourses();
-        $this->assertTrue($courses instanceof FullPaginator);
-        $this->assertSame(34.0, $courses->getTotalItems());
-        $course = $courses->current();
+        $courses = $this->api->getCourses(1, 50);
+        $this->assertCount(34, $courses);
+        $course = $courses[0];
         $this->assertSame('241333', $course->getIdentifier());
         $this->assertSame('Technische Informatik 1', $course->getName());
         $this->assertSame('VO', $course->getType());
@@ -59,7 +57,7 @@ class CourseProviderTest extends TestCase
         ]);
 
         $this->expectException(ApiError::class);
-        $this->api->getCourses();
+        $this->api->getCourses(1, 50);
     }
 
     public function testGetCoursesInvalidXML()
@@ -69,7 +67,7 @@ class CourseProviderTest extends TestCase
         ]);
 
         $this->expectException(ApiError::class);
-        $this->api->getCourses();
+        $this->api->getCourses(1, 50);
     }
 
     public function testGetCourseById()
@@ -120,10 +118,10 @@ class CourseProviderTest extends TestCase
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
         ]);
 
-        $courses = $this->api->getCourses(['queryLocal' => 'organization:2337']);
-        $this->assertTrue($courses instanceof FullPaginator);
-        $this->assertSame(34.0, $courses->getTotalItems());
-        $course = $courses->current();
+        $courses = $this->api->getCourses(1, 50, ['queryLocal' => 'organization:2337']);
+        $this->assertCount(34, $courses);
+
+        $course = $courses[0];
         $this->assertSame('241333', $course->getIdentifier());
         $this->assertSame('Technische Informatik 1', $course->getName());
         $this->assertSame('VO', $course->getType());

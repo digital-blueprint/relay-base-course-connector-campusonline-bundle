@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service;
 
-use Dbp\CampusonlineApi\Helpers\Paginator;
+use Dbp\CampusonlineApi\Helpers\Pagination;
 use Dbp\CampusonlineApi\LegacyWebService\Api;
 use Dbp\CampusonlineApi\LegacyWebService\ApiException;
 use Dbp\CampusonlineApi\LegacyWebService\Course\CourseData;
@@ -14,9 +14,9 @@ use Psr\Log\LoggerInterface;
 
 class CourseApi implements LoggerAwareInterface
 {
-    /*
-     * @var Api
-     */
+    public const ALL_ITEMS = -1;
+
+    /** @var Api */
     private $api;
     private $config;
     private $clientHandler;
@@ -78,33 +78,57 @@ class CourseApi implements LoggerAwareInterface
     /**
      * @throws ApiException
      */
-    public function getCourses(array $options = []): Paginator
+    public function getCourses(int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
-        return $this->getApi()->Course()->getCourses($options);
+        $options[Pagination::CURRENT_PAGE_NUMBER_PARAMETER_NAME] = $currentPageNumber;
+        if ($maxNumItemsPerPage !== self::ALL_ITEMS) {
+            $options[Pagination::MAX_NUM_ITEMS_PER_PAGE_PARAMETER_NAME] = $maxNumItemsPerPage;
+        }
+        $options[Pagination::IS_PARTIAL_PAGINATION_PARAMETER_NAME] = true;
+
+        return $this->getApi()->Course()->getCourses($options)->getItems();
     }
 
     /**
      * @throws ApiException
      */
-    public function getCoursesByOrganization(string $orgUnitId, array $options = []): Paginator
+    public function getCoursesByOrganization(string $orgUnitId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
-        return $this->getApi()->Course()->getCoursesByOrganization($orgUnitId, $options);
+        $options[Pagination::CURRENT_PAGE_NUMBER_PARAMETER_NAME] = $currentPageNumber;
+        if ($maxNumItemsPerPage !== self::ALL_ITEMS) {
+            $options[Pagination::MAX_NUM_ITEMS_PER_PAGE_PARAMETER_NAME] = $maxNumItemsPerPage;
+        }
+        $options[Pagination::IS_PARTIAL_PAGINATION_PARAMETER_NAME] = true;
+
+        return $this->getApi()->Course()->getCoursesByOrganization($orgUnitId, $options)->getItems();
     }
 
     /**
      * @throws ApiException
      */
-    public function getCoursesByLecturer(string $personId, array $options = []): Paginator
+    public function getCoursesByLecturer(string $personId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
-        return $this->getApi()->Course()->getCoursesByLecturer($personId, $options);
+        $options[Pagination::CURRENT_PAGE_NUMBER_PARAMETER_NAME] = $currentPageNumber;
+        if ($maxNumItemsPerPage !== self::ALL_ITEMS) {
+            $options[Pagination::MAX_NUM_ITEMS_PER_PAGE_PARAMETER_NAME] = $maxNumItemsPerPage;
+        }
+        $options[Pagination::IS_PARTIAL_PAGINATION_PARAMETER_NAME] = true;
+
+        return $this->getApi()->Course()->getCoursesByLecturer($personId, $options)->getItems();
     }
 
     /**
      * @throws ApiException
      */
-    public function getStudentsByCourse(string $courseId, array $options = []): Paginator
+    public function getStudentsByCourse(string $courseId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
-        return $this->getApi()->Person()->getStudentsByCourse($courseId, $options);
+        $options[Pagination::CURRENT_PAGE_NUMBER_PARAMETER_NAME] = $currentPageNumber;
+        if ($maxNumItemsPerPage !== self::ALL_ITEMS) {
+            $options[Pagination::MAX_NUM_ITEMS_PER_PAGE_PARAMETER_NAME] = $maxNumItemsPerPage;
+        }
+        $options[Pagination::IS_PARTIAL_PAGINATION_PARAMETER_NAME] = true;
+
+        return $this->getApi()->Person()->getStudentsByCourse($courseId, $options)->getItems();
     }
 
     private function getApi(): Api

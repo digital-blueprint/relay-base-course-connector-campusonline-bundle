@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service;
 
-use Dbp\CampusonlineApi\Helpers\FullPaginator as CoFullPaginator;
-use Dbp\CampusonlineApi\Helpers\Pagination as CoPagination;
-use Dbp\CampusonlineApi\Helpers\Paginator as CoPaginator;
 use Dbp\CampusonlineApi\LegacyWebService\ApiException;
 use Dbp\CampusonlineApi\LegacyWebService\Course\CourseData;
 use Dbp\CampusonlineApi\LegacyWebService\Person\PersonData;
@@ -20,10 +17,6 @@ use Dbp\Relay\BasePersonBundle\API\PersonProviderInterface;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Dbp\Relay\CoreBundle\Helpers\Tools;
 use Dbp\Relay\CoreBundle\LocalData\LocalDataAwareEventDispatcher;
-use Dbp\Relay\CoreBundle\Pagination\FullPaginator;
-use Dbp\Relay\CoreBundle\Pagination\Pagination;
-use Dbp\Relay\CoreBundle\Pagination\Paginator;
-use Dbp\Relay\CoreBundle\Pagination\PartialPaginator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -72,14 +65,16 @@ class CourseProvider implements CourseProviderInterface
 
     /**
      * @param array $options Available options:
-     *                       * 'lang' ('de' or 'en')
+     *                       * Locale::LANGUAGE_OPTION (language in ISO 639‑1 format)
      *                       * Course::SEARCH_PARAMETER_NAME (partial, case-insensitive text search on 'name' attribute)
-     *                       * LocalData::INCLUDE_PARAMETER_NAME: Available attributes: 'language', 'typeName', 'code', 'description', 'teachingTerm', 'numberOfCredits', 'levelUrl', 'admissionUrl', 'syllabusUrl', examsUrl', 'datesUrl'
+     *                       * LocalData::INCLUDE_PARAMETER_NAME
      *                       * LocalData::QUERY_PARAMETER_NAME
+     *
+     * @return Course[]
      *
      * @throws ApiError
      */
-    public function getCourses(array $options = []): Paginator
+    public function getCourses(int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
         $this->eventDispatcher->onNewOperation($options);
 
@@ -95,80 +90,66 @@ class CourseProvider implements CourseProviderInterface
         $filterByOrganizationId = $organizationId !== '';
         $filterByLecturerId = $lecturerId !== '';
 
-        $coPaginator = null;
+        $courseDataArray = null;
 
         if ($filterByOrganizationId || $filterByLecturerId) {
-            $tmpPaginationOptions = [];
             if ($filterByOrganizationId && $filterByLecturerId) {
-                // request paginators holding the whole set of results since we need to intersect them ->
-                // temporarily remove pagination options
-                Pagination::addOptions($tmpPaginationOptions, $options);
-                Pagination::removeOptions($options);
+                // request the whole set of results since we need to intersect them ->
+                $currentPageNumber = 1;
+                $maxNumItemsPerPage = CourseApi::ALL_ITEMS;
             }
 
             if ($filterByOrganizationId) {
-                $coPaginator = $this->getCoursesByOrganization($organizationId, $options);
+                $courseDataArray = $this->getCoursesByOrganization($organizationId, $currentPageNumber, $maxNumItemsPerPage, $options);
             }
             if ($filterByLecturerId) {
-                $coCursesByPersonPaginator = $this->getCoursesByLecturer($lecturerId, $options);
+                $coursesByPersonDataArray = $this->getCoursesByLecturer($lecturerId, $currentPageNumber, $maxNumItemsPerPage, $options);
 
                 if (!$filterByOrganizationId) {
-                    $coPaginator = $coCursesByPersonPaginator;
+                    $courseDataArray = $coursesByPersonDataArray;
                 } else {
-                    $intersection = array_uintersect($coPaginator->getItems(), $coCursesByPersonPaginator->getItems(),
+                    $intersection = array_uintersect($courseDataArray, $coursesByPersonDataArray,
                         'Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider::compareCourses');
-                    $courses = array_values($intersection);
-
-                    // re-add pagination options
-                    Pagination::addOptions($options, $tmpPaginationOptions);
-                    $coPaginator = CoPagination::createPaginatorFromWholeResult($courses, $options);
+                    $courseDataArray = array_values($intersection);
                 }
             }
         } else {
-            $coPaginator = $this->getCoursesInternal($options);
+            $courseDataArray = $this->getCoursesInternal($currentPageNumber, $maxNumItemsPerPage, $options);
         }
 
         $courses = [];
-        foreach ($coPaginator->getItems() as $courseData) {
+        foreach ($courseDataArray as $courseData) {
             $courses[] = $this->createCourseFromCourseData($courseData);
         }
 
-        if (Pagination::isPartialPagination($options)) {
-            return new PartialPaginator($courses, $coPaginator->getCurrentPageNumber(), $coPaginator->getMaxNumItemsPerPage());
-        } else {
-            if ($coPaginator instanceof CoFullPaginator) {
-                return new FullPaginator($courses, $coPaginator->getCurrentPageNumber(), $coPaginator->getMaxNumItemsPerPage(), $coPaginator->getTotalNumItems());
-            } else {
-                throw ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, 'camppusonline api returned invalid paginator');
-            }
-        }
+        return $courses;
     }
 
-    /*
- * @throws ApiError
-*/
-    private function getCoursesInternal(array $options = []): CoPaginator
+    /**
+     * @throws ApiError
+     */
+    private function getCoursesInternal(int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
         try {
-            return $this->courseApi->getCourses($options);
+            return $this->courseApi->getCourses($currentPageNumber, $maxNumItemsPerPage, $options);
         } catch (ApiException $e) {
             throw self::toApiError($e, '');
         }
     }
 
-    /*
+    /**
      * @throws ApiError
-    */
-    private function getCoursesByOrganization(string $orgUnitId, array $options = []): CoPaginator
+     */
+    private function getCoursesByOrganization(string $orgUnitId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
         try {
-            return $this->courseApi->getCoursesByOrganization($orgUnitId, $options);
+            return $this->courseApi->getCoursesByOrganization($orgUnitId, $currentPageNumber, $maxNumItemsPerPage, $options);
         } catch (ApiException $e) {
             throw self::toApiError($e, $orgUnitId);
         }
     }
 
-    private function getCoursesByLecturer(string $lecturerId, array $options = []): CoPaginator
+    private function getCoursesByLecturer(string $lecturerId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
         $lecturer = $this->personProvider->getPerson($lecturerId);
         $coEmployeeId = $lecturer->getExtraData('coEmployeeId');
@@ -177,33 +158,32 @@ class CourseProvider implements CourseProviderInterface
         }
 
         try {
-            return $this->courseApi->getCoursesByLecturer($coEmployeeId, $options);
+            return $this->courseApi->getCoursesByLecturer($coEmployeeId, $currentPageNumber, $maxNumItemsPerPage, $options);
         } catch (ApiException $e) {
             throw self::toApiError($e, $lecturerId);
         }
     }
 
-    public function getAttendeesByCourse(string $courseId, array $options = []): Paginator
+    /**
+     * @param array $options Available options:
+     *                       * Locale::LANGUAGE_OPTION (language in ISO 639‑1 format)
+     *
+     * @return CourseAttendee[]
+     *
+     * @throws ApiError
+     */
+    public function getAttendeesByCourse(string $courseId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
         $attendees = [];
         try {
-            $paginator = $this->courseApi->getStudentsByCourse($courseId, $options);
-            foreach ($paginator->getItems() as $personData) {
+            foreach ($this->courseApi->getStudentsByCourse($courseId, $currentPageNumber, $maxNumItemsPerPage, $options) as $personData) {
                 $attendees[] = self::createCourseAttendeeFromPersonData($personData);
             }
         } catch (ApiException $e) {
             throw self::toApiError($e, $courseId);
         }
 
-        if (Pagination::isPartialPagination($options)) {
-            return new PartialPaginator($attendees, $paginator->getCurrentPageNumber(), $paginator->getMaxNumItemsPerPage());
-        } else {
-            if ($paginator instanceof CoFullPaginator) {
-                return new FullPaginator($attendees, $paginator->getCurrentPageNumber(), $paginator->getMaxNumItemsPerPage(), $paginator->getTotalNumItems());
-            } else {
-                throw new ApiError(500, 'camppusonline api returned invalid paginator');
-            }
-        }
+        return $attendees;
     }
 
     private function createCourseFromCourseData(CourseData $courseData): Course
