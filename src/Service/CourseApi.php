@@ -64,7 +64,8 @@ class CourseApi implements LoggerAwareInterface
      */
     public function checkConnection()
     {
-        $this->getApi()->Course()->getCourses();
+        $this->getApi()->Course()->checkConnection();
+        $this->getApi()->Person()->checkConnection();
     }
 
     /**

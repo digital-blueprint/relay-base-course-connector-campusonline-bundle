@@ -7,5 +7,9 @@ services:
    autowire: true
    autoconfigure: true
 
+ Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\HealthCheck:
+   autowire: true
+   autoconfigure: true
+
  Dbp\Relay\BaseCourseBundle\API\CourseProviderInterface:
     '@Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider'
