@@ -16,7 +16,7 @@ use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CoursePreEvent;
 use Dbp\Relay\BasePersonBundle\API\PersonProviderInterface;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Dbp\Relay\CoreBundle\Helpers\Tools;
-use Dbp\Relay\CoreBundle\LocalData\LocalDataAwareEventDispatcher;
+use Dbp\Relay\CoreBundle\LocalData\LocalDataEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -29,7 +29,7 @@ class CourseProvider implements CourseProviderInterface
     /** @var CourseApi */
     private $courseApi;
 
-    /** @var LocalDataAwareEventDispatcher */
+    /** @var LocalDataEventDispatcher */
     private $eventDispatcher;
 
     /** @var PersonProviderInterface */
@@ -38,7 +38,7 @@ class CourseProvider implements CourseProviderInterface
     public function __construct(CourseApi $courseApi, EventDispatcherInterface $eventDispatcher, PersonProviderInterface $personProvider)
     {
         $this->courseApi = $courseApi;
-        $this->eventDispatcher = new LocalDataAwareEventDispatcher(Course::class, $eventDispatcher);
+        $this->eventDispatcher = new LocalDataEventDispatcher(Course::class, $eventDispatcher);
         $this->personProvider = $personProvider;
     }
 
@@ -193,10 +193,10 @@ class CourseProvider implements CourseProviderInterface
         $course->setName($courseData->getName());
         $course->setType($courseData->getType());
 
-        $postEvent = new CoursePostEvent($course, $courseData);
+        $postEvent = new CoursePostEvent($course, $courseData->getData());
         $this->eventDispatcher->dispatch($postEvent, CoursePostEvent::NAME);
 
-        return $postEvent->getEntity();
+        return $course;
     }
 
     private static function createCourseAttendeeFromPersonData(PersonData $personData): CourseAttendee

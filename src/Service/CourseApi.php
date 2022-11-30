@@ -85,7 +85,6 @@ class CourseApi implements LoggerAwareInterface
         if ($maxNumItemsPerPage !== self::ALL_ITEMS) {
             $options[Pagination::MAX_NUM_ITEMS_PER_PAGE_PARAMETER_NAME] = $maxNumItemsPerPage;
         }
-        $options[Pagination::IS_PARTIAL_PAGINATION_PARAMETER_NAME] = true;
 
         return $this->getApi()->Course()->getCourses($options)->getItems();
     }
@@ -99,7 +98,6 @@ class CourseApi implements LoggerAwareInterface
         if ($maxNumItemsPerPage !== self::ALL_ITEMS) {
             $options[Pagination::MAX_NUM_ITEMS_PER_PAGE_PARAMETER_NAME] = $maxNumItemsPerPage;
         }
-        $options[Pagination::IS_PARTIAL_PAGINATION_PARAMETER_NAME] = true;
 
         return $this->getApi()->Course()->getCoursesByOrganization($orgUnitId, $options)->getItems();
     }
@@ -113,7 +111,6 @@ class CourseApi implements LoggerAwareInterface
         if ($maxNumItemsPerPage !== self::ALL_ITEMS) {
             $options[Pagination::MAX_NUM_ITEMS_PER_PAGE_PARAMETER_NAME] = $maxNumItemsPerPage;
         }
-        $options[Pagination::IS_PARTIAL_PAGINATION_PARAMETER_NAME] = true;
 
         return $this->getApi()->Course()->getCoursesByLecturer($personId, $options)->getItems();
     }
@@ -127,7 +124,6 @@ class CourseApi implements LoggerAwareInterface
         if ($maxNumItemsPerPage !== self::ALL_ITEMS) {
             $options[Pagination::MAX_NUM_ITEMS_PER_PAGE_PARAMETER_NAME] = $maxNumItemsPerPage;
         }
-        $options[Pagination::IS_PARTIAL_PAGINATION_PARAMETER_NAME] = true;
 
         return $this->getApi()->Person()->getStudentsByCourse($courseId, $options)->getItems();
     }
