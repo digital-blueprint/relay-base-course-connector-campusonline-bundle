@@ -79,7 +79,7 @@ class CourseProvider implements CourseProviderInterface
         $this->eventDispatcher->onNewOperation($options);
 
         $preEvent = new CoursePreEvent();
-        $this->eventDispatcher->dispatch($preEvent, CoursePreEvent::NAME);
+        $this->eventDispatcher->dispatch($preEvent);
         $options = array_merge($options, $preEvent->getQueryParameters());
 
         $this->addFilterOptions($options);
@@ -194,7 +194,7 @@ class CourseProvider implements CourseProviderInterface
         $course->setType($courseData->getType());
 
         $postEvent = new CoursePostEvent($course, $courseData->getData());
-        $this->eventDispatcher->dispatch($postEvent, CoursePostEvent::NAME);
+        $this->eventDispatcher->dispatch($postEvent);
 
         return $course;
     }

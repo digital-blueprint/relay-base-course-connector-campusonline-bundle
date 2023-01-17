@@ -11,6 +11,6 @@ class CoursePostEventSubscriber extends AbstractLocalDataPostEventSubscriber
 {
     public static function getSubscribedEventName(): string
     {
-        return CoursePostEvent::NAME;
+        return CoursePostEvent::class;
     }
 }
