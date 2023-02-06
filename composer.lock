@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4a2e771ebdd9b6f49568b72f92681bc9",
+    "content-hash": "b1be6ddc7bfd84bcfc63e987029163fb",
     "packages": [
         {
             "name": "api-platform/core",
@@ -169,11 +169,11 @@
         },
         {
             "name": "dbp/campusonline-api",
-            "version": "v0.2.23",
+            "version": "v0.3.1",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.tugraz.at/dbp/campus-online/dbp-campusonline-api",
-                "reference": "97514edc58934263dd122a4ccc7d3bde98125512"
+                "reference": "e230955e7212e5b88668333a80485b835ddb1aa0"
             },
             "require": {
                 "ext-json": "*",
@@ -202,7 +202,7 @@
             "license": [
                 "AGPL-3.0-or-later"
             ],
-            "time": "2022-11-30T12:15:00+00:00"
+            "time": "2023-02-02T15:14:41+00:00"
         },
         {
             "name": "dbp/relay-base-course-bundle",
@@ -334,11 +334,11 @@
         },
         {
             "name": "dbp/relay-core-bundle",
-            "version": "v0.1.71",
+            "version": "v0.1.73",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-core-bundle",
-                "reference": "fa743c094f807e028cc917387643379c0324a4d5"
+                "reference": "49ded5104452bf56301aa782823e12537642946b"
             },
             "require": {
                 "api-platform/core": "^2.6.8 <2.7.0",
@@ -402,7 +402,7 @@
                 "AGPL-3.0-or-later"
             ],
             "description": "The core bundle of the Relay API gateway",
-            "time": "2023-01-17T11:13:52+00:00"
+            "time": "2023-02-06T09:38:35+00:00"
         },
         {
             "name": "doctrine/annotations",
@@ -10423,5 +10423,5 @@
     "platform-overrides": {
         "php": "7.3"
     },
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.2.0"
 }

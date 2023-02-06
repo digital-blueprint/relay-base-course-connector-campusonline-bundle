@@ -11,7 +11,7 @@ services:
    autowire: true
    autoconfigure: true
 
- Dbp\Relay\BaseCourseConnectorCampusonlineBundle\EventSubscriber\CoursePostEventSubscriber:
+ Dbp\Relay\BaseCourseConnectorCampusonlineBundle\EventSubscriber\CourseEventSubscriber:
    autowire: true
    autoconfigure: true
 

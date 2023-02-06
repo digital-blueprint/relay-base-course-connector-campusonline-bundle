@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service;
 
+use Dbp\CampusonlineApi\Helpers\Filters;
 use Dbp\CampusonlineApi\LegacyWebService\ApiException;
 use Dbp\CampusonlineApi\LegacyWebService\Course\CourseData;
 use Dbp\CampusonlineApi\LegacyWebService\Person\PersonData;
-use Dbp\CampusonlineApi\LegacyWebService\ResourceData;
+use Dbp\CampusonlineApi\LegacyWebService\ResourceApi;
 use Dbp\Relay\BaseCourseBundle\API\CourseProviderInterface;
 use Dbp\Relay\BaseCourseBundle\Entity\Course;
 use Dbp\Relay\BaseCourseBundle\Entity\CourseAttendee;
@@ -23,8 +24,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CourseProvider implements CourseProviderInterface
 {
-    private const ORGANIZATION_QUERY_PARAMETER = 'organization';
-    private const LECTURER_QUERY_PARAMETER = 'lecturer';
+    public const ORGANIZATION_QUERY_PARAMETER = 'organization';
+    public const LECTURER_QUERY_PARAMETER = 'lecturer';
+    public const TERM_QUERY_PARAMETER = 'term';
 
     /** @var CourseApi */
     private $courseApi;
@@ -78,9 +80,9 @@ class CourseProvider implements CourseProviderInterface
     {
         $this->eventDispatcher->onNewOperation($options);
 
-        $preEvent = new CoursePreEvent();
+        $preEvent = new CoursePreEvent($options);
         $this->eventDispatcher->dispatch($preEvent);
-        $options = array_merge($options, $preEvent->getQueryParameters());
+        $options = $preEvent->getOptions();
 
         $this->addFilterOptions($options);
 
@@ -151,6 +153,7 @@ class CourseProvider implements CourseProviderInterface
 
     private function getCoursesByLecturer(string $lecturerId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
+        // TODO: extra data is deprected: use LocalData mechanism to get employee ID
         $lecturer = $this->personProvider->getPerson($lecturerId);
         $coEmployeeId = $lecturer->getExtraData('coEmployeeId');
         if (Tools::isNullOrEmpty($coEmployeeId)) {
@@ -235,7 +238,9 @@ class CourseProvider implements CourseProviderInterface
     private function addFilterOptions(array &$options)
     {
         if (($searchParameter = $options[Course::SEARCH_PARAMETER_NAME] ?? null) && $searchParameter !== '') {
-            $options[ResourceData::NAME_SEARCH_FILTER_NAME] = $searchParameter;
+            unset($options[Course::SEARCH_PARAMETER_NAME]);
+
+            ResourceApi::addFilter($options, CourseData::NAME_ATTRIBUTE, Filters::CONTAINS_CI_OPERATOR, $searchParameter, Filters::LOGICAL_OR_OPERATOR);
         }
     }
 

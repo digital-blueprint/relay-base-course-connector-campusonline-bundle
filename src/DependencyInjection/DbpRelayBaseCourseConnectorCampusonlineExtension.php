@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\DependencyInjection;
 
-use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\EventSubscriber\CoursePostEventSubscriber;
+use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\EventSubscriber\CourseEventSubscriber;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -30,7 +30,7 @@ class DbpRelayBaseCourseConnectorCampusonlineExtension extends ConfigurableExten
         $courseApi->addMethodCall('setCache', [$courseCache, 3600]);
         $courseApi->addMethodCall('setConfig', [$mergedConfig['campus_online'] ?? []]);
 
-        $courseApi = $container->getDefinition(CoursePostEventSubscriber::class);
+        $courseApi = $container->getDefinition(CourseEventSubscriber::class);
         $courseApi->addMethodCall('setConfig', [$mergedConfig]);
     }
 }
