@@ -1,6 +1,7 @@
 # DbpRelayBaseCourseConnectorCampusonlineBundle
 [GitLab](https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-connector-campusonline-bundle)
 
+Base Symfony bundle for Campusonline Course integration for the DBP Relay API Server
 
 ## Integration into the Relay API Server
 
