@@ -1,13 +1,14 @@
 # DbpRelayBaseCourseConnectorCampusonlineBundle
-[GitLab](https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-connector-campusonline-bundle)
 
-Base Symfony bundle for Campusonline Course integration for the DBP Relay API Server
+[GitHub](https://github.com/digital-blueprint/relay-base-course-connector-campusonline-bundle)
+
+Base Symfony bundle for CampusOnline Course integration for the DBP Relay API Server
 
 ## Integration into the Relay API Server
 
 * Add the bundle package as a dependency:
 
-```
+```bash
 composer require dbp/relay-base-course-connector-campusonline-bundle
 ```
 
