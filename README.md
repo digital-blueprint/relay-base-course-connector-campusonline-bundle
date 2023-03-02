@@ -1,6 +1,9 @@
 # DbpRelayBaseCourseConnectorCampusonlineBundle
 
-[GitHub](https://github.com/digital-blueprint/relay-base-course-connector-campusonline-bundle)
+[GitHub](https://github.com/digital-blueprint/relay-base-course-connector-campusonline-bundle) |
+[Packagist](https://packagist.org/packages/dbp/relay-base-course-connector-campusonline-bundle)
+
+[![Test](https://github.com/digital-blueprint/relay-base-course-connector-campusonline-bundle/actions/workflows/test.yml/badge.svg)](https://github.com/digital-blueprint/relay-base-course-connector-campusonline-bundle/actions/workflows/test.yml)
 
 Base Symfony bundle for CampusOnline Course integration for the DBP Relay API Server
 
