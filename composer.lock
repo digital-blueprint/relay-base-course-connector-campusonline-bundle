@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5e4d05d6d50ee970e8e51375960a5abc",
+    "content-hash": "a764b57e2f1cc1533b54e6927f32cd1c",
     "packages": [
         {
             "name": "api-platform/core",
@@ -206,21 +206,21 @@
         },
         {
             "name": "dbp/relay-base-course-bundle",
-            "version": "v0.2.0",
+            "version": "v0.2.2",
             "source": {
                 "type": "git",
-                "url": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle.git",
-                "reference": "4b805849419f05202023fbeb0969a7d0834b4941"
+                "url": "https://github.com/digital-blueprint/relay-base-course-bundle.git",
+                "reference": "624c308a2c615e1354d6cdec4fe286fc3f4bff22"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://gitlab.tugraz.at/api/v4/projects/dbp%2Frelay%2Fdbp-relay-base-course-bundle/repository/archive.zip?sha=4b805849419f05202023fbeb0969a7d0834b4941",
-                "reference": "4b805849419f05202023fbeb0969a7d0834b4941",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-base-course-bundle/zipball/624c308a2c615e1354d6cdec4fe286fc3f4bff22",
+                "reference": "624c308a2c615e1354d6cdec4fe286fc3f4bff22",
                 "shasum": ""
             },
             "require": {
                 "api-platform/core": "^2.6.8",
-                "dbp/relay-core-bundle": "^0.1.48",
+                "dbp/relay-core-bundle": "^0.1.91",
                 "ext-json": "*",
                 "php": ">=7.3",
                 "symfony/config": "^5.4",
@@ -244,44 +244,15 @@
                     "Dbp\\Relay\\BaseCourseBundle\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Dbp\\Relay\\BaseCourseBundle\\Tests\\": "tests/"
-                }
-            },
-            "scripts": {
-                "test": [
-                    "@php vendor/bin/phpunit"
-                ],
-                "phpstan": [
-                    "@php vendor/bin/phpstan analyze --ansi"
-                ],
-                "psalm": [
-                    "@php vendor/bin/psalm"
-                ],
-                "lint": [
-                    "@composer run cs",
-                    "@composer run phpstan",
-                    "@composer run psalm"
-                ],
-                "cs-fix": [
-                    "@php vendor/bin/php-cs-fixer --ansi fix"
-                ],
-                "cs": [
-                    "@php vendor/bin/php-cs-fixer --ansi fix --dry-run --diff"
-                ],
-                "coverage": [
-                    "@php vendor/bin/phpunit --coverage-html _coverage"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "AGPL-3.0-or-later"
             ],
             "support": {
-                "source": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle/-/tree/v0.2.0",
-                "issues": "https://gitlab.tugraz.at/dbp/relay/dbp-relay-base-course-bundle/-/issues"
+                "issues": "https://github.com/digital-blueprint/relay-base-course-bundle/issues",
+                "source": "https://github.com/digital-blueprint/relay-base-course-bundle/tree/v0.2.2"
             },
-            "time": "2022-11-15T10:09:13+01:00"
+            "time": "2023-03-23T09:26:36+00:00"
         },
         {
             "name": "dbp/relay-base-person-bundle",
