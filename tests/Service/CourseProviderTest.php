@@ -8,11 +8,8 @@ use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\EventSubscriber\CourseEventS
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseApi;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider;
 use Dbp\Relay\BasePersonBundle\Service\DummyPersonProvider;
-use Dbp\Relay\CoreBundle\Authorization\AuthorizationDataMuxer;
-use Dbp\Relay\CoreBundle\Authorization\AuthorizationDataProviderProvider;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Dbp\Relay\CoreBundle\LocalData\LocalData;
-use Dbp\Relay\CoreBundle\TestUtils\TestUserSession;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
@@ -36,8 +33,6 @@ class CourseProviderTest extends TestCase
             [
                 'local_data_attribute' => self::COURSE_CODE_ATTRIBUTE_NAME,
                 'source_attribute' => self::COURSE_CODE_ATTRIBUTE_NAME,
-                'authorization_expression' => 'true',
-                'allow_query' => false,
                 'default_value' => '',
             ],
         ];
@@ -51,7 +46,6 @@ class CourseProviderTest extends TestCase
 
         $eventDispatcher = new EventDispatcher();
         $localDataEventSubscriber = new CourseEventSubscriber();
-        $localDataEventSubscriber->_injectServices(new TestUserSession('testuser'), new AuthorizationDataMuxer(new AuthorizationDataProviderProvider([]), new EventDispatcher()));
         $localDataEventSubscriber->setConfig(self::createConfig());
         $eventDispatcher->addSubscriber($localDataEventSubscriber);
 
@@ -164,7 +158,7 @@ class CourseProviderTest extends TestCase
         ]);
 
         $options = [];
-        LocalData::addIncludeParameter($options, [self::COURSE_CODE_ATTRIBUTE_NAME]);
+        LocalData::requestLocalDataAttributes($options, [self::COURSE_CODE_ATTRIBUTE_NAME]);
         $course = $this->courseProvider->getCourseById('240759', $options);
 
         $this->assertSame('240759', $course->getIdentifier());
