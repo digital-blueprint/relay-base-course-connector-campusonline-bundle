@@ -16,11 +16,9 @@ use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CoursePostEvent;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CoursePreEvent;
 use Dbp\Relay\BasePersonBundle\API\PersonProviderInterface;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
-use Dbp\Relay\CoreBundle\Helpers\Tools;
 use Dbp\Relay\CoreBundle\LocalData\LocalDataEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CourseProvider implements CourseProviderInterface
 {
@@ -153,15 +151,8 @@ class CourseProvider implements CourseProviderInterface
 
     private function getCoursesByLecturer(string $lecturerId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
-        // TODO: extra data is deprected: use LocalData mechanism to get employee ID
-        $lecturer = $this->personProvider->getPerson($lecturerId);
-        $coEmployeeId = $lecturer->getExtraData('coEmployeeId');
-        if (Tools::isNullOrEmpty($coEmployeeId)) {
-            throw new NotFoundHttpException(sprintf("Employee with id '%s' not found", $lecturerId));
-        }
-
         try {
-            return $this->courseApi->getCoursesByLecturer($coEmployeeId, $currentPageNumber, $maxNumItemsPerPage, $options);
+            return $this->courseApi->getCoursesByLecturer($lecturerId, $currentPageNumber, $maxNumItemsPerPage, $options);
         } catch (ApiException $e) {
             throw self::toApiError($e, $lecturerId);
         }
