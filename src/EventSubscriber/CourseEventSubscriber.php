@@ -20,7 +20,7 @@ class CourseEventSubscriber extends AbstractLocalDataEventSubscriber
         ];
     }
 
-    protected function onPreEvent(LocalDataPreEvent $preEvent, array $mappedQueryParameters)
+    protected function onPreEvent(LocalDataPreEvent $preEvent, array $localQueryFilters)
     {
         $options = $preEvent->getOptions();
         $term = null;
