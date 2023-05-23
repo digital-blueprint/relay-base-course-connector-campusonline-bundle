@@ -6,6 +6,8 @@ services:
  Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseApi:
    autowire: true
    autoconfigure: true
+   calls:
+    - setCache: [ '@dbp.relay.base_course_connector_campusonline.cache.campus_online', 3600 ]
 
  Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\HealthCheck:
    autowire: true
@@ -17,3 +19,8 @@ services:
 
  Dbp\Relay\BaseCourseBundle\API\CourseProviderInterface:
     '@Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider'
+
+ dbp.relay.base_course_connector_campusonline.cache.campus_online:
+    parent: cache.app
+    tags:
+      - { name: 'cache.pool', default_lifetime: 60 }
