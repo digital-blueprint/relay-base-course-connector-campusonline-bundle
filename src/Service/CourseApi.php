@@ -21,7 +21,7 @@ class CourseApi implements LoggerAwareInterface
     private $config;
     private $clientHandler;
     private $cachePool;
-    private $cacheTTL;
+    private $cacheTTL = 0;
     private $logger;
 
     public function __construct()
@@ -33,9 +33,6 @@ class CourseApi implements LoggerAwareInterface
     {
         $this->cachePool = $cachePool;
         $this->cacheTTL = $ttl;
-        if ($this->api !== null) {
-            $this->api->setCache($cachePool, $ttl);
-        }
     }
 
     public function setConfig(array $config): void

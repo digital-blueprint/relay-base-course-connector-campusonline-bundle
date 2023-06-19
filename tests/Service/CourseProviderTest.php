@@ -14,6 +14,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CourseProviderTest extends TestCase
@@ -51,6 +52,7 @@ class CourseProviderTest extends TestCase
 
         $this->courseApi = new CourseApi();
         $this->courseApi->setConfig(['org_root_id' => '1']); // some value is required
+        $this->courseApi->setCache(new ArrayAdapter(3600, true, 3600, 356), 3600);
         $this->courseProvider = new CourseProvider($this->courseApi, $eventDispatcher, new DummyPersonProvider());
         $this->mockResponses([]);
     }
