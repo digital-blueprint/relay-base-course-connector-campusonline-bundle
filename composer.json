@@ -7,9 +7,9 @@
         "ext-json": "*",
         "api-platform/core": "^2.7.11",
         "dbp/campusonline-api": "^0.3.1",
-        "dbp/relay-base-course-bundle": "dev-main as 0.2.4",
-        "dbp/relay-base-person-bundle": "dev-main as 0.2.19",
-        "dbp/relay-core-bundle": "dev-main as 0.1.114",
+        "dbp/relay-base-course-bundle": "^0.2.4",
+        "dbp/relay-base-person-bundle": "^0.2.19",
+        "dbp/relay-core-bundle": "^0.1.115",
         "symfony/event-dispatcher": "^5.4",
         "symfony/framework-bundle": "^5.4"
     },

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e3e4e95c5dba1c68fea5869512be0f62",
+    "content-hash": "0858474277128f08332289d596260c46",
     "packages": [
         {
             "name": "api-platform/core",
@@ -225,21 +225,21 @@
         },
         {
             "name": "dbp/relay-base-course-bundle",
-            "version": "dev-main",
+            "version": "v0.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-base-course-bundle.git",
-                "reference": "db879301bf4d68403d989e5798247804d6db122e"
+                "reference": "b3bd4ae10c3a459cf33caed98048c5fdd55953f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-base-course-bundle/zipball/db879301bf4d68403d989e5798247804d6db122e",
-                "reference": "db879301bf4d68403d989e5798247804d6db122e",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-base-course-bundle/zipball/b3bd4ae10c3a459cf33caed98048c5fdd55953f8",
+                "reference": "b3bd4ae10c3a459cf33caed98048c5fdd55953f8",
                 "shasum": ""
             },
             "require": {
                 "api-platform/core": "^2.7.11",
-                "dbp/relay-core-bundle": "dev-main as 0.1.114",
+                "dbp/relay-core-bundle": "^0.1.115",
                 "ext-json": "*",
                 "php": ">=7.3",
                 "symfony/config": "^5.4",
@@ -257,7 +257,6 @@
                 "symfony/phpunit-bridge": "^5.4.14",
                 "vimeo/psalm": "^4.29"
             },
-            "default-branch": true,
             "type": "symfony-bundle",
             "autoload": {
                 "psr-4": {
@@ -270,27 +269,27 @@
             ],
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-base-course-bundle/issues",
-                "source": "https://github.com/digital-blueprint/relay-base-course-bundle/tree/main"
+                "source": "https://github.com/digital-blueprint/relay-base-course-bundle/tree/v0.2.5"
             },
-            "time": "2023-07-15T04:07:41+00:00"
+            "time": "2023-07-17T12:21:58+00:00"
         },
         {
             "name": "dbp/relay-base-person-bundle",
-            "version": "dev-main",
+            "version": "v0.2.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-base-person-bundle.git",
-                "reference": "3099012ad9aa2262c3d09f070d7aa9fd6425b8fa"
+                "reference": "0dad5c52bb0f6f9ac24338d377c3d58a5f8c5afa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-base-person-bundle/zipball/3099012ad9aa2262c3d09f070d7aa9fd6425b8fa",
-                "reference": "3099012ad9aa2262c3d09f070d7aa9fd6425b8fa",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-base-person-bundle/zipball/0dad5c52bb0f6f9ac24338d377c3d58a5f8c5afa",
+                "reference": "0dad5c52bb0f6f9ac24338d377c3d58a5f8c5afa",
                 "shasum": ""
             },
             "require": {
                 "api-platform/core": "^2.7.11",
-                "dbp/relay-core-bundle": "dev-main as 0.1.114",
+                "dbp/relay-core-bundle": "^0.1.115",
                 "ext-json": "*",
                 "guzzlehttp/guzzle": "^7.0",
                 "nelmio/cors-bundle": "^2.1.0",
@@ -317,7 +316,6 @@
                 "symfony/phpunit-bridge": "^5.2",
                 "vimeo/psalm": "^4.4"
             },
-            "default-branch": true,
             "type": "symfony-bundle",
             "autoload": {
                 "psr-4": {
@@ -330,22 +328,22 @@
             ],
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-base-person-bundle/issues",
-                "source": "https://github.com/digital-blueprint/relay-base-person-bundle/tree/main"
+                "source": "https://github.com/digital-blueprint/relay-base-person-bundle/tree/v0.2.20"
             },
-            "time": "2023-07-15T04:41:52+00:00"
+            "time": "2023-07-17T11:45:02+00:00"
         },
         {
             "name": "dbp/relay-core-bundle",
-            "version": "dev-main",
+            "version": "v0.1.115",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-core-bundle.git",
-                "reference": "b03a4e32375597751968214160774c67c4d24215"
+                "reference": "b9c5ca9b1b543895bc3c58d697c14fba1778b800"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-core-bundle/zipball/b03a4e32375597751968214160774c67c4d24215",
-                "reference": "b03a4e32375597751968214160774c67c4d24215",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-core-bundle/zipball/b9c5ca9b1b543895bc3c58d697c14fba1778b800",
+                "reference": "b9c5ca9b1b543895bc3c58d697c14fba1778b800",
                 "shasum": ""
             },
             "require": {
@@ -393,7 +391,6 @@
                 "symfony/phpunit-bridge": "^5.4.11",
                 "vimeo/psalm": "^4.27"
             },
-            "default-branch": true,
             "type": "symfony-bundle",
             "extra": {
                 "hooks": {
@@ -414,9 +411,9 @@
             "description": "The core bundle of the Relay API gateway",
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-core-bundle/issues",
-                "source": "https://github.com/digital-blueprint/relay-core-bundle/tree/main"
+                "source": "https://github.com/digital-blueprint/relay-core-bundle/tree/v0.1.115"
             },
-            "time": "2023-07-15T03:14:42+00:00"
+            "time": "2023-07-17T09:43:13+00:00"
         },
         {
             "name": "doctrine/annotations",
@@ -10363,32 +10360,9 @@
             "time": "2015-12-17T08:42:14+00:00"
         }
     ],
-    "aliases": [
-        {
-            "package": "dbp/relay-base-course-bundle",
-            "version": "dev-main",
-            "alias": "0.2.4",
-            "alias_normalized": "0.2.4.0"
-        },
-        {
-            "package": "dbp/relay-base-person-bundle",
-            "version": "dev-main",
-            "alias": "0.2.19",
-            "alias_normalized": "0.2.19.0"
-        },
-        {
-            "package": "dbp/relay-core-bundle",
-            "version": "dev-main",
-            "alias": "0.1.114",
-            "alias_normalized": "0.1.114.0"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "dbp/relay-base-course-bundle": 20,
-        "dbp/relay-base-person-bundle": 20,
-        "dbp/relay-core-bundle": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
@@ -10399,5 +10373,5 @@
     "platform-overrides": {
         "php": "7.3"
     },
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.2.0"
 }
