@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.16
+
+* Add support for api-platform 3.2
+
 ## v0.1.15
 
 * Add support for Symfony 6
