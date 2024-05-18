@@ -196,16 +196,16 @@
         },
         {
             "name": "dbp/campusonline-api",
-            "version": "v0.3.18",
+            "version": "v0.3.19",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/campusonline-api.git",
-                "reference": "65258f12cf81c37fa4a6de38e2b6e91a2e05fa87"
+                "reference": "d2ae5bfbc2aff4d4c48974ebc15d1da797ace18f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/65258f12cf81c37fa4a6de38e2b6e91a2e05fa87",
-                "reference": "65258f12cf81c37fa4a6de38e2b6e91a2e05fa87",
+                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/d2ae5bfbc2aff4d4c48974ebc15d1da797ace18f",
+                "reference": "d2ae5bfbc2aff4d4c48974ebc15d1da797ace18f",
                 "shasum": ""
             },
             "require": {
@@ -224,9 +224,9 @@
                 "friendsofphp/php-cs-fixer": "^3.50",
                 "phpstan/phpstan": "^1.10.59",
                 "phpstan/phpstan-phpunit": "^1.3.16",
-                "phpunit/phpunit": "^9.6.17",
+                "phpunit/phpunit": "^10.1",
                 "symfony/cache": "^5.4 || ^6.4.3",
-                "symfony/phpunit-bridge": "^5.4.35",
+                "symfony/phpunit-bridge": "^7.0.7",
                 "vimeo/psalm": "^5.22.2"
             },
             "type": "library",
@@ -241,9 +241,9 @@
             ],
             "support": {
                 "issues": "https://github.com/digital-blueprint/campusonline-api/issues",
-                "source": "https://github.com/digital-blueprint/campusonline-api/tree/v0.3.18"
+                "source": "https://github.com/digital-blueprint/campusonline-api/tree/v0.3.19"
             },
-            "time": "2024-03-19T14:23:52+00:00"
+            "time": "2024-05-15T12:53:36+00:00"
         },
         {
             "name": "dbp/relay-base-course-bundle",
