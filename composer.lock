@@ -247,16 +247,16 @@
         },
         {
             "name": "dbp/relay-base-course-bundle",
-            "version": "v0.2.10",
+            "version": "v0.2.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-base-course-bundle.git",
-                "reference": "c03078b0ce473ac3584edd1d5d10ab74bc2753ad"
+                "reference": "1449c60bdc353b5ee9045bba5f567656ace6caaa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-base-course-bundle/zipball/c03078b0ce473ac3584edd1d5d10ab74bc2753ad",
-                "reference": "c03078b0ce473ac3584edd1d5d10ab74bc2753ad",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-base-course-bundle/zipball/1449c60bdc353b5ee9045bba5f567656ace6caaa",
+                "reference": "1449c60bdc353b5ee9045bba5f567656ace6caaa",
                 "shasum": ""
             },
             "require": {
@@ -274,7 +274,7 @@
                 "friendsofphp/php-cs-fixer": "^3.4",
                 "phpstan/phpstan": "^1.8.11",
                 "phpstan/phpstan-phpunit": "^1.2.2",
-                "phpunit/phpunit": "^9.5.26",
+                "phpunit/phpunit": "^10.1",
                 "symfony/browser-kit": "^5.4.11 || ^6.4",
                 "symfony/error-handler": "^5.4 || ^6.4",
                 "symfony/http-client": "^5.4.15 || ^6.4",
@@ -295,9 +295,9 @@
             ],
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-base-course-bundle/issues",
-                "source": "https://github.com/digital-blueprint/relay-base-course-bundle/tree/v0.2.10"
+                "source": "https://github.com/digital-blueprint/relay-base-course-bundle/tree/v0.2.11"
             },
-            "time": "2024-04-11T14:36:13+00:00"
+            "time": "2024-05-23T09:29:31+00:00"
         },
         {
             "name": "dbp/relay-base-person-bundle",
@@ -355,16 +355,16 @@
         },
         {
             "name": "dbp/relay-core-bundle",
-            "version": "v0.1.160",
+            "version": "v0.1.163",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-core-bundle.git",
-                "reference": "a2c359620fa727e6dab76c783e48df2c8acb25ec"
+                "reference": "6faf43cc6b42a28dff013c4a4372b596b0f56d4e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-core-bundle/zipball/a2c359620fa727e6dab76c783e48df2c8acb25ec",
-                "reference": "a2c359620fa727e6dab76c783e48df2c8acb25ec",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-core-bundle/zipball/6faf43cc6b42a28dff013c4a4372b596b0f56d4e",
+                "reference": "6faf43cc6b42a28dff013c4a4372b596b0f56d4e",
                 "shasum": ""
             },
             "require": {
@@ -449,9 +449,9 @@
             "description": "The core bundle of the Relay API gateway",
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-core-bundle/issues",
-                "source": "https://github.com/digital-blueprint/relay-core-bundle/tree/v0.1.160"
+                "source": "https://github.com/digital-blueprint/relay-core-bundle/tree/v0.1.163"
             },
-            "time": "2024-04-29T09:42:04+00:00"
+            "time": "2024-05-23T11:58:51+00:00"
         },
         {
             "name": "doctrine/annotations",
@@ -1607,16 +1607,16 @@
         },
         {
             "name": "phpdocumentor/reflection-docblock",
-            "version": "5.4.0",
+            "version": "5.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/ReflectionDocBlock.git",
-                "reference": "298d2febfe79d03fe714eb871d5538da55205b1a"
+                "reference": "9d07b3f7fdcf5efec5d1609cba3c19c5ea2bdc9c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/298d2febfe79d03fe714eb871d5538da55205b1a",
-                "reference": "298d2febfe79d03fe714eb871d5538da55205b1a",
+                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/9d07b3f7fdcf5efec5d1609cba3c19c5ea2bdc9c",
+                "reference": "9d07b3f7fdcf5efec5d1609cba3c19c5ea2bdc9c",
                 "shasum": ""
             },
             "require": {
@@ -1665,9 +1665,9 @@
             "description": "With this component, a library can provide support for annotations via DocBlocks or otherwise retrieve information that is embedded in a DocBlock.",
             "support": {
                 "issues": "https://github.com/phpDocumentor/ReflectionDocBlock/issues",
-                "source": "https://github.com/phpDocumentor/ReflectionDocBlock/tree/5.4.0"
+                "source": "https://github.com/phpDocumentor/ReflectionDocBlock/tree/5.4.1"
             },
-            "time": "2024-04-09T21:13:58+00:00"
+            "time": "2024-05-21T05:55:05+00:00"
         },
         {
             "name": "phpdocumentor/type-resolver",
@@ -6557,16 +6557,16 @@
         },
         {
             "name": "twig/twig",
-            "version": "v3.10.1",
+            "version": "v3.10.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "3af5ab2e52279e5e23dc192b1a26db3b8cffa4e7"
+                "reference": "67f29781ffafa520b0bbfbd8384674b42db04572"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/3af5ab2e52279e5e23dc192b1a26db3b8cffa4e7",
-                "reference": "3af5ab2e52279e5e23dc192b1a26db3b8cffa4e7",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/67f29781ffafa520b0bbfbd8384674b42db04572",
+                "reference": "67f29781ffafa520b0bbfbd8384674b42db04572",
                 "shasum": ""
             },
             "require": {
@@ -6620,7 +6620,7 @@
             ],
             "support": {
                 "issues": "https://github.com/twigphp/Twig/issues",
-                "source": "https://github.com/twigphp/Twig/tree/v3.10.1"
+                "source": "https://github.com/twigphp/Twig/tree/v3.10.3"
             },
             "funding": [
                 {
@@ -6632,7 +6632,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-05-12T06:16:18+00:00"
+            "time": "2024-05-16T10:04:27+00:00"
         },
         {
             "name": "webmozart/assert",
@@ -7773,16 +7773,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.11.1",
+            "version": "1.11.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "e524358f930e41a2b4cca1320e3b04fc26b39e0b"
+                "reference": "0d5d4294a70deb7547db655c47685d680e39cfec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/e524358f930e41a2b4cca1320e3b04fc26b39e0b",
-                "reference": "e524358f930e41a2b4cca1320e3b04fc26b39e0b",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/0d5d4294a70deb7547db655c47685d680e39cfec",
+                "reference": "0d5d4294a70deb7547db655c47685d680e39cfec",
                 "shasum": ""
             },
             "require": {
@@ -7827,7 +7827,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-05-15T08:00:59+00:00"
+            "time": "2024-05-24T13:23:04+00:00"
         },
         {
             "name": "phpstan/phpstan-phpunit",
