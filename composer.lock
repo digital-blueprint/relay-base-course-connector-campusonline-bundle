@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b966689ca9e7cabcbd48820f420ecc51",
+    "content-hash": "b4f1a2780c9c17cd1657c4ade816bd23",
     "packages": [
         {
             "name": "api-platform/core",
@@ -247,21 +247,21 @@
         },
         {
             "name": "dbp/relay-base-course-bundle",
-            "version": "v0.2.11",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-base-course-bundle.git",
-                "reference": "1449c60bdc353b5ee9045bba5f567656ace6caaa"
+                "reference": "3fa279de85aa17760c1cc00f1e7be514106d0f8f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-base-course-bundle/zipball/1449c60bdc353b5ee9045bba5f567656ace6caaa",
-                "reference": "1449c60bdc353b5ee9045bba5f567656ace6caaa",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-base-course-bundle/zipball/3fa279de85aa17760c1cc00f1e7be514106d0f8f",
+                "reference": "3fa279de85aa17760c1cc00f1e7be514106d0f8f",
                 "shasum": ""
             },
             "require": {
                 "api-platform/core": "^2.7.11 || ^3.2",
-                "dbp/relay-core-bundle": "^0.1.153",
+                "dbp/relay-core-bundle": "^0.1.171",
                 "ext-json": "*",
                 "php": ">=8.1",
                 "symfony/config": "^5.4 || ^6.4",
@@ -283,6 +283,7 @@
                 "symfony/phpunit-bridge": "^5.4.14 || ^6.4",
                 "vimeo/psalm": "^5.22.2"
             },
+            "default-branch": true,
             "type": "symfony-bundle",
             "autoload": {
                 "psr-4": {
@@ -295,9 +296,9 @@
             ],
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-base-course-bundle/issues",
-                "source": "https://github.com/digital-blueprint/relay-base-course-bundle/tree/v0.2.11"
+                "source": "https://github.com/digital-blueprint/relay-base-course-bundle/tree/main"
             },
-            "time": "2024-05-23T09:29:31+00:00"
+            "time": "2024-07-10T10:57:49+00:00"
         },
         {
             "name": "dbp/relay-base-person-bundle",
@@ -355,16 +356,16 @@
         },
         {
             "name": "dbp/relay-core-bundle",
-            "version": "v0.1.170",
+            "version": "v0.1.171",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-core-bundle.git",
-                "reference": "5998191b7ac5ef04c0ecdd1783f62262112f6a62"
+                "reference": "24fc3d0973f0c0730ec66bb8a464334ef753b1b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-core-bundle/zipball/5998191b7ac5ef04c0ecdd1783f62262112f6a62",
-                "reference": "5998191b7ac5ef04c0ecdd1783f62262112f6a62",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-core-bundle/zipball/24fc3d0973f0c0730ec66bb8a464334ef753b1b6",
+                "reference": "24fc3d0973f0c0730ec66bb8a464334ef753b1b6",
                 "shasum": ""
             },
             "require": {
@@ -447,9 +448,9 @@
             "description": "The core bundle of the Relay API gateway",
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-core-bundle/issues",
-                "source": "https://github.com/digital-blueprint/relay-core-bundle/tree/v0.1.170"
+                "source": "https://github.com/digital-blueprint/relay-core-bundle/tree/v0.1.171"
             },
-            "time": "2024-07-04T10:25:13+00:00"
+            "time": "2024-07-10T09:39:58+00:00"
         },
         {
             "name": "doctrine/inflector",
@@ -10540,9 +10541,18 @@
             "time": "2024-06-16T15:08:35+00:00"
         }
     ],
-    "aliases": [],
+    "aliases": [
+        {
+            "package": "dbp/relay-base-course-bundle",
+            "version": "dev-main",
+            "alias": "0.2.10",
+            "alias_normalized": "0.2.10.0"
+        }
+    ],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "dbp/relay-base-course-bundle": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
@@ -10553,5 +10563,5 @@
     "platform-overrides": {
         "php": "8.1"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.2.0"
 }

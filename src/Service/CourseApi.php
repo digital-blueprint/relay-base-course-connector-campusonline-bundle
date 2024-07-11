@@ -10,23 +10,22 @@ use Dbp\CampusonlineApi\LegacyWebService\ApiException;
 use Dbp\CampusonlineApi\LegacyWebService\Course\CourseData;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareTrait;
 
 class CourseApi implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     public const ALL_ITEMS = -1;
 
-    /** @var Api */
-    private $api;
-    private $config;
-    private $clientHandler;
-    private $cachePool;
-    private $cacheTTL = 0;
-    private $logger;
+    private ?Api $api = null;
+    private array $config = [];
+    private ?object $clientHandler = null;
+    private ?CacheItemPoolInterface $cachePool = null;
+    private int $cacheTTL = 0;
 
     public function __construct()
     {
-        $this->config = [];
     }
 
     public function setCache(?CacheItemPoolInterface $cachePool, int $ttl): void
@@ -40,6 +39,11 @@ class CourseApi implements LoggerAwareInterface
         $this->config = $config;
     }
 
+    /**
+     * @internal
+     *
+     * Just for unit testing
+     */
     public function setClientHandler(?object $handler): void
     {
         $this->clientHandler = $handler;
@@ -48,18 +52,10 @@ class CourseApi implements LoggerAwareInterface
         }
     }
 
-    public function setLogger(LoggerInterface $logger): void
-    {
-        $this->logger = $logger;
-        if ($this->api !== null) {
-            $this->api->setLogger($logger);
-        }
-    }
-
     /**
      * @throws ApiException
      */
-    public function checkConnection()
+    public function checkConnection(): void
     {
         $this->getApi()->Course()->checkConnection();
         $this->getApi()->Person()->checkConnection();

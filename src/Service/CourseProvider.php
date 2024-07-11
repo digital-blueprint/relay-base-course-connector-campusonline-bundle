@@ -7,14 +7,11 @@ namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service;
 use Dbp\CampusonlineApi\Helpers\Filters;
 use Dbp\CampusonlineApi\LegacyWebService\ApiException;
 use Dbp\CampusonlineApi\LegacyWebService\Course\CourseData;
-use Dbp\CampusonlineApi\LegacyWebService\Person\PersonData;
 use Dbp\CampusonlineApi\LegacyWebService\ResourceApi;
 use Dbp\Relay\BaseCourseBundle\API\CourseProviderInterface;
 use Dbp\Relay\BaseCourseBundle\Entity\Course;
-use Dbp\Relay\BaseCourseBundle\Entity\CourseAttendee;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CoursePostEvent;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CoursePreEvent;
-use Dbp\Relay\BasePersonBundle\API\PersonProviderInterface;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Dbp\Relay\CoreBundle\LocalData\LocalDataEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -24,22 +21,15 @@ class CourseProvider implements CourseProviderInterface
 {
     public const ORGANIZATION_QUERY_PARAMETER = 'organization';
     public const LECTURER_QUERY_PARAMETER = 'lecturer';
-    public const TERM_QUERY_PARAMETER = 'term';
+    public const ALL_ITEMS = CourseApi::ALL_ITEMS;
 
-    /** @var CourseApi */
-    private $courseApi;
+    private CourseApi $courseApi;
+    private LocalDataEventDispatcher $eventDispatcher;
 
-    /** @var LocalDataEventDispatcher */
-    private $eventDispatcher;
-
-    /** @var PersonProviderInterface */
-    private $personProvider;
-
-    public function __construct(CourseApi $courseApi, EventDispatcherInterface $eventDispatcher, PersonProviderInterface $personProvider)
+    public function __construct(CourseApi $courseApi, EventDispatcherInterface $eventDispatcher)
     {
         $this->courseApi = $courseApi;
         $this->eventDispatcher = new LocalDataEventDispatcher(Course::class, $eventDispatcher);
-        $this->personProvider = $personProvider;
     }
 
     /**
@@ -53,7 +43,6 @@ class CourseProvider implements CourseProviderInterface
     {
         $this->eventDispatcher->onNewOperation($options);
 
-        $courseData = null;
         try {
             $courseData = $this->courseApi->getCourseById($identifier, $options);
         } catch (\Exception $e) {
@@ -82,7 +71,7 @@ class CourseProvider implements CourseProviderInterface
         $this->eventDispatcher->dispatch($preEvent);
         $options = $preEvent->getOptions();
 
-        $this->addFilterOptions($options);
+        self::addFilterOptions($options);
 
         $organizationId = $options[self::ORGANIZATION_QUERY_PARAMETER] ?? '';
         $lecturerId = $options[self::LECTURER_QUERY_PARAMETER] ?? '';
@@ -108,8 +97,9 @@ class CourseProvider implements CourseProviderInterface
                 if (!$filterByOrganizationId) {
                     $courseDataArray = $coursesByPersonDataArray;
                 } else {
-                    $intersection = array_uintersect($courseDataArray, $coursesByPersonDataArray,
-                        'Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider::compareCourses');
+                    $intersection = array_uintersect($courseDataArray, $coursesByPersonDataArray, function (mixed $a, mixed $b) {
+                        return self::compareCourses($a, $b);
+                    });
                     $courseDataArray = array_values($intersection);
                 }
             }
@@ -162,22 +152,19 @@ class CourseProvider implements CourseProviderInterface
      * @param array $options Available options:
      *                       * Locale::LANGUAGE_OPTION (language in ISO 639‑1 format)
      *
-     * @return CourseAttendee[]
+     * @return string[]
      *
      * @throws ApiError
      */
     public function getAttendeesByCourse(string $courseId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
-        $attendees = [];
         try {
-            foreach ($this->courseApi->getStudentsByCourse($courseId, $currentPageNumber, $maxNumItemsPerPage, $options) as $personData) {
-                $attendees[] = self::createCourseAttendeeFromPersonData($personData);
-            }
+            return array_map(function ($personData) {
+                return $personData->getIdentifier();
+            }, $this->courseApi->getStudentsByCourse($courseId, $currentPageNumber, $maxNumItemsPerPage, $options));
         } catch (ApiException $e) {
             throw self::toApiError($e, $courseId);
         }
-
-        return $attendees;
     }
 
     private function createCourseFromCourseData(CourseData $courseData): Course
@@ -185,25 +172,11 @@ class CourseProvider implements CourseProviderInterface
         $course = new Course();
         $course->setIdentifier($courseData->getIdentifier());
         $course->setName($courseData->getName());
-        $course->setType($courseData->getType());
 
-        $postEvent = new CoursePostEvent($course, $courseData->getData());
+        $postEvent = new CoursePostEvent($course, $courseData->getData(), $this);
         $this->eventDispatcher->dispatch($postEvent);
 
         return $course;
-    }
-
-    private static function createCourseAttendeeFromPersonData(PersonData $personData): CourseAttendee
-    {
-        $attendee = new CourseAttendee();
-        // note: CO person ID is not the same as LDAP person ID,
-        // which is currently used as BasePerson entity ID
-        $attendee->setIdentifier($personData->getIdentifier());
-        $attendee->setGivenName($personData->getGivenName());
-        $attendee->setFamilyName($personData->getFamilyName());
-        $attendee->setEmail($personData->getEmail());
-
-        return $attendee;
     }
 
     /**
@@ -226,7 +199,7 @@ class CourseProvider implements CourseProviderInterface
         return ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
     }
 
-    private function addFilterOptions(array &$options)
+    private static function addFilterOptions(array &$options): void
     {
         if (($searchParameter = $options[Course::SEARCH_PARAMETER_NAME] ?? null) && $searchParameter !== '') {
             unset($options[Course::SEARCH_PARAMETER_NAME]);

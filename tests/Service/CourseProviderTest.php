@@ -7,7 +7,6 @@ namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Tests\Service;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\EventSubscriber\CourseEventSubscriber;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseApi;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider;
-use Dbp\Relay\BasePersonBundle\Service\DummyPersonProvider;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Dbp\Relay\CoreBundle\LocalData\LocalData;
 use GuzzleHttp\Handler\MockHandler;
@@ -52,12 +51,12 @@ class CourseProviderTest extends TestCase
 
         $this->courseApi = new CourseApi();
         $this->courseApi->setConfig(['org_root_id' => '1']); // some value is required
-        $this->courseApi->setCache(new ArrayAdapter(3600, true, 3600, 356), 3600);
-        $this->courseProvider = new CourseProvider($this->courseApi, $eventDispatcher, new DummyPersonProvider());
+        $this->courseApi->setCache(new ArrayAdapter(), 3600);
+        $this->courseProvider = new CourseProvider($this->courseApi, $eventDispatcher);
         $this->mockResponses([]);
     }
 
-    private function mockResponses(array $responses)
+    private function mockResponses(array $responses): void
     {
         $stack = HandlerStack::create(new MockHandler($responses));
         $this->courseApi->setClientHandler($stack);
@@ -74,7 +73,6 @@ class CourseProviderTest extends TestCase
         $course = $courses[0];
         $this->assertSame('241333', $course->getIdentifier());
         $this->assertSame('Technische Informatik 1', $course->getName());
-        $this->assertSame('VO', $course->getType());
     }
 
     public function testGetCourses500()
@@ -107,7 +105,6 @@ class CourseProviderTest extends TestCase
 
         $this->assertSame('240759', $course->getIdentifier());
         $this->assertSame('Computational Intelligence', $course->getName());
-        $this->assertSame('UE', $course->getType());
     }
 
     public function testGetCourseByIdNotFound()
@@ -150,7 +147,6 @@ class CourseProviderTest extends TestCase
         $course = $courses[0];
         $this->assertSame('241333', $course->getIdentifier());
         $this->assertSame('Technische Informatik 1', $course->getName());
-        $this->assertSame('VO', $course->getType());
     }
 
     public function testGetCourseLocalData()
@@ -165,7 +161,6 @@ class CourseProviderTest extends TestCase
 
         $this->assertSame('240759', $course->getIdentifier());
         $this->assertSame('Computational Intelligence', $course->getName());
-        $this->assertSame('UE', $course->getType());
         $this->assertSame('442071', $course->getLocalDataValue(self::COURSE_CODE_ATTRIBUTE_NAME));
     }
 }

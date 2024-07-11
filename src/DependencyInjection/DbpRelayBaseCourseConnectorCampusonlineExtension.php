@@ -21,7 +21,7 @@ class DbpRelayBaseCourseConnectorCampusonlineExtension extends ConfigurableExten
         $loader->load('services.yaml');
 
         $courseApi = $container->getDefinition('Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseApi');
-        $courseApi->addMethodCall('setConfig', [$mergedConfig['campus_online'] ?? []]);
+        $courseApi->addMethodCall('setConfig', [$mergedConfig[Configuration::CAMPUS_ONLINE_NODE] ?? []]);
 
         $courseApi = $container->getDefinition(CourseEventSubscriber::class);
         $courseApi->addMethodCall('setConfig', [$mergedConfig]);
