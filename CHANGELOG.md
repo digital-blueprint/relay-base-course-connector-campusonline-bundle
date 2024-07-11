@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.18
+
+* Refactor and modernize
+
 ## v0.1.17
 
 * Port to PHPUnit 10
