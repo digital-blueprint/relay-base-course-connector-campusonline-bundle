@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5b53dafbcbc476f46f59dec0deecc4b7",
+    "content-hash": "ce8493537007230153777b949bc196a5",
     "packages": [
         {
             "name": "api-platform/core",
@@ -247,7 +247,7 @@
         },
         {
             "name": "dbp/relay-base-course-bundle",
-            "version": "dev-main",
+            "version": "v0.2.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-base-course-bundle.git",
@@ -283,7 +283,6 @@
                 "symfony/phpunit-bridge": "^5.4.14 || ^6.4",
                 "vimeo/psalm": "^5.22.2"
             },
-            "default-branch": true,
             "type": "symfony-bundle",
             "autoload": {
                 "psr-4": {
@@ -10487,18 +10486,9 @@
             "time": "2024-06-16T15:08:35+00:00"
         }
     ],
-    "aliases": [
-        {
-            "package": "dbp/relay-base-course-bundle",
-            "version": "dev-main",
-            "alias": "0.2.10",
-            "alias_normalized": "0.2.10.0"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "dbp/relay-base-course-bundle": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
