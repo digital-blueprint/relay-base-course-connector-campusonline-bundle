@@ -39,17 +39,20 @@ class CourseProvider implements CourseProviderInterface
      *
      * @throws ApiError
      */
-    public function getCourseById(string $identifier, array $options = []): Course
+    public function getCourseById(string $identifier, array $options = []): ?Course
     {
         $this->eventDispatcher->onNewOperation($options);
-
+        $course = null;
         try {
             $courseData = $this->courseApi->getCourseById($identifier, $options);
-        } catch (\Exception $e) {
-            throw self::toApiError($e, $identifier);
+            $course = $this->createCourseFromCourseData($courseData);
+        } catch (ApiException $apiException) {
+            if (!$apiException->isHttpResponseCodeNotFound()) {
+                throw self::toApiError($apiException, $identifier);
+            }
         }
 
-        return $this->createCourseFromCourseData($courseData);
+        return $course;
     }
 
     /**
@@ -134,8 +137,8 @@ class CourseProvider implements CourseProviderInterface
     {
         try {
             return $this->courseApi->getCoursesByOrganization($orgUnitId, $currentPageNumber, $maxNumItemsPerPage, $options);
-        } catch (ApiException $e) {
-            throw self::toApiError($e, $orgUnitId);
+        } catch (ApiException $apiException) {
+            throw self::toApiError($apiException, $orgUnitId);
         }
     }
 

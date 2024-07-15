@@ -8,7 +8,7 @@ use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\EventSubscriber\CourseEventS
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseApi;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
-use Dbp\Relay\CoreBundle\LocalData\LocalData;
+use Dbp\Relay\CoreBundle\Rest\Options;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
@@ -113,12 +113,7 @@ class CourseProviderTest extends TestCase
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/course_by_id_response.xml')),
         ]);
 
-        try {
-            $this->courseProvider->getCourseById('---');
-        } catch (\Throwable $exception) {
-            $this->assertInstanceOf(ApiError::class, $exception);
-            $this->assertEquals(404, $exception->getStatusCode());
-        }
+        $this->assertNull($this->courseProvider->getCourseById('---'));
     }
 
     public function testGetCourseById500()
@@ -129,6 +124,7 @@ class CourseProviderTest extends TestCase
 
         try {
             $this->courseProvider->getCourseById('240759');
+            $this->fail('Expected an ApiError to be thrown');
         } catch (\Throwable $exception) {
             $this->assertInstanceOf(ApiError::class, $exception);
             $this->assertEquals(500, $exception->getStatusCode());
@@ -156,7 +152,7 @@ class CourseProviderTest extends TestCase
         ]);
 
         $options = [];
-        LocalData::requestLocalDataAttributes($options, [self::COURSE_CODE_ATTRIBUTE_NAME]);
+        Options::requestLocalDataAttributes($options, [self::COURSE_CODE_ATTRIBUTE_NAME]);
         $course = $this->courseProvider->getCourseById('240759', $options);
 
         $this->assertSame('240759', $course->getIdentifier());
