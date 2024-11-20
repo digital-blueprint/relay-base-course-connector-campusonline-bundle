@@ -47,9 +47,7 @@ class CourseProvider implements CourseProviderInterface
             $courseData = $this->courseApi->getCourseById($identifier, $options);
             $course = $this->createCourseFromCourseData($courseData);
         } catch (ApiException $apiException) {
-            if (!$apiException->isHttpResponseCodeNotFound()) {
-                throw self::toApiError($apiException, $identifier);
-            }
+            self::dispatchException($apiException, $identifier);
         }
 
         return $course;
@@ -123,11 +121,14 @@ class CourseProvider implements CourseProviderInterface
      */
     private function getCoursesInternal(int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
+        $courses = [];
         try {
-            return $this->courseApi->getCourses($currentPageNumber, $maxNumItemsPerPage, $options);
+            $courses = $this->courseApi->getCourses($currentPageNumber, $maxNumItemsPerPage, $options);
         } catch (ApiException $e) {
-            throw self::toApiError($e, '');
+            self::dispatchException($e);
         }
+
+        return $courses;
     }
 
     /**
@@ -135,20 +136,26 @@ class CourseProvider implements CourseProviderInterface
      */
     private function getCoursesByOrganization(string $orgUnitId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
+        $courses = [];
         try {
-            return $this->courseApi->getCoursesByOrganization($orgUnitId, $currentPageNumber, $maxNumItemsPerPage, $options);
+            $courses = $this->courseApi->getCoursesByOrganization($orgUnitId, $currentPageNumber, $maxNumItemsPerPage, $options);
         } catch (ApiException $apiException) {
-            throw self::toApiError($apiException, $orgUnitId);
+            self::dispatchException($apiException, $orgUnitId);
         }
+
+        return $courses;
     }
 
     private function getCoursesByLecturer(string $lecturerId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
+        $courses = [];
         try {
-            return $this->courseApi->getCoursesByLecturer($lecturerId, $currentPageNumber, $maxNumItemsPerPage, $options);
+            $courses = $this->courseApi->getCoursesByLecturer($lecturerId, $currentPageNumber, $maxNumItemsPerPage, $options);
         } catch (ApiException $e) {
-            throw self::toApiError($e, $lecturerId);
+            self::dispatchException($e, $lecturerId);
         }
+
+        return $courses;
     }
 
     /**
@@ -161,13 +168,16 @@ class CourseProvider implements CourseProviderInterface
      */
     public function getAttendeesByCourse(string $courseId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
+        $attendees = [];
         try {
-            return array_map(function ($personData) {
+            $attendees = array_map(function ($personData) {
                 return $personData->getIdentifier();
             }, $this->courseApi->getStudentsByCourse($courseId, $currentPageNumber, $maxNumItemsPerPage, $options));
         } catch (ApiException $e) {
-            throw self::toApiError($e, $courseId);
+            self::dispatchException($e, $courseId);
         }
+
+        return $attendees;
     }
 
     private function createCourseFromCourseData(CourseData $courseData): Course
@@ -184,22 +194,28 @@ class CourseProvider implements CourseProviderInterface
 
     /**
      * NOTE: Campusonline returns '401 unauthorized' for some resources that are not found. So we can't
-     * safely return '404' in all cases.
+     * safely return '404' in all cases because '401' is also returned by CO if e.g. the token is not valid.
+     *
+     * @throws ApiError
+     * @throws ApiException
      */
-    private static function toApiError(ApiException $e, string $identifier): ApiError
+    private static function dispatchException(ApiException $apiException, ?string $identifier = null): void
     {
-        if ($e->isHttpResponseCode()) {
-            switch ($e->getCode()) {
+        if ($apiException->isHttpResponseCode()) {
+            switch ($apiException->getCode()) {
                 case Response::HTTP_NOT_FOUND:
-                    return ApiError::withDetails(Response::HTTP_NOT_FOUND, sprintf("Id '%s' could not be found!", $identifier));
-                case Response::HTTP_UNAUTHORIZED:
-                    return ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, sprintf("Id '%s' could not be found or access denied!", $identifier));
-                default:
+                    if ($identifier !== null) {
+                        throw new ApiError(Response::HTTP_NOT_FOUND, sprintf("Id '%s' could not be found!", $identifier));
+                    }
                     break;
+                case Response::HTTP_UNAUTHORIZED:
+                    throw new ApiError(Response::HTTP_UNAUTHORIZED, sprintf("Id '%s' could not be found or access denied!", $identifier));
+            }
+            if ($apiException->getCode() >= 500) {
+                throw new ApiError(Response::HTTP_BAD_GATEWAY, 'failed to get organizations from Campusonline');
             }
         }
-
-        return ApiError::withDetails(Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
+        throw $apiException;
     }
 
     private static function addFilterOptions(array &$options): void

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Tests\Service;
 
+use Dbp\CampusonlineApi\LegacyWebService\ApiException;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\EventSubscriber\CourseEventSubscriber;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseApi;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider;
@@ -91,7 +92,7 @@ class CourseProviderTest extends TestCase
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/course_response_invalid_xml.xml')),
         ]);
 
-        $this->expectException(ApiError::class);
+        $this->expectException(ApiException::class);
         $this->courseProvider->getCourses(1, 50);
     }
 
@@ -113,13 +114,19 @@ class CourseProviderTest extends TestCase
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/course_by_id_response.xml')),
         ]);
 
-        $this->assertNull($this->courseProvider->getCourseById('---'));
+        try {
+            $this->courseProvider->getCourseById('404');
+            $this->fail('Expected an ApiError to be thrown');
+        } catch (\Throwable $exception) {
+            $this->assertInstanceOf(ApiError::class, $exception);
+            $this->assertEquals(404, $exception->getStatusCode());
+        }
     }
 
-    public function testGetCourseById500()
+    public function testGetCourseById503()
     {
         $this->mockResponses([
-            new Response(500, ['Content-Type' => 'text/xml;charset=utf-8'], ''),
+            new Response(503, ['Content-Type' => 'text/xml;charset=utf-8'], ''),
         ]);
 
         try {
@@ -127,7 +134,7 @@ class CourseProviderTest extends TestCase
             $this->fail('Expected an ApiError to be thrown');
         } catch (\Throwable $exception) {
             $this->assertInstanceOf(ApiError::class, $exception);
-            $this->assertEquals(500, $exception->getStatusCode());
+            $this->assertEquals(502, $exception->getStatusCode());
         }
     }
 
