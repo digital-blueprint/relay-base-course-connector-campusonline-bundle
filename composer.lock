@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "api-platform/core",
-            "version": "v3.4.9",
+            "version": "v3.4.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/api-platform/core.git",
-                "reference": "535bbf57a7fc00ba0f8d05261050d90b3cbad987"
+                "reference": "f8dae8e1154480a49e86d2393118ffbd99acc51c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/api-platform/core/zipball/535bbf57a7fc00ba0f8d05261050d90b3cbad987",
-                "reference": "535bbf57a7fc00ba0f8d05261050d90b3cbad987",
+                "url": "https://api.github.com/repos/api-platform/core/zipball/f8dae8e1154480a49e86d2393118ffbd99acc51c",
+                "reference": "f8dae8e1154480a49e86d2393118ffbd99acc51c",
                 "shasum": ""
             },
             "require": {
@@ -223,22 +223,22 @@
             ],
             "support": {
                 "issues": "https://github.com/api-platform/core/issues",
-                "source": "https://github.com/api-platform/core/tree/v3.4.9"
+                "source": "https://github.com/api-platform/core/tree/v3.4.10"
             },
-            "time": "2024-12-13T14:29:05+00:00"
+            "time": "2024-12-20T10:18:28+00:00"
         },
         {
             "name": "dbp/campusonline-api",
-            "version": "v0.3.22",
+            "version": "v0.3.23",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/campusonline-api.git",
-                "reference": "b20d7ae5f7b7f5be516c95762015be835d3b1599"
+                "reference": "296687c8cd9f191ad02a0e5d52ccd98cdd3c2faf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/b20d7ae5f7b7f5be516c95762015be835d3b1599",
-                "reference": "b20d7ae5f7b7f5be516c95762015be835d3b1599",
+                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/296687c8cd9f191ad02a0e5d52ccd98cdd3c2faf",
+                "reference": "296687c8cd9f191ad02a0e5d52ccd98cdd3c2faf",
                 "shasum": ""
             },
             "require": {
@@ -273,9 +273,9 @@
             ],
             "support": {
                 "issues": "https://github.com/digital-blueprint/campusonline-api/issues",
-                "source": "https://github.com/digital-blueprint/campusonline-api/tree/v0.3.22"
+                "source": "https://github.com/digital-blueprint/campusonline-api/tree/v0.3.23"
             },
-            "time": "2024-11-28T12:10:15+00:00"
+            "time": "2024-12-19T16:46:38+00:00"
         },
         {
             "name": "dbp/relay-base-course-bundle",
