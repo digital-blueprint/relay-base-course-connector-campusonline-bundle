@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2a72ae2b9aaa5722520acd71c5043959",
+    "content-hash": "cba177a2c30cda4b5d12be6de5f9f905",
     "packages": [
         {
             "name": "api-platform/core",
@@ -279,40 +279,41 @@
         },
         {
             "name": "dbp/relay-base-course-bundle",
-            "version": "v0.2.12",
+            "version": "v0.2.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-base-course-bundle.git",
-                "reference": "ee4f6ba7d43acb7da8521afe273ff23b2b761659"
+                "reference": "04e3ffda9046f3758a33294a580ff9d5d3e34aa7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-base-course-bundle/zipball/ee4f6ba7d43acb7da8521afe273ff23b2b761659",
-                "reference": "ee4f6ba7d43acb7da8521afe273ff23b2b761659",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-base-course-bundle/zipball/04e3ffda9046f3758a33294a580ff9d5d3e34aa7",
+                "reference": "04e3ffda9046f3758a33294a580ff9d5d3e34aa7",
                 "shasum": ""
             },
             "require": {
-                "api-platform/core": "^2.7.11 || ^3.2",
-                "dbp/relay-core-bundle": "^0.1.171",
+                "api-platform/core": "^3.2",
+                "dbp/relay-core-bundle": "^0.1.186",
                 "ext-json": "*",
                 "php": ">=8.1",
-                "symfony/config": "^5.4 || ^6.4",
-                "symfony/dependency-injection": "^5.4 || ^6.4",
-                "symfony/framework-bundle": "^5.4 || ^6.4",
-                "symfony/http-foundation": "^5.4 || ^6.4",
-                "symfony/http-kernel": "^5.4 || ^6.4"
+                "symfony/config": "^6.4",
+                "symfony/dependency-injection": "^6.4",
+                "symfony/framework-bundle": "^6.4",
+                "symfony/http-foundation": "^6.4",
+                "symfony/http-kernel": "^6.4"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.4",
-                "phpstan/phpstan": "^1.8.11",
-                "phpstan/phpstan-phpunit": "^1.2.2",
+                "phpstan/phpstan": "^2.0.0",
+                "phpstan/phpstan-phpunit": "^2.0.0",
+                "phpstan/phpstan-symfony": "^2.0.0",
                 "phpunit/phpunit": "^10.1",
-                "symfony/browser-kit": "^5.4.11 || ^6.4",
-                "symfony/error-handler": "^5.4 || ^6.4",
-                "symfony/http-client": "^5.4.15 || ^6.4",
-                "symfony/monolog-bridge": "^5.4 || ^6.4",
+                "symfony/browser-kit": "^6.4",
+                "symfony/error-handler": "^6.4",
+                "symfony/http-client": "^6.4",
+                "symfony/monolog-bridge": "^6.4",
                 "symfony/monolog-bundle": "^3.8",
-                "symfony/phpunit-bridge": "^5.4.14 || ^6.4",
+                "symfony/phpunit-bridge": "^6.4",
                 "vimeo/psalm": "^5.22.2"
             },
             "type": "symfony-bundle",
@@ -327,9 +328,9 @@
             ],
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-base-course-bundle/issues",
-                "source": "https://github.com/digital-blueprint/relay-base-course-bundle/tree/v0.2.12"
+                "source": "https://github.com/digital-blueprint/relay-base-course-bundle/tree/v0.2.13"
             },
-            "time": "2024-07-11T20:09:39+00:00"
+            "time": "2025-01-28T10:31:34+00:00"
         },
         {
             "name": "dbp/relay-core-bundle",
@@ -7676,16 +7677,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v3.68.1",
+            "version": "v3.68.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer.git",
-                "reference": "b9db2b2ea3cdba7201067acee46f984ef2397cff"
+                "reference": "85fd31cced824749a732e697acdd1a3d657312f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/b9db2b2ea3cdba7201067acee46f984ef2397cff",
-                "reference": "b9db2b2ea3cdba7201067acee46f984ef2397cff",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/85fd31cced824749a732e697acdd1a3d657312f0",
+                "reference": "85fd31cced824749a732e697acdd1a3d657312f0",
                 "shasum": ""
             },
             "require": {
@@ -7767,7 +7768,7 @@
             ],
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues",
-                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.68.1"
+                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.68.3"
             },
             "funding": [
                 {
@@ -7775,7 +7776,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-01-17T09:20:36+00:00"
+            "time": "2025-01-27T16:37:32+00:00"
         },
         {
             "name": "masterminds/html5",
@@ -11145,14 +11146,14 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": ">=8.1",
         "ext-json": "*"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "platform-overrides": {
         "php": "8.1"
     },

@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.19
+
+* Add course code
+
 ## v0.1.18
 
 * Refactor and modernize

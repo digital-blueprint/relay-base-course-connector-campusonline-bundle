@@ -184,6 +184,7 @@ class CourseProvider implements CourseProviderInterface
     {
         $course = new Course();
         $course->setIdentifier($courseData->getIdentifier());
+        $course->setCode($courseData->getCode());
         $course->setName($courseData->getName());
 
         $postEvent = new CoursePostEvent($course, $courseData->getData(), $this);
@@ -223,7 +224,10 @@ class CourseProvider implements CourseProviderInterface
         if (($searchParameter = $options[Course::SEARCH_PARAMETER_NAME] ?? null) && $searchParameter !== '') {
             unset($options[Course::SEARCH_PARAMETER_NAME]);
 
-            ResourceApi::addFilter($options, CourseData::NAME_ATTRIBUTE, Filters::CONTAINS_CI_OPERATOR, $searchParameter, Filters::LOGICAL_OR_OPERATOR);
+            ResourceApi::addFilter($options, CourseData::NAME_ATTRIBUTE,
+                Filters::CONTAINS_CI_OPERATOR, $searchParameter, Filters::LOGICAL_OR_OPERATOR);
+            ResourceApi::addFilter($options, CourseData::CODE_ATTRIBUTE,
+                Filters::CONTAINS_CI_OPERATOR, $searchParameter, Filters::LOGICAL_OR_OPERATOR);
         }
     }
 

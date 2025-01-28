@@ -19,21 +19,18 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CourseProviderTest extends TestCase
 {
-    private const COURSE_CODE_ATTRIBUTE_NAME = 'code';
+    private const COURSE_TYPE_ATTRIBUTE_NAME = 'type';
 
-    /** @var CourseProvider */
-    private $courseProvider;
-
-    /** @var CourseApi */
-    private $courseApi;
+    private ?CourseProvider $courseProvider = null;
+    private ?CourseApi $courseApi = null;
 
     private static function createConfig(): array
     {
         $config = [];
         $config['local_data_mapping'] = [
             [
-                'local_data_attribute' => self::COURSE_CODE_ATTRIBUTE_NAME,
-                'source_attribute' => self::COURSE_CODE_ATTRIBUTE_NAME,
+                'local_data_attribute' => self::COURSE_TYPE_ATTRIBUTE_NAME,
+                'source_attribute' => self::COURSE_TYPE_ATTRIBUTE_NAME,
                 'default_value' => '',
             ],
         ];
@@ -76,6 +73,40 @@ class CourseProviderTest extends TestCase
         $this->assertSame('Technische Informatik 1', $course->getName());
     }
 
+    public function testGetCoursesPagination()
+    {
+        $this->mockResponses([
+            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
+        ]);
+
+        $courses = $this->courseProvider->getCourses(1, 15);
+        $this->assertCount(15, $courses);
+
+        $courseIdsPage1 = [];
+        foreach ($courses as $course) {
+            $courseIdsPage1[] = $course->getIdentifier();
+        }
+
+        $courses = $this->courseProvider->getCourses(2, 15);
+        $this->assertCount(15, $courses);
+
+        $courseIdsPage2 = [];
+        foreach ($courses as $course) {
+            $courseIdsPage2[] = $course->getIdentifier();
+        }
+
+        $courses = $this->courseProvider->getCourses(3, 15);
+        $this->assertCount(4, $courses);
+
+        $courseIdsPage3 = [];
+        foreach ($courses as $course) {
+            $courseIdsPage3[] = $course->getIdentifier();
+        }
+
+        $courseIds = array_unique(array_merge($courseIdsPage1, $courseIdsPage2, $courseIdsPage3));
+        $this->assertCount(34, $courseIds);
+    }
+
     public function testGetCourses500()
     {
         $this->mockResponses([
@@ -106,6 +137,7 @@ class CourseProviderTest extends TestCase
 
         $this->assertSame('240759', $course->getIdentifier());
         $this->assertSame('Computational Intelligence', $course->getName());
+        $this->assertSame('442071', $course->getCode());
     }
 
     public function testGetCourseByIdNotFound()
@@ -144,12 +176,13 @@ class CourseProviderTest extends TestCase
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
         ]);
 
-        $courses = $this->courseProvider->getCourses(1, 50, ['queryLocal' => 'organization:2337']);
+        $courses = $this->courseProvider->getCourses(1, 50, ['organization' => '2337']);
         $this->assertCount(34, $courses);
 
         $course = $courses[0];
         $this->assertSame('241333', $course->getIdentifier());
         $this->assertSame('Technische Informatik 1', $course->getName());
+        $this->assertSame('448001', $course->getCode());
     }
 
     public function testGetCourseLocalData()
@@ -159,11 +192,83 @@ class CourseProviderTest extends TestCase
         ]);
 
         $options = [];
-        Options::requestLocalDataAttributes($options, [self::COURSE_CODE_ATTRIBUTE_NAME]);
+        Options::requestLocalDataAttributes($options, [self::COURSE_TYPE_ATTRIBUTE_NAME]);
         $course = $this->courseProvider->getCourseById('240759', $options);
 
         $this->assertSame('240759', $course->getIdentifier());
         $this->assertSame('Computational Intelligence', $course->getName());
-        $this->assertSame('442071', $course->getLocalDataValue(self::COURSE_CODE_ATTRIBUTE_NAME));
+        $this->assertSame('UE', $course->getLocalDataValue(self::COURSE_TYPE_ATTRIBUTE_NAME));
+    }
+
+    public function testGetCoursesSearchParameter(): void
+    {
+        $this->mockResponses([
+            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
+        ]);
+
+        $courses = $this->courseProvider->getCourses(1, 50, ['search' => 'labor']);
+        $this->assertCount(6, $courses);
+
+        $courseIds = [];
+        foreach ($courses as $course) {
+            $courseIds[] = $course->getIdentifier();
+        }
+
+        $this->assertContains('234661', $courseIds);
+        $this->assertContains('236259', $courseIds);
+        $this->assertContains('236526', $courseIds);
+        $this->assertContains('236527', $courseIds);
+        $this->assertContains('237934', $courseIds);
+        $this->assertContains('238140', $courseIds);
+
+        $this->mockResponses([
+            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
+        ]);
+
+        $courses = $this->courseProvider->getCourses(1, 50, ['search' => '44801']);
+        $this->assertCount(4, $courses);
+
+        $courseCodes = [];
+        foreach ($courses as $course) {
+            $courseCodes[] = $course->getCode();
+        }
+
+        $this->assertContains('448010', $courseCodes);
+        $this->assertContains('448011', $courseCodes);
+        $this->assertContains('448018', $courseCodes);
+        $this->assertContains('448019', $courseCodes);
+
+        $this->mockResponses([
+            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
+        ]);
+
+        $courses = $this->courseProvider->getCourses(1, 50, ['search' => 'foobar']);
+        $this->assertEquals([], $courses);
+    }
+
+    public function testGetCoursesSearchParameterPagination()
+    {
+        $this->mockResponses([
+            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
+        ]);
+
+        $courses = $this->courseProvider->getCourses(1, 5, ['search' => 'labor']);
+        $this->assertCount(5, $courses);
+
+        $courseIdsPage1 = [];
+        foreach ($courses as $course) {
+            $courseIdsPage1[] = $course->getIdentifier();
+        }
+
+        $courses = $this->courseProvider->getCourses(2, 5, ['search' => 'labor']);
+        $this->assertCount(1, $courses);
+
+        $courseIdsPage2 = [];
+        foreach ($courses as $course) {
+            $courseIdsPage2[] = $course->getIdentifier();
+        }
+
+        $courseIds = array_unique(array_merge($courseIdsPage1, $courseIdsPage2));
+        $this->assertCount(6, $courseIds);
     }
 }
