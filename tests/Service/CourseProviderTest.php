@@ -19,7 +19,10 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CourseProviderTest extends TestCase
 {
-    private const COURSE_TYPE_ATTRIBUTE_NAME = 'type';
+    private const COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME = 'type';
+    private const COURSE_TYPE_SOURCE_ATTRIBUTE_NAME = 'type';
+    private const TEACHING_TERM_LOCAL_DATA_ATTRIBUTE_NAME = 'term';
+    private const TEACHING_TERM_SOURCE_ATTRIBUTE_NAME = 'teachingTerm';
 
     private ?CourseProvider $courseProvider = null;
     private ?CourseApi $courseApi = null;
@@ -29,8 +32,13 @@ class CourseProviderTest extends TestCase
         $config = [];
         $config['local_data_mapping'] = [
             [
-                'local_data_attribute' => self::COURSE_TYPE_ATTRIBUTE_NAME,
-                'source_attribute' => self::COURSE_TYPE_ATTRIBUTE_NAME,
+                'local_data_attribute' => self::COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME,
+                'source_attribute' => self::COURSE_TYPE_SOURCE_ATTRIBUTE_NAME,
+                'default_value' => '',
+            ],
+            [
+                'local_data_attribute' => self::TEACHING_TERM_LOCAL_DATA_ATTRIBUTE_NAME,
+                'source_attribute' => self::TEACHING_TERM_SOURCE_ATTRIBUTE_NAME,
                 'default_value' => '',
             ],
         ];
@@ -63,7 +71,8 @@ class CourseProviderTest extends TestCase
     public function testGetCourses()
     {
         $this->mockResponses([
-            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
+            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
+                file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
         ]);
 
         $courses = $this->courseProvider->getCourses(1, 50);
@@ -76,7 +85,8 @@ class CourseProviderTest extends TestCase
     public function testGetCoursesPagination()
     {
         $this->mockResponses([
-            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
+            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
+                file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
         ]);
 
         $courses = $this->courseProvider->getCourses(1, 15);
@@ -120,7 +130,8 @@ class CourseProviderTest extends TestCase
     public function testGetCoursesInvalidXML()
     {
         $this->mockResponses([
-            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/course_response_invalid_xml.xml')),
+            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
+                file_get_contents(__DIR__.'/course_response_invalid_xml.xml')),
         ]);
 
         $this->expectException(ApiException::class);
@@ -130,7 +141,8 @@ class CourseProviderTest extends TestCase
     public function testGetCourseById()
     {
         $this->mockResponses([
-            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/course_by_id_response.xml')),
+            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
+                file_get_contents(__DIR__.'/course_by_id_response.xml')),
         ]);
 
         $course = $this->courseProvider->getCourseById('240759');
@@ -143,7 +155,8 @@ class CourseProviderTest extends TestCase
     public function testGetCourseByIdNotFound()
     {
         $this->mockResponses([
-            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/course_by_id_response.xml')),
+            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
+                file_get_contents(__DIR__.'/course_by_id_response.xml')),
         ]);
 
         try {
@@ -173,7 +186,8 @@ class CourseProviderTest extends TestCase
     public function testGetCoursesByOrganization()
     {
         $this->mockResponses([
-            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
+            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
+                file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
         ]);
 
         $courses = $this->courseProvider->getCourses(1, 50, ['organization' => '2337']);
@@ -188,22 +202,46 @@ class CourseProviderTest extends TestCase
     public function testGetCourseLocalData()
     {
         $this->mockResponses([
-            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/course_by_id_response.xml')),
+            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
+                file_get_contents(__DIR__.'/course_by_id_response.xml')),
         ]);
 
         $options = [];
-        Options::requestLocalDataAttributes($options, [self::COURSE_TYPE_ATTRIBUTE_NAME]);
+        Options::requestLocalDataAttributes($options,
+            [self::COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME, self::TEACHING_TERM_LOCAL_DATA_ATTRIBUTE_NAME]);
         $course = $this->courseProvider->getCourseById('240759', $options);
 
         $this->assertSame('240759', $course->getIdentifier());
         $this->assertSame('Computational Intelligence', $course->getName());
-        $this->assertSame('UE', $course->getLocalDataValue(self::COURSE_TYPE_ATTRIBUTE_NAME));
+        $this->assertSame('UE', $course->getLocalDataValue(self::COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME));
+        $this->assertSame('Sommersemester 2021',
+            $course->getLocalDataValue(self::TEACHING_TERM_LOCAL_DATA_ATTRIBUTE_NAME));
+    }
+
+    public function testGetCoursesLocalData()
+    {
+        $this->mockResponses([
+            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
+                file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
+        ]);
+
+        $options = [];
+        Options::requestLocalDataAttributes($options,
+            [self::COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME, self::TEACHING_TERM_LOCAL_DATA_ATTRIBUTE_NAME]);
+        $courses = $this->courseProvider->getCourses(1, 50, $options);
+        $this->assertCount(34, $courses);
+
+        foreach ($courses as $course) {
+            $this->assertNotNull($course->getLocalDataValue(self::COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME));
+            $this->assertNotNull($course->getLocalDataValue(self::TEACHING_TERM_LOCAL_DATA_ATTRIBUTE_NAME));
+        }
     }
 
     public function testGetCoursesSearchParameter(): void
     {
         $this->mockResponses([
-            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
+            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
+                file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
         ]);
 
         $courses = $this->courseProvider->getCourses(1, 50, ['search' => 'labor']);
@@ -222,7 +260,8 @@ class CourseProviderTest extends TestCase
         $this->assertContains('238140', $courseIds);
 
         $this->mockResponses([
-            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
+            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
+                file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
         ]);
 
         $courses = $this->courseProvider->getCourses(1, 50, ['search' => '44801']);
@@ -239,7 +278,8 @@ class CourseProviderTest extends TestCase
         $this->assertContains('448019', $courseCodes);
 
         $this->mockResponses([
-            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
+            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
+                file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
         ]);
 
         $courses = $this->courseProvider->getCourses(1, 50, ['search' => 'foobar']);
@@ -249,7 +289,8 @@ class CourseProviderTest extends TestCase
     public function testGetCoursesSearchParameterPagination()
     {
         $this->mockResponses([
-            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'], file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
+            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
+                file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
         ]);
 
         $courses = $this->courseProvider->getCourses(1, 5, ['search' => 'labor']);
