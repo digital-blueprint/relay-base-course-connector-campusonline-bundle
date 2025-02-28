@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.21
+
+* Extend caching of courses to one day.
+
 ## v0.1.20
 
 * Add course code

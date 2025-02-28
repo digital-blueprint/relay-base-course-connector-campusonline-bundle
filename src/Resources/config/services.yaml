@@ -7,7 +7,7 @@ services:
    autowire: true
    autoconfigure: true
    calls:
-    - setCache: [ '@dbp.relay.base_course_connector_campusonline.cache.campus_online', 3600 ]
+    - setCache: [ '@dbp.relay.base_course_connector_campusonline.cache.campus_online', 87000 ] # one day
 
  Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\HealthCheck:
    autowire: true
