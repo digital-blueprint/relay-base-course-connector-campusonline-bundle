@@ -229,16 +229,16 @@
         },
         {
             "name": "dbp/campusonline-api",
-            "version": "v0.3.23",
+            "version": "v0.3.24",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/campusonline-api.git",
-                "reference": "296687c8cd9f191ad02a0e5d52ccd98cdd3c2faf"
+                "reference": "e47ed081e7345c3e092981045b9677e072f52a55"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/296687c8cd9f191ad02a0e5d52ccd98cdd3c2faf",
-                "reference": "296687c8cd9f191ad02a0e5d52ccd98cdd3c2faf",
+                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/e47ed081e7345c3e092981045b9677e072f52a55",
+                "reference": "e47ed081e7345c3e092981045b9677e072f52a55",
                 "shasum": ""
             },
             "require": {
@@ -273,9 +273,9 @@
             ],
             "support": {
                 "issues": "https://github.com/digital-blueprint/campusonline-api/issues",
-                "source": "https://github.com/digital-blueprint/campusonline-api/tree/v0.3.23"
+                "source": "https://github.com/digital-blueprint/campusonline-api/tree/v0.3.24"
             },
-            "time": "2024-12-19T16:46:38+00:00"
+            "time": "2025-03-10T09:11:40+00:00"
         },
         {
             "name": "dbp/relay-base-course-bundle",
@@ -334,16 +334,16 @@
         },
         {
             "name": "dbp/relay-core-bundle",
-            "version": "v0.1.203",
+            "version": "v0.1.204",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-core-bundle.git",
-                "reference": "4444920da7b51df531fce0aacd461c2716ac96d9"
+                "reference": "431157d57306e74fc5c10b5e6402faf54d1abf3a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-core-bundle/zipball/4444920da7b51df531fce0aacd461c2716ac96d9",
-                "reference": "4444920da7b51df531fce0aacd461c2716ac96d9",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-core-bundle/zipball/431157d57306e74fc5c10b5e6402faf54d1abf3a",
+                "reference": "431157d57306e74fc5c10b5e6402faf54d1abf3a",
                 "shasum": ""
             },
             "require": {
@@ -430,9 +430,9 @@
             "description": "The core bundle of the Relay API gateway",
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-core-bundle/issues",
-                "source": "https://github.com/digital-blueprint/relay-core-bundle/tree/v0.1.203"
+                "source": "https://github.com/digital-blueprint/relay-core-bundle/tree/v0.1.204"
             },
-            "time": "2025-03-06T09:54:21+00:00"
+            "time": "2025-03-11T13:27:48+00:00"
         },
         {
             "name": "doctrine/collections",
