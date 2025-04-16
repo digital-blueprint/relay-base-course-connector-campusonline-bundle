@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Tests;
 
-use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
 use Dbp\Relay\BaseCourseBundle\DbpRelayBaseCourseBundle;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\DbpRelayBaseCourseConnectorCampusonlineBundle;
 use Dbp\Relay\CoreBundle\DbpRelayCoreBundle;
@@ -30,7 +29,6 @@ class Kernel extends BaseKernel
         yield new TwigBundle();
         yield new NelmioCorsBundle();
         yield new MonologBundle();
-        yield new ApiPlatformBundle();
         yield new DbpRelayBaseCourseBundle();
         yield new DbpRelayBaseCourseConnectorCampusonlineBundle();
         yield new DbpRelayCoreBundle();
