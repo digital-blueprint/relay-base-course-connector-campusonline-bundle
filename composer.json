@@ -3,7 +3,7 @@
     "type": "symfony-bundle",
     "license": "AGPL-3.0-or-later",
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.2",
         "ext-json": "*",
         "dbp/campusonline-api": "^0.3.1",
         "dbp/relay-base-course-bundle": "^0.2.13",
@@ -41,7 +41,7 @@
     "config": {
         "sort-packages": true,
         "platform": {
-            "php": "8.1"
+            "php": "8.2"
         },
         "allow-plugins": {
             "composer/package-versions-deprecated": true
