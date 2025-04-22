@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.22
+
+* dependency cleanup
+
 ## v0.1.21
 
 * Extend caching of courses to one day.
