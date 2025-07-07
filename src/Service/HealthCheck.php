@@ -8,16 +8,10 @@ use Dbp\Relay\CoreBundle\HealthCheck\CheckInterface;
 use Dbp\Relay\CoreBundle\HealthCheck\CheckOptions;
 use Dbp\Relay\CoreBundle\HealthCheck\CheckResult;
 
-class HealthCheck implements CheckInterface
+readonly class HealthCheck implements CheckInterface
 {
-    /**
-     * @var CourseApi
-     */
-    private $api;
-
-    public function __construct(CourseApi $api)
+    public function __construct(private CourseProvider $courseProvider)
     {
-        $this->api = $api;
     }
 
     public function getName(): string
@@ -31,7 +25,7 @@ class HealthCheck implements CheckInterface
 
         $result->set(CheckResult::STATUS_SUCCESS);
         try {
-            $this->api->checkConnection();
+            $this->courseProvider->checkConnection();
         } catch (\Throwable $e) {
             $result->set(CheckResult::STATUS_FAILURE, $e->getMessage(), ['exception' => $e]);
         }

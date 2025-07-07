@@ -4,20 +4,22 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Tests\Service;
 
-use Dbp\CampusonlineApi\LegacyWebService\ApiException;
+use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\DependencyInjection\Configuration;
+use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\DependencyInjection\DbpRelayBaseCourseConnectorCampusonlineExtension;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\EventSubscriber\CourseEventSubscriber;
-use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseApi;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Dbp\Relay\CoreBundle\Rest\Options;
+use Dbp\Relay\CoreBundle\TestUtils\TestEntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class CourseProviderTest extends TestCase
+class CourseProviderTest extends ApiTestCase
 {
     private const COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME = 'type';
     private const COURSE_TYPE_SOURCE_ATTRIBUTE_NAME = 'type';
@@ -25,9 +27,10 @@ class CourseProviderTest extends TestCase
     private const TEACHING_TERM_SOURCE_ATTRIBUTE_NAME = 'teachingTerm';
 
     private ?CourseProvider $courseProvider = null;
-    private ?CourseApi $courseApi = null;
+    private ?EventDispatcher $eventDispatcher = null;
+    private ?EntityManagerInterface $entityManager = null;
 
-    private static function createConfig(): array
+    private static function createEventSubscriberConfig(): array
     {
         $config = [];
         $config['local_data_mapping'] = [
@@ -50,26 +53,109 @@ class CourseProviderTest extends TestCase
     {
         parent::setUp();
 
+        $kernel = self::bootKernel();
+
         $eventDispatcher = new EventDispatcher();
         $localDataEventSubscriber = new CourseEventSubscriber();
-        $localDataEventSubscriber->setConfig(self::createConfig());
+        $localDataEventSubscriber->setConfig(self::createEventSubscriberConfig());
         $eventDispatcher->addSubscriber($localDataEventSubscriber);
+        $this->eventDispatcher = $eventDispatcher;
 
-        $this->courseApi = new CourseApi();
-        $this->courseApi->setConfig(['org_root_id' => '1']); // some value is required
-        $this->courseApi->setCache(new ArrayAdapter(), 3600);
-        $this->courseProvider = new CourseProvider($this->courseApi, $eventDispatcher);
+        $this->entityManager = TestEntityManager::setUpEntityManager($kernel->getContainer(),
+            DbpRelayBaseCourseConnectorCampusonlineExtension::ENTITY_MANAGER_ID);
+
+        $this->withPublicRestApi();
+    }
+
+    private function withLegacyApi(): void
+    {
+        $config = [];
+        $config[Configuration::CAMPUS_ONLINE_NODE] = [
+            'legacy' => true,
+            'org_root_id' => '1',
+        ];
+
+        $this->courseProvider = new CourseProvider($this->entityManager, $this->eventDispatcher);
+        $this->courseProvider->setConfig($config);
+        $this->courseProvider->setCache(new ArrayAdapter(), 3600);
         $this->mockResponses([]);
     }
 
-    private function mockResponses(array $responses): void
+    private function withPublicRestApi(): void
     {
-        $stack = HandlerStack::create(new MockHandler($responses));
-        $this->courseApi->setClientHandler($stack);
+        $config = [];
+        $config[Configuration::CAMPUS_ONLINE_NODE] = [
+            'legacy' => false,
+            'base_url' => 'https://campusonline.at/campusonline/ws/public/rest/',
+            'client_id' => 'client',
+            'client_secret' => 'secret',
+        ];
+
+        $this->courseProvider = new CourseProvider($this->entityManager, $this->eventDispatcher);
+        $this->courseProvider->setConfig($config);
+        $this->courseProvider->setCache(new ArrayAdapter(), 3600);
     }
 
-    public function testGetCourses()
+    private function mockResponses(array $responses, bool $mockAuthServerResponses = false): void
     {
+        if ($mockAuthServerResponses) {
+            $responses = array_merge(self::createMockAuthServerResponses(), $responses);
+        }
+
+        $stack = HandlerStack::create(new MockHandler($responses));
+        $this->courseProvider->setClientHandler($stack);
+    }
+
+    public function testGetCourseByIdentifierEn(): void
+    {
+        $coResponses = [
+            new Response(200, ['Content-Type' => 'applicateion/json;charset=utf-8'],
+                json_encode([
+                    'uid' => '240759',
+                    'title' => [
+                        'value' => [
+                            'en' => 'Computational Intelligence',
+                            'de' => 'Komputationswissenschaft',
+                        ],
+                    ],
+                ])),
+        ];
+
+        $options = [];
+        Options::setLanguage($options, 'en');
+        $this->mockResponses($coResponses, true);
+        $course = $this->courseProvider->getCourseById('240759', $options);
+        $this->assertSame('240759', $course->getIdentifier());
+        $this->assertSame('Computational Intelligence', $course->getName());
+    }
+
+    public function testGetCourseByIdentifierDe(): void
+    {
+        $coResponses = [
+            new Response(200, ['Content-Type' => 'applicateion/json;charset=utf-8'],
+                json_encode([
+                    'uid' => '240759',
+                    'title' => [
+                        'value' => [
+                            'en' => 'Computational Intelligence',
+                            'de' => 'Komputationswissenschaft',
+                        ],
+                    ],
+                ])),
+        ];
+
+        $options = [];
+        Options::setLanguage($options, 'de');
+        $this->mockResponses($coResponses, true);
+        $course = $this->courseProvider->getCourseById('240759', $options);
+        $this->assertSame('240759', $course->getIdentifier());
+        $this->assertSame('Komputationswissenschaft', $course->getName());
+    }
+
+    public function testGetCoursesLegacy(): void
+    {
+        $this->withLegacyApi();
+
         $this->mockResponses([
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
                 file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
@@ -82,8 +168,10 @@ class CourseProviderTest extends TestCase
         $this->assertSame('Technische Informatik 1', $course->getName());
     }
 
-    public function testGetCoursesPagination()
+    public function testGetCoursesPaginationLegacy(): void
     {
+        $this->withLegacyApi();
+
         $this->mockResponses([
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
                 file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
@@ -117,8 +205,10 @@ class CourseProviderTest extends TestCase
         $this->assertCount(34, $courseIds);
     }
 
-    public function testGetCourses500()
+    public function testGetCourses500Legacy(): void
     {
+        $this->withLegacyApi();
+
         $this->mockResponses([
             new Response(500, ['Content-Type' => 'text/xml;charset=utf-8'], ''),
         ]);
@@ -127,19 +217,27 @@ class CourseProviderTest extends TestCase
         $this->courseProvider->getCourses(1, 50);
     }
 
-    public function testGetCoursesInvalidXML()
+    public function testGetCoursesInvalidXMLLegacy(): void
     {
+        $this->withLegacyApi();
+
         $this->mockResponses([
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
                 file_get_contents(__DIR__.'/course_response_invalid_xml.xml')),
         ]);
 
-        $this->expectException(ApiException::class);
-        $this->courseProvider->getCourses(1, 50);
+        try {
+            $this->courseProvider->getCourses(1, 50);
+            $this->fail('Expected an ApiError to be thrown');
+        } catch (ApiError $apiError) {
+            $this->assertEquals(500, $apiError->getStatusCode());
+        }
     }
 
-    public function testGetCourseById()
+    public function testGetCourseByIdLegacy(): void
     {
+        $this->withLegacyApi();
+
         $this->mockResponses([
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
                 file_get_contents(__DIR__.'/course_by_id_response.xml')),
@@ -152,8 +250,10 @@ class CourseProviderTest extends TestCase
         $this->assertSame('442071', $course->getCode());
     }
 
-    public function testGetCourseByIdNotFound()
+    public function testGetCourseByIdNotFoundLegacy(): void
     {
+        $this->withLegacyApi();
+
         $this->mockResponses([
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
                 file_get_contents(__DIR__.'/course_by_id_response.xml')),
@@ -168,8 +268,10 @@ class CourseProviderTest extends TestCase
         }
     }
 
-    public function testGetCourseById503()
+    public function testGetCourseById503Legacy(): void
     {
+        $this->withLegacyApi();
+
         $this->mockResponses([
             new Response(503, ['Content-Type' => 'text/xml;charset=utf-8'], ''),
         ]);
@@ -183,8 +285,10 @@ class CourseProviderTest extends TestCase
         }
     }
 
-    public function testGetCoursesByOrganization()
+    public function testGetCoursesByOrganizationLegacy(): void
     {
+        $this->withLegacyApi();
+
         $this->mockResponses([
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
                 file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
@@ -199,8 +303,10 @@ class CourseProviderTest extends TestCase
         $this->assertSame('448001', $course->getCode());
     }
 
-    public function testGetCourseLocalData()
+    public function testGetCourseLocalDataLegacy(): void
     {
+        $this->withLegacyApi();
+
         $this->mockResponses([
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
                 file_get_contents(__DIR__.'/course_by_id_response.xml')),
@@ -218,8 +324,10 @@ class CourseProviderTest extends TestCase
             $course->getLocalDataValue(self::TEACHING_TERM_LOCAL_DATA_ATTRIBUTE_NAME));
     }
 
-    public function testGetCoursesLocalData()
+    public function testGetCoursesLocalDataLegacy(): void
     {
+        $this->withLegacyApi();
+
         $this->mockResponses([
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
                 file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
@@ -237,8 +345,10 @@ class CourseProviderTest extends TestCase
         }
     }
 
-    public function testGetCoursesSearchParameter(): void
+    public function testGetCoursesSearchParameterLegacy(): void
     {
+        $this->withLegacyApi();
+
         $this->mockResponses([
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
                 file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
@@ -286,8 +396,10 @@ class CourseProviderTest extends TestCase
         $this->assertEquals([], $courses);
     }
 
-    public function testGetCoursesSearchParameterPagination()
+    public function testGetCoursesSearchParameterPaginationLegacy(): void
     {
+        $this->withLegacyApi();
+
         $this->mockResponses([
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
                 file_get_contents(__DIR__.'/courses_by_organization_response.xml')),
@@ -311,5 +423,14 @@ class CourseProviderTest extends TestCase
 
         $courseIds = array_unique(array_merge($courseIdsPage1, $courseIdsPage2));
         $this->assertCount(6, $courseIds);
+    }
+
+    private static function createMockAuthServerResponses(): array
+    {
+        return [
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'], '{"authServerUrl": "https://auth-server.net/"}'),
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'], '{"token_endpoint": "https://token-endpoint.net/"}'),
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'], '{"access_token": "token", "expires_in": 3600, "token_type": "Bearer"}'),
+        ];
     }
 }

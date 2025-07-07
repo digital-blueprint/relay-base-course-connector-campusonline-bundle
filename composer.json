@@ -5,9 +5,13 @@
     "require": {
         "php": ">=8.2",
         "ext-json": "*",
-        "dbp/campusonline-api": "^0.3.1",
+        "dbp/campusonline-api": "dev-main as 0.3.24",
         "dbp/relay-base-course-bundle": "^0.2.13",
-        "dbp/relay-core-bundle": "^0.1.186",
+        "dbp/relay-core-bundle": "dev-main as 0.1.215",
+        "doctrine/dbal": "^4.2",
+        "doctrine/doctrine-migrations-bundle": "^3.4",
+        "doctrine/migrations": "^3.9",
+        "doctrine/orm": "^3.4",
         "symfony/event-dispatcher": "^5.4 || ^6.4",
         "symfony/http-kernel": "^5.4 || ^6.4",
         "symfony/http-foundation": "^5.4 || ^6.4",
@@ -27,6 +31,11 @@
         "symfony/monolog-bundle": "^3.10",
         "symfony/phpunit-bridge": "^5.4 || ^6.4",
         "vimeo/psalm": "^5.22.2"
+    },
+    "conflict": {
+        "symfony/doctrine-bridge": "<6.4.7",
+        "symfony/web-link": "<6.4.7",
+        "doctrine/doctrine-bundle": "<2.13.1"
     },
     "autoload": {
         "psr-4": {

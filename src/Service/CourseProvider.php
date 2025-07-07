@@ -4,32 +4,78 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service;
 
-use Dbp\CampusonlineApi\Helpers\Filters;
 use Dbp\CampusonlineApi\LegacyWebService\ApiException;
-use Dbp\CampusonlineApi\LegacyWebService\Course\CourseData;
-use Dbp\CampusonlineApi\LegacyWebService\ResourceApi;
 use Dbp\Relay\BaseCourseBundle\API\CourseProviderInterface;
 use Dbp\Relay\BaseCourseBundle\Entity\Course;
+use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Apis\CourseAndExtraData;
+use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Apis\CourseApiInterface;
+use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Apis\LegacyCourseApi;
+use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Apis\PublicRestCourseApi;
+use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\DependencyInjection\Configuration;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CoursePostEvent;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CoursePreEvent;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Dbp\Relay\CoreBundle\LocalData\LocalDataEventDispatcher;
+use Doctrine\ORM\EntityManagerInterface;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-class CourseProvider implements CourseProviderInterface
+class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
 {
-    public const ORGANIZATION_QUERY_PARAMETER = 'organization';
-    public const LECTURER_QUERY_PARAMETER = 'lecturer';
-    public const ALL_ITEMS = CourseApi::ALL_ITEMS;
+    use LoggerAwareTrait;
 
-    private CourseApi $courseApi;
+    private ?CourseApiInterface $courseApi = null;
     private LocalDataEventDispatcher $eventDispatcher;
+    private array $config = [];
+    private ?object $clientHandler = null;
+    private ?CacheItemPoolInterface $cachePool = null;
+    private int $cacheTTL = 0;
 
-    public function __construct(CourseApi $courseApi, EventDispatcherInterface $eventDispatcher)
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        EventDispatcherInterface $eventDispatcher)
     {
-        $this->courseApi = $courseApi;
         $this->eventDispatcher = new LocalDataEventDispatcher(Course::class, $eventDispatcher);
+    }
+
+    public function setCache(?CacheItemPoolInterface $cachePool, int $ttl): void
+    {
+        $this->cachePool = $cachePool;
+        $this->cacheTTL = $ttl;
+    }
+
+    public function setConfig(array $config): void
+    {
+        $this->config = $config[Configuration::CAMPUS_ONLINE_NODE];
+    }
+
+    /**
+     * @internal
+     *
+     * Just for unit testing
+     */
+    public function setClientHandler(?object $handler): void
+    {
+        $this->clientHandler = $handler;
+        if ($this->courseApi !== null) {
+            $this->courseApi->setClientHandler($handler);
+        }
+    }
+
+    /**
+     * @throws ApiException
+     */
+    public function checkConnection(): void
+    {
+        $this->getCourseApi()->checkConnection();
+    }
+
+    public function recreateCoursesCache(): void
+    {
+        $this->getCourseApi()->recreateCoursesCache();
     }
 
     /**
@@ -42,15 +88,13 @@ class CourseProvider implements CourseProviderInterface
     public function getCourseById(string $identifier, array $options = []): ?Course
     {
         $this->eventDispatcher->onNewOperation($options);
-        $course = null;
         try {
-            $courseData = $this->courseApi->getCourseById($identifier, $options);
-            $course = $this->createCourseFromCourseData($courseData);
+            $courseAndExtraData = $this->getCourseApi()->getCourseById($identifier, $options);
         } catch (ApiException $apiException) {
-            self::dispatchException($apiException, $identifier);
+            throw self::dispatchException($apiException, $identifier);
         }
 
-        return $course;
+        return $this->postProcessCourse($courseAndExtraData);
     }
 
     /**
@@ -58,7 +102,6 @@ class CourseProvider implements CourseProviderInterface
      *                       * Locale::LANGUAGE_OPTION (language in ISO 639‑1 format)
      *                       * Course::SEARCH_PARAMETER_NAME (partial, case-insensitive text search on 'name' attribute)
      *                       * LocalData::INCLUDE_PARAMETER_NAME
-     *                       * LocalData::QUERY_PARAMETER_NAME
      *
      * @return Course[]
      *
@@ -71,126 +114,39 @@ class CourseProvider implements CourseProviderInterface
         $preEvent = new CoursePreEvent($options);
         $this->eventDispatcher->dispatch($preEvent);
         $options = $preEvent->getOptions();
-
-        self::addFilterOptions($options);
-
-        $organizationId = $options[self::ORGANIZATION_QUERY_PARAMETER] ?? '';
-        $lecturerId = $options[self::LECTURER_QUERY_PARAMETER] ?? '';
-
-        $filterByOrganizationId = $organizationId !== '';
-        $filterByLecturerId = $lecturerId !== '';
-
-        $courseDataArray = null;
-
-        if ($filterByOrganizationId || $filterByLecturerId) {
-            if ($filterByOrganizationId && $filterByLecturerId) {
-                // request the whole set of results since we need to intersect them ->
-                $currentPageNumber = 1;
-                $maxNumItemsPerPage = CourseApi::ALL_ITEMS;
-            }
-
-            if ($filterByOrganizationId) {
-                $courseDataArray = $this->getCoursesByOrganization($organizationId, $currentPageNumber, $maxNumItemsPerPage, $options);
-            }
-            if ($filterByLecturerId) {
-                $coursesByPersonDataArray = $this->getCoursesByLecturer($lecturerId, $currentPageNumber, $maxNumItemsPerPage, $options);
-
-                if (!$filterByOrganizationId) {
-                    $courseDataArray = $coursesByPersonDataArray;
-                } else {
-                    $intersection = array_uintersect($courseDataArray, $coursesByPersonDataArray, function (mixed $a, mixed $b) {
-                        return self::compareCourses($a, $b);
-                    });
-                    $courseDataArray = array_values($intersection);
-                }
-            }
-        } else {
-            $courseDataArray = $this->getCoursesInternal($currentPageNumber, $maxNumItemsPerPage, $options);
-        }
-
         $courses = [];
-        foreach ($courseDataArray as $courseData) {
-            $courses[] = $this->createCourseFromCourseData($courseData);
-        }
 
-        return $courses;
-    }
-
-    /**
-     * @throws ApiError
-     */
-    private function getCoursesInternal(int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
-    {
-        $courses = [];
         try {
-            $courses = $this->courseApi->getCourses($currentPageNumber, $maxNumItemsPerPage, $options);
-        } catch (ApiException $e) {
-            self::dispatchException($e);
-        }
-
-        return $courses;
-    }
-
-    /**
-     * @throws ApiError
-     */
-    private function getCoursesByOrganization(string $orgUnitId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
-    {
-        $courses = [];
-        try {
-            $courses = $this->courseApi->getCoursesByOrganization($orgUnitId, $currentPageNumber, $maxNumItemsPerPage, $options);
+            foreach ($this->getCourseApi()->getCourses($currentPageNumber, $maxNumItemsPerPage, $options) as $courseAndExtraData) {
+                $courses[] = $this->postProcessCourse($courseAndExtraData);
+            }
         } catch (ApiException $apiException) {
-            self::dispatchException($apiException, $orgUnitId);
+            throw self::dispatchException($apiException);
         }
 
         return $courses;
     }
 
-    private function getCoursesByLecturer(string $lecturerId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
+    private function getCourseApi(): CourseApiInterface
     {
-        $courses = [];
-        try {
-            $courses = $this->courseApi->getCoursesByLecturer($lecturerId, $currentPageNumber, $maxNumItemsPerPage, $options);
-        } catch (ApiException $e) {
-            self::dispatchException($e, $lecturerId);
+        if ($this->courseApi === null) {
+            if ($this->config['legacy'] ?? true) {
+                $this->courseApi = new LegacyCourseApi($this->config, $this->cachePool, $this->cacheTTL, $this->clientHandler, $this->logger);
+            } else {
+                $this->courseApi = new PublicRestCourseApi($this->entityManager, $this->config, $this->clientHandler);
+            }
         }
 
-        return $courses;
+        return $this->courseApi;
     }
 
-    /**
-     * @param array $options Available options:
-     *                       * Locale::LANGUAGE_OPTION (language in ISO 639‑1 format)
-     *
-     * @return string[]
-     *
-     * @throws ApiError
-     */
-    public function getAttendeesByCourse(string $courseId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
+    private function postProcessCourse(CourseAndExtraData $courseAndExtraData): Course
     {
-        $attendees = [];
-        try {
-            $attendees = array_map(function ($personData) {
-                return $personData->getIdentifier();
-            }, $this->courseApi->getStudentsByCourse($courseId, $currentPageNumber, $maxNumItemsPerPage, $options));
-        } catch (ApiException $e) {
-            self::dispatchException($e, $courseId);
-        }
-
-        return $attendees;
-    }
-
-    private function createCourseFromCourseData(CourseData $courseData): Course
-    {
-        $course = new Course();
-        $course->setIdentifier($courseData->getIdentifier());
-        $course->setCode($courseData->getCode());
-        $course->setName($courseData->getName());
-
-        $postEvent = new CoursePostEvent($course, $courseData->getData(), $this);
+        $postEvent = new CoursePostEvent(
+            $courseAndExtraData->getCourse(), $courseAndExtraData->getExtraData(), $this);
         $this->eventDispatcher->dispatch($postEvent);
 
-        return $course;
+        return $courseAndExtraData->getCourse();
     }
 
     /**
@@ -200,45 +156,23 @@ class CourseProvider implements CourseProviderInterface
      * @throws ApiError
      * @throws ApiException
      */
-    private static function dispatchException(ApiException $apiException, ?string $identifier = null): void
+    private static function dispatchException(ApiException $apiException, ?string $identifier = null): ApiError
     {
         if ($apiException->isHttpResponseCode()) {
             switch ($apiException->getCode()) {
                 case Response::HTTP_NOT_FOUND:
                     if ($identifier !== null) {
-                        throw new ApiError(Response::HTTP_NOT_FOUND, sprintf("Id '%s' could not be found!", $identifier));
+                        return new ApiError(Response::HTTP_NOT_FOUND, sprintf("Id '%s' could not be found!", $identifier));
                     }
                     break;
                 case Response::HTTP_UNAUTHORIZED:
-                    throw new ApiError(Response::HTTP_UNAUTHORIZED, sprintf("Id '%s' could not be found or access denied!", $identifier));
+                    return new ApiError(Response::HTTP_UNAUTHORIZED, sprintf("Id '%s' could not be found or access denied!", $identifier));
             }
             if ($apiException->getCode() >= 500) {
-                throw new ApiError(Response::HTTP_BAD_GATEWAY, 'failed to get organizations from Campusonline');
+                return new ApiError(Response::HTTP_BAD_GATEWAY, 'failed to get organizations from Campusonline');
             }
         }
-        throw $apiException;
-    }
 
-    private static function addFilterOptions(array &$options): void
-    {
-        if (($searchParameter = $options[Course::SEARCH_PARAMETER_NAME] ?? null) && $searchParameter !== '') {
-            unset($options[Course::SEARCH_PARAMETER_NAME]);
-
-            ResourceApi::addFilter($options, CourseData::NAME_ATTRIBUTE,
-                Filters::CONTAINS_CI_OPERATOR, $searchParameter, Filters::LOGICAL_OR_OPERATOR);
-            ResourceApi::addFilter($options, CourseData::CODE_ATTRIBUTE,
-                Filters::CONTAINS_CI_OPERATOR, $searchParameter, Filters::LOGICAL_OR_OPERATOR);
-        }
-    }
-
-    public static function compareCourses(CourseData $a, CourseData $b): int
-    {
-        if ($a->getIdentifier() > $b->getIdentifier()) {
-            return 1;
-        } elseif ($a->getIdentifier() === $b->getIdentifier()) {
-            return 0;
-        } else {
-            return -1;
-        }
+        return new ApiError(Response::HTTP_INTERNAL_SERVER_ERROR, 'failed to get course(s): '.$apiException->getMessage());
     }
 }

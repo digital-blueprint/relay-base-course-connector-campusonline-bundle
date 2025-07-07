@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Tests;
 
+use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
 use Dbp\Relay\BaseCourseBundle\DbpRelayBaseCourseBundle;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\DbpRelayBaseCourseConnectorCampusonlineBundle;
+use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\DependencyInjection\Configuration;
 use Dbp\Relay\CoreBundle\DbpRelayCoreBundle;
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle;
 use Nelmio\CorsBundle\NelmioCorsBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
@@ -29,6 +33,9 @@ class Kernel extends BaseKernel
         yield new TwigBundle();
         yield new NelmioCorsBundle();
         yield new MonologBundle();
+        yield new DoctrineBundle();
+        yield new DoctrineMigrationsBundle();
+        yield new ApiPlatformBundle();
         yield new DbpRelayBaseCourseBundle();
         yield new DbpRelayBaseCourseConnectorCampusonlineBundle();
         yield new DbpRelayCoreBundle();
@@ -46,6 +53,10 @@ class Kernel extends BaseKernel
             'test' => true,
             'secret' => '',
             'annotations' => false,
+        ]);
+
+        $container->extension(Configuration::ROOT_NODE, [
+            Configuration::DATABASE_URL => 'sqlite:///:memory:',
         ]);
     }
 }
