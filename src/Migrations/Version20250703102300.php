@@ -17,10 +17,10 @@ final class Version20250703102300 extends EntityManagerMigration
 
     public function up(Schema $schema): void
     {
-        $uidColumn = CachedCourse::UID_COLUMN;
-        $courseCodeColumn = CachedCourse::COURSE_CODE_COLUMN;
-        $semesterKeyColumn = CachedCourse::SEMESTER_KEY_COLUMN;
-        $courseTypeColumn = CachedCourse::COURSE_TYPE_KEY_COLUMN;
+        $uidColumn = CachedCourse::UID_COLUMN_NAME;
+        $courseCodeColumn = CachedCourse::COURSE_CODE_COLUMN_NAME;
+        $semesterKeyColumn = CachedCourse::SEMESTER_KEY_COLUMN_NAME;
+        $courseTypeColumn = CachedCourse::COURSE_TYPE_KEY_COLUMN_NAME;
 
         $createStatement = "CREATE TABLE courses ($uidColumn VARCHAR(32) NOT NULL, $courseCodeColumn VARCHAR(32), $semesterKeyColumn VARCHAR(5), $courseTypeColumn VARCHAR(8), PRIMARY KEY($uidColumn))";
         $this->addSql($createStatement);

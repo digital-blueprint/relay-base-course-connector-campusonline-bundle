@@ -10,9 +10,15 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 class CachedCourseTitle
 {
-    public const COURSE_UID_COLUMN_NAME = 'course_uid';
-    public const LANGUAGE_TAG_COLUMN_NAME = 'language_tag';
+    public const COURSE_UID_COLUMN_NAME = 'courseUid';
+    public const LANGUAGE_TAG_COLUMN_NAME = 'languageTag';
     public const TITLE_COLUMN_NAME = 'title';
+
+    public const ALL_COLUMN_NAMES = [
+        self::COURSE_UID_COLUMN_NAME,
+        self::LANGUAGE_TAG_COLUMN_NAME,
+        self::TITLE_COLUMN_NAME,
+    ];
 
     #[ORM\Id]
     #[ORM\JoinColumn(name: self::COURSE_UID_COLUMN_NAME, referencedColumnName: 'uid', onDelete: 'CASCADE')]

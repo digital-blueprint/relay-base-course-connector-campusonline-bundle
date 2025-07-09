@@ -7,25 +7,31 @@ namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Table(name: 'courses')]
 #[ORM\Entity]
 class CachedCourse
 {
-    public const UID_COLUMN = 'uid';
-    public const COURSE_CODE_COLUMN = 'courseCode';
-    public const SEMESTER_KEY_COLUMN = 'semesterKey';
-    public const COURSE_TYPE_KEY_COLUMN = 'courseTypeKey';
+    public const UID_COLUMN_NAME = 'uid';
+    public const COURSE_CODE_COLUMN_NAME = 'courseCode';
+    public const SEMESTER_KEY_COLUMN_NAME = 'semesterKey';
+    public const COURSE_TYPE_KEY_COLUMN_NAME = 'courseTypeKey';
+
+    public const ALL_COLUMN_NAMES = [
+        self::UID_COLUMN_NAME,
+        self::COURSE_CODE_COLUMN_NAME,
+        self::SEMESTER_KEY_COLUMN_NAME,
+        self::COURSE_TYPE_KEY_COLUMN_NAME,
+    ];
 
     #[ORM\Id]
-    #[ORM\Column(name: self::UID_COLUMN, type: 'string', length: 32)]
+    #[ORM\Column(name: self::UID_COLUMN_NAME, type: 'string', length: 32)]
     private ?string $uid = null;
-    #[ORM\Column(name: self::COURSE_CODE_COLUMN, type: 'string', length: 32)]
+    #[ORM\Column(name: self::COURSE_CODE_COLUMN_NAME, type: 'string', length: 32)]
     private ?string $courseCode = null;
-    #[ORM\Column(name: self::SEMESTER_KEY_COLUMN, type: 'string', length: 5)]
+    #[ORM\Column(name: self::SEMESTER_KEY_COLUMN_NAME, type: 'string', length: 5)]
     private ?string $semesterKey = null;
-    #[ORM\Column(name: self::COURSE_TYPE_KEY_COLUMN, type: 'string', length: 8)]
+    #[ORM\Column(name: self::COURSE_TYPE_KEY_COLUMN_NAME, type: 'string', length: 8)]
     private ?string $courseTypeKey = null;
 
     #[ORM\OneToMany(targetEntity: CachedCourseTitle::class, mappedBy: 'course')]
@@ -85,5 +91,4 @@ class CachedCourse
     {
         $this->titles = $titles;
     }
-
 }

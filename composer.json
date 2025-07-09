@@ -7,7 +7,7 @@
         "ext-json": "*",
         "dbp/campusonline-api": "dev-main as 0.3.24",
         "dbp/relay-base-course-bundle": "^0.2.13",
-        "dbp/relay-core-bundle": "dev-main as 0.1.215",
+        "dbp/relay-core-bundle": "^0.1.217",
         "doctrine/dbal": "^4.2",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/migrations": "^3.9",

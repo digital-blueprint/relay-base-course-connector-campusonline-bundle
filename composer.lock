@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fd5eca47759c6859214e21c76551fcac",
+    "content-hash": "1c499c8cf46558320c32648023f8b507",
     "packages": [
         {
             "name": "api-platform/core",
@@ -330,16 +330,16 @@
         },
         {
             "name": "dbp/relay-core-bundle",
-            "version": "dev-main",
+            "version": "v0.1.217",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-core-bundle.git",
-                "reference": "7947907e5c47185013dd2542a471b204c1602b0e"
+                "reference": "137972bb5ae33331b8585cba7048f7dd72386150"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-core-bundle/zipball/7947907e5c47185013dd2542a471b204c1602b0e",
-                "reference": "7947907e5c47185013dd2542a471b204c1602b0e",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-core-bundle/zipball/137972bb5ae33331b8585cba7048f7dd72386150",
+                "reference": "137972bb5ae33331b8585cba7048f7dd72386150",
                 "shasum": ""
             },
             "require": {
@@ -393,7 +393,6 @@
                 "symfony/twig-bundle": "^6.4",
                 "symfony/uid": "^6.4",
                 "symfony/validator": "^6.4",
-                "symfony/var-dumper": "^7.3",
                 "symfony/web-link": "^6.4",
                 "symfony/yaml": "^6.4"
             },
@@ -423,7 +422,6 @@
                 "symfony/phpunit-bridge": "^7.0.6",
                 "symfony/runtime": "^6.4"
             },
-            "default-branch": true,
             "type": "symfony-bundle",
             "autoload": {
                 "psr-4": {
@@ -437,9 +435,9 @@
             "description": "The core bundle of the Relay API gateway",
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-core-bundle/issues",
-                "source": "https://github.com/digital-blueprint/relay-core-bundle/tree/main"
+                "source": "https://github.com/digital-blueprint/relay-core-bundle/tree/v0.1.217"
             },
-            "time": "2025-07-07T09:58:16+00:00"
+            "time": "2025-07-09T10:27:43+00:00"
         },
         {
             "name": "doctrine/collections",
@@ -12017,18 +12015,11 @@
             "version": "dev-main",
             "alias": "0.3.24",
             "alias_normalized": "0.3.24.0"
-        },
-        {
-            "package": "dbp/relay-core-bundle",
-            "version": "dev-main",
-            "alias": "0.1.215",
-            "alias_normalized": "0.1.215.0"
         }
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "dbp/campusonline-api": 20,
-        "dbp/relay-core-bundle": 20
+        "dbp/campusonline-api": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

@@ -11,10 +11,13 @@ use Dbp\Relay\BaseCourseBundle\Entity\Course;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Entity\CachedCourse;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Entity\CachedCourseTitle;
 use Dbp\Relay\CoreBundle\Doctrine\QueryHelper;
-use Dbp\Relay\CoreBundle\LocalData\LocalData;
 use Dbp\Relay\CoreBundle\Rest\Options;
-use Dbp\Relay\CoreBundle\Rest\Query\Filter\FilterTools;
+use Dbp\Relay\CoreBundle\Rest\Query\Filter\FilterTreeBuilder;
+use Dbp\Relay\CoreBundle\Rest\Query\Filter\Nodes\ConditionNode;
+use Dbp\Relay\CoreBundle\Rest\Query\Filter\Nodes\Node;
+use Dbp\Relay\CoreBundle\Rest\Query\Pagination\Pagination;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\Expr\Join;
 
 class PublicRestCourseApi implements CourseApiInterface
 {
@@ -52,10 +55,10 @@ class PublicRestCourseApi implements CourseApiInterface
      */
     public function recreateCoursesCache(): void
     {
-        $uidColumn = CachedCourse::UID_COLUMN;
-        $courseCodeColumn = CachedCourse::COURSE_CODE_COLUMN;
-        $semesterKeyColumn = CachedCourse::SEMESTER_KEY_COLUMN;
-        $courseTypeColumn = CachedCourse::COURSE_TYPE_KEY_COLUMN;
+        $uidColumn = CachedCourse::UID_COLUMN_NAME;
+        $courseCodeColumn = CachedCourse::COURSE_CODE_COLUMN_NAME;
+        $semesterKeyColumn = CachedCourse::SEMESTER_KEY_COLUMN_NAME;
+        $courseTypeColumn = CachedCourse::COURSE_TYPE_KEY_COLUMN_NAME;
 
         $courseUidColumn = CachedCourseTitle::COURSE_UID_COLUMN_NAME;
         $languageTagColumn = CachedCourseTitle::LANGUAGE_TAG_COLUMN_NAME;
@@ -119,21 +122,78 @@ class PublicRestCourseApi implements CourseApiInterface
 
     /**
      * @throws ApiException
+     * @throws \Exception
      */
     public function getCourses(int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): iterable
     {
-        if ($filter = Options::getFilter($options)) {
-            $pathMapping = [
-                'identifier' => 'uid',
-                'code' => 'courseCode',
-                'name' => 'title',
-            ];
-            FilterTools::mapConditionPaths($filter, $pathMapping);
+        $CACHED_COURSE_ENTITY_ALIAS = 'c';
+        $CACHED_COURSE_TITLE_ENTITY_ALIAS = 't';
+
+        $combinedFilter = null;
+        if ($searchTerm = $options[Course::SEARCH_PARAMETER_NAME] ?? null) {
+            $combinedFilter = FilterTreeBuilder::create()
+                ->or()
+                    ->and()
+                        ->iContains($CACHED_COURSE_TITLE_ENTITY_ALIAS.'.'.CachedCourseTitle::TITLE_COLUMN_NAME,
+                            $searchTerm)
+                        ->equals($CACHED_COURSE_TITLE_ENTITY_ALIAS.'.'.CachedCourseTitle::LANGUAGE_TAG_COLUMN_NAME,
+                            Options::getLanguage($options))
+                    ->end()
+                    ->iContains($CACHED_COURSE_ENTITY_ALIAS.'.'.CachedCourse::COURSE_CODE_COLUMN_NAME, $searchTerm)
+                ->end()
+                ->createFilter();
         }
 
+        if ($filter = Options::getFilter($options)) {
+            $pathMapping = [
+                'identifier' => $CACHED_COURSE_ENTITY_ALIAS.'.'.CachedCourse::UID_COLUMN_NAME,
+                'code' => $CACHED_COURSE_ENTITY_ALIAS.'.'.CachedCourse::COURSE_CODE_COLUMN_NAME,
+            ];
+            foreach (CachedCourse::ALL_COLUMN_NAMES as $columnName) {
+                $pathMapping[$columnName] = $CACHED_COURSE_ENTITY_ALIAS.'.'.$columnName;
+            }
+            foreach (CachedCourseTitle::ALL_COLUMN_NAMES as $columnName) {
+                $pathMapping[$columnName] = $CACHED_COURSE_TITLE_ENTITY_ALIAS.'.'.$columnName;
+            }
+
+            $filter->mapConditionNodes(
+                function (ConditionNode $node) use ($pathMapping, $CACHED_COURSE_TITLE_ENTITY_ALIAS, $options): Node {
+                    if (isset($pathMapping[$node->getPath()])) {
+                        $node->setPath($pathMapping[$node->getPath()]);
+                    } elseif ($node->getPath() === 'name') {
+                        $node->setPath($CACHED_COURSE_TITLE_ENTITY_ALIAS.'.'.CachedCourseTitle::TITLE_COLUMN_NAME);
+                        $node = FilterTreeBuilder::create()
+                            ->appendChild($node)
+                            ->equals($CACHED_COURSE_TITLE_ENTITY_ALIAS.'.'.CachedCourseTitle::LANGUAGE_TAG_COLUMN_NAME,
+                                Options::getLanguage($options))
+                            ->createFilter()->getRootNode();
+                    }
+
+                    return $node;
+                });
+
+            $combinedFilter = $combinedFilter ?
+                $combinedFilter->combineWith($filter) : $filter;
+        }
+
+        $queryBuilder = $this->entityManager->createQueryBuilder();
+        $queryBuilder
+            ->select($CACHED_COURSE_ENTITY_ALIAS)
+            ->from(CachedCourse::class, $CACHED_COURSE_ENTITY_ALIAS)
+            ->innerJoin(CachedCourseTitle::class, $CACHED_COURSE_TITLE_ENTITY_ALIAS, Join::WITH,
+                $CACHED_COURSE_ENTITY_ALIAS.'.'.CachedCourse::UID_COLUMN_NAME." = $CACHED_COURSE_TITLE_ENTITY_ALIAS.course");
+        if ($combinedFilter !== null) {
+            QueryHelper::addFilter($queryBuilder, $combinedFilter);
+        }
+
+        $result = $queryBuilder
+            ->getQuery()
+            ->setFirstResult(Pagination::getFirstItemIndex($currentPageNumber, $maxNumItemsPerPage))
+            ->setMaxResults($maxNumItemsPerPage)
+            ->getResult();
+
         /** @var CachedCourse $cachedCourse */
-        foreach (QueryHelper::getEntitiesPageNumberBased(CachedCourse::class, $this->entityManager,
-            $currentPageNumber, $maxNumItemsPerPage) as $cachedCourse) {
+        foreach ($result as $cachedCourse) {
             yield self::createCourseAndExtraDataFromCachedCourse($cachedCourse, $options);
         }
     }
@@ -162,7 +222,8 @@ class PublicRestCourseApi implements CourseApiInterface
         }
 
         return new CourseAndExtraData($course, [
-            // TODO
+            CachedCourse::COURSE_TYPE_KEY_COLUMN_NAME => $cachedCourse->getCourseTypeKey(),
+            CachedCourse::SEMESTER_KEY_COLUMN_NAME => $cachedCourse->getSemesterKey(),
         ]);
     }
 }

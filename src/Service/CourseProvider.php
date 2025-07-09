@@ -127,6 +127,11 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
         return $courses;
     }
 
+    public function getAttendeesByCourseId(string $courseId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
+    {
+        return [];
+    }
+
     private function getCourseApi(): CourseApiInterface
     {
         if ($this->courseApi === null) {
