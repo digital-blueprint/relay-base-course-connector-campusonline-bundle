@@ -229,12 +229,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/campusonline-api.git",
-                "reference": "3ad9687a2cc477cb53962e46e518ddf99353add0"
+                "reference": "9083db1c3ab07dd554620452037acd5df0f2d649"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/3ad9687a2cc477cb53962e46e518ddf99353add0",
-                "reference": "3ad9687a2cc477cb53962e46e518ddf99353add0",
+                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/9083db1c3ab07dd554620452037acd5df0f2d649",
+                "reference": "9083db1c3ab07dd554620452037acd5df0f2d649",
                 "shasum": ""
             },
             "require": {
@@ -272,7 +272,7 @@
                 "issues": "https://github.com/digital-blueprint/campusonline-api/issues",
                 "source": "https://github.com/digital-blueprint/campusonline-api/tree/main"
             },
-            "time": "2025-08-18T05:59:42+00:00"
+            "time": "2025-09-14T07:59:49+00:00"
         },
         {
             "name": "dbp/relay-base-course-bundle",
@@ -681,16 +681,16 @@
         },
         {
             "name": "doctrine/doctrine-bundle",
-            "version": "2.16.1",
+            "version": "2.16.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/DoctrineBundle.git",
-                "reference": "152d5083f0cd205a278131dc4351a8c94d007fe1"
+                "reference": "1c10de0fe995f01eca6b073d1c2549ef0b603a7f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/DoctrineBundle/zipball/152d5083f0cd205a278131dc4351a8c94d007fe1",
-                "reference": "152d5083f0cd205a278131dc4351a8c94d007fe1",
+                "url": "https://api.github.com/repos/doctrine/DoctrineBundle/zipball/1c10de0fe995f01eca6b073d1c2549ef0b603a7f",
+                "reference": "1c10de0fe995f01eca6b073d1c2549ef0b603a7f",
                 "shasum": ""
             },
             "require": {
@@ -724,12 +724,11 @@
                 "phpstan/phpstan": "2.1.1",
                 "phpstan/phpstan-phpunit": "2.0.3",
                 "phpstan/phpstan-strict-rules": "^2",
-                "phpunit/phpunit": "^9.6.22",
+                "phpunit/phpunit": "^10.5.53",
                 "psr/log": "^1.1.4 || ^2.0 || ^3.0",
                 "symfony/doctrine-messenger": "^6.4 || ^7.0",
                 "symfony/expression-language": "^6.4 || ^7.0",
                 "symfony/messenger": "^6.4 || ^7.0",
-                "symfony/phpunit-bridge": "^7.2",
                 "symfony/property-info": "^6.4 || ^7.0",
                 "symfony/security-bundle": "^6.4 || ^7.0",
                 "symfony/stopwatch": "^6.4 || ^7.0",
@@ -784,7 +783,7 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/DoctrineBundle/issues",
-                "source": "https://github.com/doctrine/DoctrineBundle/tree/2.16.1"
+                "source": "https://github.com/doctrine/DoctrineBundle/tree/2.16.2"
             },
             "funding": [
                 {
@@ -800,7 +799,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-09-05T15:24:53+00:00"
+            "time": "2025-09-10T19:14:48+00:00"
         },
         {
             "name": "doctrine/doctrine-migrations-bundle",
@@ -8681,16 +8680,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v3.87.1",
+            "version": "v3.87.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer.git",
-                "reference": "2f5170365e2a422d0c5421f9c8818b2c078105f6"
+                "reference": "da5f0a7858c79b56fc0b8c36d3efcfe5f37f0992"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/2f5170365e2a422d0c5421f9c8818b2c078105f6",
-                "reference": "2f5170365e2a422d0c5421f9c8818b2c078105f6",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/da5f0a7858c79b56fc0b8c36d3efcfe5f37f0992",
+                "reference": "da5f0a7858c79b56fc0b8c36d3efcfe5f37f0992",
                 "shasum": ""
             },
             "require": {
@@ -8773,7 +8772,7 @@
             ],
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues",
-                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.87.1"
+                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.87.2"
             },
             "funding": [
                 {
@@ -8781,7 +8780,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-09-02T15:27:36+00:00"
+            "time": "2025-09-10T09:51:40+00:00"
         },
         {
             "name": "masterminds/html5",
@@ -9359,16 +9358,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.1.22",
+            "version": "2.1.25",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "41600c8379eb5aee63e9413fe9e97273e25d57e4"
+                "reference": "4087d28bd252895874e174d65e26b2c202ed893a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/41600c8379eb5aee63e9413fe9e97273e25d57e4",
-                "reference": "41600c8379eb5aee63e9413fe9e97273e25d57e4",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/4087d28bd252895874e174d65e26b2c202ed893a",
+                "reference": "4087d28bd252895874e174d65e26b2c202ed893a",
                 "shasum": ""
             },
             "require": {
@@ -9413,7 +9412,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-08-04T19:17:37+00:00"
+            "time": "2025-09-12T14:26:42+00:00"
         },
         {
             "name": "phpstan/phpstan-phpunit",
