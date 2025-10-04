@@ -280,42 +280,44 @@
         },
         {
             "name": "dbp/relay-base-course-bundle",
-            "version": "v0.2.14",
+            "version": "v0.2.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-base-course-bundle.git",
-                "reference": "de5cbfdf5b3f7c82964fe6ce5debfe2677f9c5df"
+                "reference": "37c4cb63f6b1708ed84df28687c4b2712baaa3e2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-base-course-bundle/zipball/de5cbfdf5b3f7c82964fe6ce5debfe2677f9c5df",
-                "reference": "de5cbfdf5b3f7c82964fe6ce5debfe2677f9c5df",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-base-course-bundle/zipball/37c4cb63f6b1708ed84df28687c4b2712baaa3e2",
+                "reference": "37c4cb63f6b1708ed84df28687c4b2712baaa3e2",
                 "shasum": ""
             },
             "require": {
                 "api-platform/core": "^3.4.17 | ^4.1",
-                "dbp/relay-core-bundle": "^0.1.209",
+                "dbp/relay-core-bundle": "^0.1.219",
                 "ext-json": "*",
                 "php": ">=8.2",
                 "symfony/config": "^6.4",
                 "symfony/dependency-injection": "^6.4",
                 "symfony/framework-bundle": "^6.4",
                 "symfony/http-foundation": "^6.4",
-                "symfony/http-kernel": "^6.4"
+                "symfony/http-kernel": "^6.4",
+                "symfony/serializer": "^6.4"
             },
             "require-dev": {
+                "captainhook/captainhook": "^5.25",
                 "friendsofphp/php-cs-fixer": "^3.4",
                 "phpstan/phpstan": "^2.0.0",
                 "phpstan/phpstan-phpunit": "^2.0.0",
                 "phpstan/phpstan-symfony": "^2.0.0",
-                "phpunit/phpunit": "^10.1",
+                "phpunit/phpunit": "^11.0",
                 "symfony/browser-kit": "^6.4",
                 "symfony/error-handler": "^6.4",
                 "symfony/http-client": "^6.4",
                 "symfony/monolog-bridge": "^6.4",
                 "symfony/monolog-bundle": "^3.8",
                 "symfony/phpunit-bridge": "^6.4",
-                "vimeo/psalm": "^5.22.2"
+                "symfony/runtime": "^6.4"
             },
             "type": "symfony-bundle",
             "autoload": {
@@ -329,22 +331,22 @@
             ],
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-base-course-bundle/issues",
-                "source": "https://github.com/digital-blueprint/relay-base-course-bundle/tree/v0.2.14"
+                "source": "https://github.com/digital-blueprint/relay-base-course-bundle/tree/v0.2.15"
             },
-            "time": "2025-04-22T12:23:55+00:00"
+            "time": "2025-10-02T08:44:28+00:00"
         },
         {
             "name": "dbp/relay-core-bundle",
-            "version": "v0.1.219",
+            "version": "v0.1.220",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-core-bundle.git",
-                "reference": "a264001a49f6da6d6fb2870ad07cb18363bde8ef"
+                "reference": "719009c265a78cd16ba9c973d75473ad8ecacc9c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-core-bundle/zipball/a264001a49f6da6d6fb2870ad07cb18363bde8ef",
-                "reference": "a264001a49f6da6d6fb2870ad07cb18363bde8ef",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-core-bundle/zipball/719009c265a78cd16ba9c973d75473ad8ecacc9c",
+                "reference": "719009c265a78cd16ba9c973d75473ad8ecacc9c",
                 "shasum": ""
             },
             "require": {
@@ -359,7 +361,7 @@
                 "ext-json": "*",
                 "guzzlehttp/guzzle": "^7.5",
                 "kekos/multipart-form-data-parser": "^1.1",
-                "kevinrob/guzzle-cache-middleware": "^4.0 || ^5.0 || ^6.0",
+                "kevinrob/guzzle-cache-middleware": "^5.0 || ^6.0 || ^7.0",
                 "monolog/monolog": "^3.2",
                 "nelmio/cors-bundle": "^2.2",
                 "nyholm/psr7": "^1.8",
@@ -439,9 +441,9 @@
             "description": "The core bundle of the Relay API gateway",
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-core-bundle/issues",
-                "source": "https://github.com/digital-blueprint/relay-core-bundle/tree/v0.1.219"
+                "source": "https://github.com/digital-blueprint/relay-core-bundle/tree/v0.1.220"
             },
-            "time": "2025-07-30T09:26:46+00:00"
+            "time": "2025-09-29T11:11:45+00:00"
         },
         {
             "name": "doctrine/collections",
