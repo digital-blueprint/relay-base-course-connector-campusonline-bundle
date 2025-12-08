@@ -233,12 +233,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/campusonline-api.git",
-                "reference": "94cf3c9777bba2393d3ad0b5eef210fdef14f45d"
+                "reference": "eacdc33addf8903a5b1bb4db8adcaf5375c098c8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/94cf3c9777bba2393d3ad0b5eef210fdef14f45d",
-                "reference": "94cf3c9777bba2393d3ad0b5eef210fdef14f45d",
+                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/eacdc33addf8903a5b1bb4db8adcaf5375c098c8",
+                "reference": "eacdc33addf8903a5b1bb4db8adcaf5375c098c8",
                 "shasum": ""
             },
             "require": {
@@ -276,7 +276,7 @@
                 "issues": "https://github.com/digital-blueprint/campusonline-api/issues",
                 "source": "https://github.com/digital-blueprint/campusonline-api/tree/main"
             },
-            "time": "2025-11-24T13:12:38+00:00"
+            "time": "2025-12-06T16:48:44+00:00"
         },
         {
             "name": "dbp/relay-base-course-bundle",
