@@ -12,12 +12,12 @@
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/migrations": "^3.9",
         "doctrine/orm": "^3.4",
-        "symfony/event-dispatcher": "^5.4 || ^6.4",
-        "symfony/http-kernel": "^5.4 || ^6.4",
-        "symfony/http-foundation": "^5.4 || ^6.4",
-        "symfony/dependency-injection": "^5.4 || ^6.4",
-        "symfony/config": "^5.4 || ^6.4",
-        "symfony/framework-bundle": "^5.4 || ^6.4",
+        "symfony/event-dispatcher": "^6.4",
+        "symfony/http-kernel": "^6.4",
+        "symfony/http-foundation": "^6.4",
+        "symfony/dependency-injection": "^6.4",
+        "symfony/config": "^6.4",
+        "symfony/framework-bundle": "^6.4",
         "psr/log": "^1.1.4 || ^2.0 || ^3.0"
     },
     "require-dev": {
@@ -26,10 +26,10 @@
         "phpstan/phpstan-phpunit": "^2.0.0",
         "phpstan/phpstan-symfony": "^2.0.0",
         "phpunit/phpunit": "^10.1",
-        "symfony/browser-kit": "^5.4 || ^6.4",
-        "symfony/http-client": "^5.4 || ^6.4",
+        "symfony/browser-kit": "^6.4",
+        "symfony/http-client": "^6.4",
         "symfony/monolog-bundle": "^3.10",
-        "symfony/phpunit-bridge": "^5.4 || ^6.4"
+        "symfony/phpunit-bridge": "^6.4"
     },
     "conflict": {
         "symfony/doctrine-bridge": "<6.4.7",
