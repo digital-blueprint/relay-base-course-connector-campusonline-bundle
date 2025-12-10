@@ -2,8 +2,12 @@
 
 ## Unreleased
 
+## v0.1.23
+
 - Add support for Campusonline Public REST API, where courses are cached in a database. Which API to use (legacy XML or Public REST) can be
 set using the bundle configuration.
+- Add support for Symfony 7
+- Drop support for Symfony 5
 
 ## v0.1.22
 
