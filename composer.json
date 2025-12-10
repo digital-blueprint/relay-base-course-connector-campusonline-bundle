@@ -5,9 +5,9 @@
     "require": {
         "php": ">=8.2",
         "ext-json": "*",
-        "dbp/campusonline-api": "^0.3.24",
+        "dbp/campusonline-api": "^0.3.26",
         "dbp/relay-base-course-bundle": "^0.2.13",
-        "dbp/relay-core-bundle": "^0.1.217",
+        "dbp/relay-core-bundle": "^0.1.220",
         "doctrine/dbal": "^4.2",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/migrations": "^3.9",
