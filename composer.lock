@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bb34877337dc15876ff23958bcf62785",
+    "content-hash": "392bd0b30555f8805fa8707d8ca69aef",
     "packages": [
         {
             "name": "api-platform/documentation",
@@ -979,7 +979,7 @@
         },
         {
             "name": "dbp/campusonline-api",
-            "version": "dev-main",
+            "version": "v0.3.26",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/campusonline-api.git",
@@ -1011,7 +1011,6 @@
                 "symfony/cache": "^5.4 || ^6.4.3",
                 "symfony/phpunit-bridge": "^7.0.7"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -1024,7 +1023,7 @@
             ],
             "support": {
                 "issues": "https://github.com/digital-blueprint/campusonline-api/issues",
-                "source": "https://github.com/digital-blueprint/campusonline-api/tree/main"
+                "source": "https://github.com/digital-blueprint/campusonline-api/tree/v0.3.26"
             },
             "time": "2025-12-09T15:59:02+00:00"
         },
@@ -12316,18 +12315,9 @@
             "time": "2025-11-17T20:03:58+00:00"
         }
     ],
-    "aliases": [
-        {
-            "package": "dbp/campusonline-api",
-            "version": "dev-main",
-            "alias": "0.3.24",
-            "alias_normalized": "0.3.24.0"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "dbp/campusonline-api": 20
-    },
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
