@@ -9,13 +9,17 @@ use Dbp\CampusonlineApi\Helpers\Pagination;
 use Dbp\CampusonlineApi\LegacyWebService\Api;
 use Dbp\CampusonlineApi\LegacyWebService\ApiException;
 use Dbp\CampusonlineApi\LegacyWebService\Course\CourseData;
+use Dbp\CampusonlineApi\LegacyWebService\Person\PersonData;
 use Dbp\CampusonlineApi\LegacyWebService\ResourceApi;
+use Dbp\CampusonlineApi\LegacyWebService\ResourceData;
 use Dbp\Relay\BaseCourseBundle\Entity\Course;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 
 class LegacyCourseApi implements CourseApiInterface
 {
+    use LoggerAwareTrait;
     public const ALL_ITEMS = -1;
 
     private Api $api;
@@ -102,16 +106,32 @@ class LegacyCourseApi implements CourseApiInterface
     }
 
     /**
-     * @throws ApiException
+     * @return string[]
+     *
+     * @throws \Dbp\CampusonlineApi\Helpers\ApiException
      */
-    public function getStudentsByCourse(string $courseId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
+    public function getAttendeesByCourse(string $courseId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
         $options[Pagination::CURRENT_PAGE_NUMBER_PARAMETER_NAME] = $currentPageNumber;
         if ($maxNumItemsPerPage !== self::ALL_ITEMS) {
             $options[Pagination::MAX_NUM_ITEMS_PER_PAGE_PARAMETER_NAME] = $maxNumItemsPerPage;
         }
 
-        return $this->api->Person()->getStudentsByCourse($courseId, $options)->getItems();
+        return array_map(function (PersonData $personData): string {
+            return $personData->getIdentifier();
+        }, $this->api->Person()->getStudentsByCourse($courseId, $options)->getItems());
+    }
+
+    /**
+     * @return string[]
+     *
+     * @throws \Dbp\CampusonlineApi\Helpers\ApiException
+     */
+    public function getLecturersByCourse(string $courseId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
+    {
+        $courseData = $this->api->Course()->getCourseById($courseId, $options);
+
+        return array_map(fn (CourseData $cd) => $cd[ResourceData::IDENTIFIER_ATTRIBUTE], $courseData->getContacts() ?? []);
     }
 
     private static function createCourseAndExtraDataFromCourseData(CourseData $courseData): CourseAndExtraData

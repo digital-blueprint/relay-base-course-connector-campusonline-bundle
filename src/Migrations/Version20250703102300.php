@@ -17,19 +17,22 @@ final class Version20250703102300 extends EntityManagerMigration
 
     public function up(Schema $schema): void
     {
+        $coursesTableName = CachedCourse::TABLE_NAME;
         $uidColumn = CachedCourse::UID_COLUMN_NAME;
         $courseCodeColumn = CachedCourse::COURSE_CODE_COLUMN_NAME;
         $semesterKeyColumn = CachedCourse::SEMESTER_KEY_COLUMN_NAME;
         $courseTypeColumn = CachedCourse::COURSE_TYPE_KEY_COLUMN_NAME;
+        $lecturersColumn = CachedCourse::LECTURERS_COLUMN_NAME;
 
-        $createStatement = "CREATE TABLE courses ($uidColumn VARCHAR(32) NOT NULL, $courseCodeColumn VARCHAR(32), $semesterKeyColumn VARCHAR(5), $courseTypeColumn VARCHAR(8), PRIMARY KEY($uidColumn))";
+        $createStatement = "CREATE TABLE $coursesTableName ($uidColumn VARCHAR(32) NOT NULL, $courseCodeColumn VARCHAR(32), $semesterKeyColumn VARCHAR(5), $courseTypeColumn VARCHAR(8), $lecturersColumn JSON DEFAULT NULL, PRIMARY KEY($uidColumn))";
         $this->addSql($createStatement);
 
+        $courseTitlesTableName = CachedCourseTitle::TABLE_NAME;
         $courseUidColumn = CachedCourseTitle::COURSE_UID_COLUMN_NAME;
         $languageTagColumn = CachedCourseTitle::LANGUAGE_TAG_COLUMN_NAME;
         $titleColumn = CachedCourseTitle::TITLE_COLUMN_NAME;
 
-        $createStatement = "CREATE TABLE course_titles ($courseUidColumn VARCHAR(32) NOT NULL, $languageTagColumn VARCHAR(2) NOT NULL, $titleColumn VARCHAR(255) NOT NULL, PRIMARY KEY($courseUidColumn, $languageTagColumn), FOREIGN KEY($courseUidColumn) REFERENCES courses($uidColumn) ON DELETE CASCADE)";
+        $createStatement = "CREATE TABLE $courseTitlesTableName ($courseUidColumn VARCHAR(32) NOT NULL, $languageTagColumn VARCHAR(2) NOT NULL, $titleColumn VARCHAR(255) NOT NULL, PRIMARY KEY($courseUidColumn, $languageTagColumn), FOREIGN KEY($courseUidColumn) REFERENCES courses($uidColumn) ON DELETE CASCADE)";
         $this->addSql($createStatement);
     }
 

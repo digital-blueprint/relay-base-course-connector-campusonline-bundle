@@ -14,10 +14,7 @@
             <subBlock userDefined="codeDesignation">INSTITUT</subBlock>
             <subBlock userDefined="name">Institut</subBlock>
         </orgUnitKind>
-        <orgUnitDescription><![CDATA[Das Institut für Technische Informatik bietet Forschung und Ausbildung im Bereich moderner vernetzter, eingebetteter Systeme mit Fokus auf deren Sofware, Hardware und Vernetzung. Diese Systeme sind integraler Bestandteil unserer Gesellschaft und finden sich in Autos, Fabriken, Kraftwerken, Gebäuden oder Wohnungen. Die Forschung am Institut leistet daher wesentliche Beiträge um die Zuverlässigkeit, Echtzeitfähigkeit, Sicherheit und Effizienz dieser Systeme zu erhöhen. In der Ausbildung liegen die Schwerpunkte neben den Grundlagen der Technischen Informatik auf eingebetteten Systemen, Echtzeitsystemen, verteilten Systemen, funktionaler Sicherheit und Pervasive Computing. Das Institut unterhält sehr enge Kooperationen mit der Industrie und internationalen Foschungseinrichtungen.
-
-
-]]></orgUnitDescription>
+        <orgUnitDescription><![CDATA[Das Institut für Technische Informatik bietet Forschung und Ausbildung im Bereich moderner vernetzter, eingebetteter Systeme mit Fokus auf deren Sofware, Hardware und Vernetzung. Diese Systeme sind integraler Bestandteil unserer Gesellschaft und finden sich in Autos, Fabriken, Kraftwerken, Gebäuden oder Wohnungen. Die Forschung am Institut leistet daher wesentliche Beiträge um die Zuverlässigkeit, Echtzeitfähigkeit, Sicherheit und Effizienz dieser Systeme zu erhöhen. In der Ausbildung liegen die Schwerpunkte neben den Grundlagen der Technischen Informatik auf eingebetteten Systemen, Echtzeitsystemen, verteilten Systemen, funktionaler Sicherheit und Pervasive Computing. Das Institut unterhält sehr enge Kooperationen mit der Industrie und internationalen Foschungseinrichtungen.]]></orgUnitDescription>
         <contacts/>
         <infoBlock>
             <webLink userDefined="CAMPUSonlineURL">

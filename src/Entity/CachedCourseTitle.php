@@ -6,10 +6,13 @@ namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: 'course_titles')]
+#[ORM\Table(name: self::TABLE_NAME)]
 #[ORM\Entity]
 class CachedCourseTitle
 {
+    public const TABLE_NAME = 'course_titles';
+    public const STAGING_TABLE_NAME = 'course_titles_staging';
+
     public const COURSE_UID_COLUMN_NAME = 'courseUid';
     public const LANGUAGE_TAG_COLUMN_NAME = 'languageTag';
     public const TITLE_COLUMN_NAME = 'title';

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Tests\Service;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Apis\PublicRestCourseApi;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\DependencyInjection\Configuration;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\DependencyInjection\DbpRelayBaseCourseConnectorCampusonlineExtension;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\EventSubscriber\CourseEventSubscriber;
@@ -16,6 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
+use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -53,21 +55,23 @@ class CourseProviderTest extends ApiTestCase
     {
         parent::setUp();
 
-        $kernel = self::bootKernel();
+        $container = self::bootKernel()->getContainer();
 
-        $eventDispatcher = new EventDispatcher();
-        $localDataEventSubscriber = new CourseEventSubscriber();
-        $localDataEventSubscriber->setConfig(self::createEventSubscriberConfig());
-        $eventDispatcher->addSubscriber($localDataEventSubscriber);
-        $this->eventDispatcher = $eventDispatcher;
-
-        $this->entityManager = TestEntityManager::setUpEntityManager($kernel->getContainer(),
+        $this->eventDispatcher = new EventDispatcher();
+        $this->entityManager = TestEntityManager::setUpEntityManager($container,
             DbpRelayBaseCourseConnectorCampusonlineExtension::ENTITY_MANAGER_ID);
 
-        $this->withPublicRestApi();
+        $this->courseProvider = new CourseProvider($this->entityManager, $this->eventDispatcher);
+        $this->courseProvider->setConfig($this->getPublicRestApiConfig());
+        $this->courseProvider->setCache(new ArrayAdapter(), 3600);
+        $this->courseProvider->setLogger(new NullLogger());
+
+        $localDataEventSubscriber = new CourseEventSubscriber($this->courseProvider);
+        $localDataEventSubscriber->setConfig(self::createEventSubscriberConfig());
+        $this->eventDispatcher->addSubscriber($localDataEventSubscriber);
     }
 
-    private function withLegacyApi(): void
+    private function getLegacyApiConfig(): array
     {
         $config = [];
         $config[Configuration::CAMPUS_ONLINE_NODE] = [
@@ -75,13 +79,10 @@ class CourseProviderTest extends ApiTestCase
             'org_root_id' => '1',
         ];
 
-        $this->courseProvider = new CourseProvider($this->entityManager, $this->eventDispatcher);
-        $this->courseProvider->setConfig($config);
-        $this->courseProvider->setCache(new ArrayAdapter(), 3600);
-        $this->mockResponses([]);
+        return $config;
     }
 
-    private function withPublicRestApi(): void
+    private function getPublicRestApiConfig(): array
     {
         $config = [];
         $config[Configuration::CAMPUS_ONLINE_NODE] = [
@@ -91,9 +92,7 @@ class CourseProviderTest extends ApiTestCase
             'client_secret' => 'secret',
         ];
 
-        $this->courseProvider = new CourseProvider($this->entityManager, $this->eventDispatcher);
-        $this->courseProvider->setConfig($config);
-        $this->courseProvider->setCache(new ArrayAdapter(), 3600);
+        return $config;
     }
 
     private function mockResponses(array $responses, bool $mockAuthServerResponses = false): void
@@ -154,7 +153,7 @@ class CourseProviderTest extends ApiTestCase
 
     public function testGetCoursesLegacy(): void
     {
-        $this->withLegacyApi();
+        $this->courseProvider->setConfig($this->getLegacyApiConfig());
 
         $this->mockResponses([
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
@@ -170,7 +169,7 @@ class CourseProviderTest extends ApiTestCase
 
     public function testGetCoursesPaginationLegacy(): void
     {
-        $this->withLegacyApi();
+        $this->courseProvider->setConfig($this->getLegacyApiConfig());
 
         $this->mockResponses([
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
@@ -207,7 +206,7 @@ class CourseProviderTest extends ApiTestCase
 
     public function testGetCourses500Legacy(): void
     {
-        $this->withLegacyApi();
+        $this->courseProvider->setConfig($this->getLegacyApiConfig());
 
         $this->mockResponses([
             new Response(500, ['Content-Type' => 'text/xml;charset=utf-8'], ''),
@@ -219,7 +218,7 @@ class CourseProviderTest extends ApiTestCase
 
     public function testGetCoursesInvalidXMLLegacy(): void
     {
-        $this->withLegacyApi();
+        $this->courseProvider->setConfig($this->getLegacyApiConfig());
 
         $this->mockResponses([
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
@@ -236,7 +235,7 @@ class CourseProviderTest extends ApiTestCase
 
     public function testGetCourseByIdLegacy(): void
     {
-        $this->withLegacyApi();
+        $this->courseProvider->setConfig($this->getLegacyApiConfig());
 
         $this->mockResponses([
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
@@ -250,9 +249,29 @@ class CourseProviderTest extends ApiTestCase
         $this->assertSame('442071', $course->getCode());
     }
 
+    public function testGetCourseByIdWithLecturersLocalDataAttributeLegacy(): void
+    {
+        $this->courseProvider->setConfig($this->getLegacyApiConfig());
+
+        $this->mockResponses([
+            new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
+                file_get_contents(__DIR__.'/course_by_id_response.xml')),
+        ]);
+
+        $options = [];
+        Options::requestLocalDataAttributes($options, [CourseEventSubscriber::LECTURERS_LOCAL_DATA_ATTRIBUTE]);
+        $course = $this->courseProvider->getCourseById('240759', $options);
+
+        $this->assertSame('240759', $course->getIdentifier());
+        $this->assertSame('Computational Intelligence', $course->getName());
+        $this->assertSame('442071', $course->getCode());
+        $this->assertSame(['DEADBEEF2', 'DEADBEEF3', 'DEADBEEF4', 'DEADBEEF'],
+            $course->getLocalDataValue(CourseEventSubscriber::LECTURERS_LOCAL_DATA_ATTRIBUTE));
+    }
+
     public function testGetCourseByIdNotFoundLegacy(): void
     {
-        $this->withLegacyApi();
+        $this->courseProvider->setConfig($this->getLegacyApiConfig());
 
         $this->mockResponses([
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
@@ -270,7 +289,7 @@ class CourseProviderTest extends ApiTestCase
 
     public function testGetCourseById503Legacy(): void
     {
-        $this->withLegacyApi();
+        $this->courseProvider->setConfig($this->getLegacyApiConfig());
 
         $this->mockResponses([
             new Response(503, ['Content-Type' => 'text/xml;charset=utf-8'], ''),
@@ -287,7 +306,7 @@ class CourseProviderTest extends ApiTestCase
 
     public function testGetCoursesByOrganizationLegacy(): void
     {
-        $this->withLegacyApi();
+        $this->courseProvider->setConfig($this->getLegacyApiConfig());
 
         $this->mockResponses([
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
@@ -303,9 +322,9 @@ class CourseProviderTest extends ApiTestCase
         $this->assertSame('448001', $course->getCode());
     }
 
-    public function testGetCourseLocalDataLegacy(): void
+    public function testGetCourseByIdLocalDataLegacy(): void
     {
-        $this->withLegacyApi();
+        $this->courseProvider->setConfig($this->getLegacyApiConfig());
 
         $this->mockResponses([
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
@@ -326,7 +345,7 @@ class CourseProviderTest extends ApiTestCase
 
     public function testGetCoursesLocalDataLegacy(): void
     {
-        $this->withLegacyApi();
+        $this->courseProvider->setConfig($this->getLegacyApiConfig());
 
         $this->mockResponses([
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
@@ -347,7 +366,7 @@ class CourseProviderTest extends ApiTestCase
 
     public function testGetCoursesSearchParameterLegacy(): void
     {
-        $this->withLegacyApi();
+        $this->courseProvider->setConfig($this->getLegacyApiConfig());
 
         $this->mockResponses([
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
@@ -398,7 +417,7 @@ class CourseProviderTest extends ApiTestCase
 
     public function testGetCoursesSearchParameterPaginationLegacy(): void
     {
-        $this->withLegacyApi();
+        $this->courseProvider->setConfig($this->getLegacyApiConfig());
 
         $this->mockResponses([
             new Response(200, ['Content-Type' => 'text/xml;charset=utf-8'],
@@ -423,6 +442,14 @@ class CourseProviderTest extends ApiTestCase
 
         $courseIds = array_unique(array_merge($courseIdsPage1, $courseIdsPage2));
         $this->assertCount(6, $courseIds);
+    }
+
+    public function testGetSemesterKeys(): void
+    {
+        $this->assertEquals(['2025S', '2025W'], PublicRestCourseApi::getSemesterKeys(new \DateTimeImmutable('2025-09-30')));
+        $this->assertEquals(['2025W', '2026S'], PublicRestCourseApi::getSemesterKeys(new \DateTimeImmutable('2025-10-01')));
+        $this->assertEquals(['2025W', '2026S'], PublicRestCourseApi::getSemesterKeys(new \DateTimeImmutable('2026-02-28')));
+        $this->assertEquals(['2026S', '2026W'], PublicRestCourseApi::getSemesterKeys(new \DateTimeImmutable('2026-03-01')));
     }
 
     private static function createMockAuthServerResponses(): array

@@ -127,18 +127,49 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
         return $courses;
     }
 
-    public function getAttendeesByCourseId(string $courseId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
+    /**
+     * @param array $options Available options:
+     *                       * Locale::LANGUAGE_OPTION (language in ISO 639‑1 format)
+     *
+     * @return string[]
+     *
+     * @throws ApiError
+     */
+    public function getAttendeesByCourse(string $courseId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
-        return [];
+        try {
+            return $this->getCourseApi()->getAttendeesByCourse($courseId, $currentPageNumber, $maxNumItemsPerPage, $options);
+        } catch (ApiException $apiException) {
+            throw self::dispatchException($apiException);
+        }
+    }
+
+    /**
+     * @return string[]
+     *
+     * @throws ApiError
+     */
+    public function getLecturersByCourse(string $courseId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
+    {
+        try {
+            return $this->getCourseApi()->getLecturersByCourse($courseId, $currentPageNumber, $maxNumItemsPerPage, $options);
+        } catch (ApiException $apiException) {
+            throw self::dispatchException($apiException);
+        }
+    }
+
+    public function isLegacy(): bool
+    {
+        return $this->config['legacy'];
     }
 
     private function getCourseApi(): CourseApiInterface
     {
         if ($this->courseApi === null) {
-            if ($this->config['legacy'] ?? true) {
+            if ($this->config['legacy']) {
                 $this->courseApi = new LegacyCourseApi($this->config, $this->cachePool, $this->cacheTTL, $this->clientHandler, $this->logger);
             } else {
-                $this->courseApi = new PublicRestCourseApi($this->entityManager, $this->config, $this->clientHandler);
+                $this->courseApi = new PublicRestCourseApi($this->entityManager, $this->config, $this->clientHandler, $this->logger);
             }
         }
 

@@ -13,6 +13,8 @@ interface CourseApiInterface
      */
     public function checkConnection(): void;
 
+    public function setClientHandler(?object $handler);
+
     /**
      * @throws ApiException
      */
@@ -25,7 +27,19 @@ interface CourseApiInterface
      */
     public function getCourses(int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): iterable;
 
-    public function setClientHandler(?object $handler);
+    /**
+     * @return string[]
+     *
+     * @throws ApiException
+     */
+    public function getAttendeesByCourse(string $courseId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array;
+
+    /**
+     * @return string[]
+     *
+     * @throws ApiException
+     */
+    public function getLecturersByCourse(string $courseId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array;
 
     public function recreateCoursesCache(): void;
 }

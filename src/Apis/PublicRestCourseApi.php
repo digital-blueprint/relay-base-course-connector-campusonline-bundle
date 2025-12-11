@@ -18,16 +18,18 @@ use Dbp\Relay\CoreBundle\Rest\Query\Filter\Nodes\Node;
 use Dbp\Relay\CoreBundle\Rest\Query\Pagination\Pagination;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr\Join;
+use Psr\Log\LoggerInterface;
 
 class PublicRestCourseApi implements CourseApiInterface
 {
     private const DEFAULT_LANGUAGE = 'de';
 
     private CourseApi $courseApi;
+    private ?LoggerInterface $logger;
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        array $config, ?object $clientHandler = null)
+        array $config, ?object $clientHandler = null, ?LoggerInterface $logger = null)
     {
         $this->courseApi = new CourseApi(
             $config['base_url'], $config['client_id'], $config['client_secret']);
@@ -35,6 +37,7 @@ class PublicRestCourseApi implements CourseApiInterface
         if ($clientHandler !== null) {
             $this->courseApi->setClientHandler($clientHandler);
         }
+        $this->logger = $logger;
     }
 
     /**
@@ -55,59 +58,78 @@ class PublicRestCourseApi implements CourseApiInterface
      */
     public function recreateCoursesCache(): void
     {
+        $coursesStagingTable = CachedCourse::STAGING_TABLE_NAME;
         $uidColumn = CachedCourse::UID_COLUMN_NAME;
         $courseCodeColumn = CachedCourse::COURSE_CODE_COLUMN_NAME;
         $semesterKeyColumn = CachedCourse::SEMESTER_KEY_COLUMN_NAME;
         $courseTypeColumn = CachedCourse::COURSE_TYPE_KEY_COLUMN_NAME;
+        $lecturersColumn = CachedCourse::LECTURERS_COLUMN_NAME;
 
+        $insertIntoCoursesStagingStatement = <<<STMT
+            INSERT INTO $coursesStagingTable ($uidColumn, $courseCodeColumn, $semesterKeyColumn, $courseTypeColumn, $lecturersColumn)
+            VALUES (:$uidColumn, :$courseCodeColumn, :$semesterKeyColumn, :$courseTypeColumn, :$lecturersColumn)
+            STMT;
+
+        $courseTitlesStagingTable = CachedCourseTitle::STAGING_TABLE_NAME;
         $courseUidColumn = CachedCourseTitle::COURSE_UID_COLUMN_NAME;
         $languageTagColumn = CachedCourseTitle::LANGUAGE_TAG_COLUMN_NAME;
         $titleColumn = CachedCourseTitle::TITLE_COLUMN_NAME;
 
-        $insertIntoCoursesStatement = <<<STMT
-            INSERT INTO courses ($uidColumn, $courseCodeColumn, $semesterKeyColumn, $courseTypeColumn)
-            VALUES (:$uidColumn, :$courseCodeColumn, :$semesterKeyColumn, :$courseTypeColumn)
-            STMT;
-
-        $insertIntoCourseTitlesStatement = <<<STMT
-                INSERT INTO course_titles ($courseUidColumn, $languageTagColumn, $titleColumn)
+        $insertIntoCourseTitlesStagingStatement = <<<STMT
+                INSERT INTO $courseTitlesStagingTable ($courseUidColumn, $languageTagColumn, $titleColumn)
                 VALUES (:$courseUidColumn, :$languageTagColumn, :$titleColumn)
             STMT;
 
         $connection = $this->entityManager->getConnection();
         try {
-            $connection->beginTransaction();
-
-            $connection->executeStatement('DELETE FROM courses');
-            $connection->executeStatement('DELETE FROM course_titles');
-
-            $nextCursor = null;
-            do {
-                $courseApiResponse = $this->courseApi->getCourses('2025W', $nextCursor, 1000);
-                /** @var CourseResource $courseResource */
-                foreach ($courseApiResponse->getCourseResources() as $courseResource) {
-                    $connection->executeStatement($insertIntoCoursesStatement, [
-                        $uidColumn => $courseResource->getUid(),
-                        $courseCodeColumn => $courseResource->getCourseCode(),
-                        $semesterKeyColumn => $courseResource->getSemesterKey(),
-                        $courseTypeColumn => $courseResource->getCourseTypeKey(),
-                    ]);
-
-                    foreach ($courseResource->getTitle() as $languageTag => $title) {
-                        $connection->executeStatement($insertIntoCourseTitlesStatement, [
-                            $courseUidColumn => $courseResource->getUid(),
-                            $languageTagColumn => $languageTag,
-                            $titleColumn => $title,
+            foreach (self::getSemesterKeys() as $semesterKey) {
+                $nextCursor = null;
+                do {
+                    $courseApiResponse = $this->courseApi->getCourses($semesterKey, $nextCursor, 1000);
+                    /** @var CourseResource $courseResource */
+                    foreach ($courseApiResponse->getCourseResources() as $courseResource) {
+                        $connection->executeStatement($insertIntoCoursesStagingStatement, [
+                            $uidColumn => $courseResource->getUid(),
+                            $courseCodeColumn => $courseResource->getCourseCode(),
+                            $semesterKeyColumn => $courseResource->getSemesterKey(),
+                            $courseTypeColumn => $courseResource->getCourseTypeKey(),
+                            $lecturersColumn => null, // $courseResource->getLecturers(),
                         ]);
-                    }
-                }
-                $nextCursor = $courseApiResponse->getNextCursor();
-            } while ($nextCursor !== null);
 
-            $connection->commit();
-        } catch (\Throwable $e) {
-            $connection->rollBack();
-            throw $e;
+                        foreach ($courseResource->getTitle() as $languageTag => $title) {
+                            $connection->executeStatement($insertIntoCourseTitlesStagingStatement, [
+                                $courseUidColumn => $courseResource->getUid(),
+                                $languageTagColumn => $languageTag,
+                                $titleColumn => $title,
+                            ]);
+                        }
+                    }
+                    $nextCursor = $courseApiResponse->getNextCursor();
+                } while ($nextCursor !== null);
+            }
+
+            $coursesLiveTable = CachedCourse::TABLE_NAME;
+            $coursesTempTable = 'courses_old';
+            $courseTitlesLiveTable = CachedCourseTitle::TABLE_NAME;
+            $courseTitlesTempTable = 'course_titles_old';
+
+            // swap live and staging tables:
+            $connection->executeStatement(<<<STMT
+                RENAME TABLE
+                $coursesLiveTable TO $coursesTempTable,
+                $coursesStagingTable TO $coursesLiveTable,
+                $coursesTempTable TO $coursesStagingTable,
+                $courseTitlesLiveTable TO $courseTitlesTempTable,
+                $courseTitlesStagingTable TO $courseTitlesLiveTable,
+                $courseTitlesTempTable TO $courseTitlesStagingTable
+                STMT
+            );
+        } catch (\Throwable $throwable) {
+            $this->logger->error('failed to recreate courses cache: '.$throwable->getMessage(), [$throwable]);
+            throw $throwable;
+        } finally {
+            $connection->executeStatement("TRUNCATE TABLE $coursesStagingTable");
+            $connection->executeStatement("TRUNCATE TABLE $courseTitlesStagingTable");
         }
     }
 
@@ -198,6 +220,16 @@ class PublicRestCourseApi implements CourseApiInterface
         }
     }
 
+    public function getAttendeesByCourse(string $courseId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
+    {
+        return []; // TODO: implement this method using Public Rest API course registration service
+    }
+
+    public function getLecturersByCourse(string $courseId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
+    {
+        return []; // TODO: implement this method using Public Rest API course lectureship service
+    }
+
     private static function createCourseAndExtraDataFromCourseResource(CourseResource $courseResource, array $options): CourseAndExtraData
     {
         $course = new Course();
@@ -225,5 +257,24 @@ class PublicRestCourseApi implements CourseApiInterface
             CachedCourse::COURSE_TYPE_KEY_COLUMN_NAME => $cachedCourse->getCourseTypeKey(),
             CachedCourse::SEMESTER_KEY_COLUMN_NAME => $cachedCourse->getSemesterKey(),
         ]);
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getSemesterKeys(?\DateTimeImmutable $now = null): array
+    {
+        $now ??= new \DateTimeImmutable();
+        $month = (int) $now->format('n');
+        $year = (int) $now->format('Y');
+
+        if ($month >= 10 || $month <= 2) { // in winter
+            $winterStartYear = ($month >= 10 && $month <= 12) ? $year : $year - 1;
+            $summerYear = $winterStartYear + 1;
+
+            return ["{$winterStartYear}W", "{$summerYear}S"];
+        } else { // in summer
+            return ["{$year}S", "{$year}W"];
+        }
     }
 }
