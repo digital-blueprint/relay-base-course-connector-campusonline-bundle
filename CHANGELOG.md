@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.1.25
+
 - Add local data attribute `attendees`
 - Make Public Rest API variant production ready
 
