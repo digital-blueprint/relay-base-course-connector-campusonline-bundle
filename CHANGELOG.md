@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add local data attribute `attendees`
+- Make Public Rest API variant production ready
+
 ## v0.1.24
 
 - Add local data attribute `lecturers`

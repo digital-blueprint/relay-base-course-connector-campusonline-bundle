@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eeabb5867d5a361ecd896bae39469d62",
+    "content-hash": "6733547318dd31b6a2dd3bb537486c6e",
     "packages": [
         {
             "name": "api-platform/documentation",
@@ -979,16 +979,16 @@
         },
         {
             "name": "dbp/campusonline-api",
-            "version": "v0.3.26",
+            "version": "v0.3.27",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/campusonline-api.git",
-                "reference": "2a5053db64d9cdbd4fbc882a93e06883adca29ba"
+                "reference": "fac5662959d9737381fe8800fd4d60258b30b1ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/2a5053db64d9cdbd4fbc882a93e06883adca29ba",
-                "reference": "2a5053db64d9cdbd4fbc882a93e06883adca29ba",
+                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/fac5662959d9737381fe8800fd4d60258b30b1ea",
+                "reference": "fac5662959d9737381fe8800fd4d60258b30b1ea",
                 "shasum": ""
             },
             "require": {
@@ -1023,9 +1023,9 @@
             ],
             "support": {
                 "issues": "https://github.com/digital-blueprint/campusonline-api/issues",
-                "source": "https://github.com/digital-blueprint/campusonline-api/tree/v0.3.26"
+                "source": "https://github.com/digital-blueprint/campusonline-api/tree/v0.3.27"
             },
-            "time": "2025-12-09T15:59:02+00:00"
+            "time": "2025-12-16T08:01:47+00:00"
         },
         {
             "name": "dbp/relay-base-course-bundle",

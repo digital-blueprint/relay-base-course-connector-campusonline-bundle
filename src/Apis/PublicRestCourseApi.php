@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Apis;
 
 use Dbp\CampusonlineApi\LegacyWebService\ApiException;
+use Dbp\CampusonlineApi\PublicRestApi\Connection;
 use Dbp\CampusonlineApi\PublicRestApi\Courses\CourseApi;
+use Dbp\CampusonlineApi\PublicRestApi\Courses\CourseRegistrationApi;
 use Dbp\CampusonlineApi\PublicRestApi\Courses\CourseResource;
+use Dbp\CampusonlineApi\PublicRestApi\Courses\LectureshipApi;
 use Dbp\Relay\BaseCourseBundle\Entity\Course;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Entity\CachedCourse;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Entity\CachedCourseTitle;
@@ -19,6 +22,7 @@ use Dbp\Relay\CoreBundle\Rest\Query\Pagination\Pagination;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr\Join;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 class PublicRestCourseApi implements CourseApiInterface
 {
@@ -29,15 +33,21 @@ class PublicRestCourseApi implements CourseApiInterface
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        array $config, ?object $clientHandler = null, ?LoggerInterface $logger = null)
+        array $config,
+        ?LoggerInterface $logger = null)
     {
         $this->courseApi = new CourseApi(
-            $config['base_url'], $config['client_id'], $config['client_secret']);
+            new Connection(
+                $config['base_url'],
+                $config['client_id'],
+                $config['client_secret']
+            )
+        );
 
-        if ($clientHandler !== null) {
-            $this->courseApi->setClientHandler($clientHandler);
-        }
         $this->logger = $logger;
+        if ($this->logger !== null) {
+            $this->courseApi->setLogger($logger);
+        }
     }
 
     /**
@@ -45,7 +55,7 @@ class PublicRestCourseApi implements CourseApiInterface
      */
     public function checkConnection(): void
     {
-        $this->courseApi->getCourses('2025W');
+        $this->courseApi->getCoursesBySemesterKey(self::getSemesterKeys()[0]);
     }
 
     public function setClientHandler(?object $handler): void
@@ -85,9 +95,9 @@ class PublicRestCourseApi implements CourseApiInterface
             foreach (self::getSemesterKeys() as $semesterKey) {
                 $nextCursor = null;
                 do {
-                    $courseApiResponse = $this->courseApi->getCourses($semesterKey, $nextCursor, 1000);
+                    $resourcePage = $this->courseApi->getCoursesBySemesterKey($semesterKey, $nextCursor, 1000);
                     /** @var CourseResource $courseResource */
-                    foreach ($courseApiResponse->getCourseResources() as $courseResource) {
+                    foreach ($resourcePage->getResources() as $courseResource) {
                         $connection->executeStatement($insertIntoCoursesStagingStatement, [
                             $uidColumn => $courseResource->getUid(),
                             $courseCodeColumn => $courseResource->getCourseCode(),
@@ -104,7 +114,7 @@ class PublicRestCourseApi implements CourseApiInterface
                             ]);
                         }
                     }
-                    $nextCursor = $courseApiResponse->getNextCursor();
+                    $nextCursor = $resourcePage->getNextCursor();
                 } while ($nextCursor !== null);
             }
 
@@ -122,8 +132,7 @@ class PublicRestCourseApi implements CourseApiInterface
                 $courseTitlesLiveTable TO $courseTitlesTempTable,
                 $courseTitlesStagingTable TO $courseTitlesLiveTable,
                 $courseTitlesTempTable TO $courseTitlesStagingTable
-                STMT
-            );
+                STMT);
         } catch (\Throwable $throwable) {
             $this->logger->error('failed to recreate courses cache: '.$throwable->getMessage(), [$throwable]);
             throw $throwable;
@@ -138,8 +147,15 @@ class PublicRestCourseApi implements CourseApiInterface
      */
     public function getCourseById(string $identifier, array $options = []): CourseAndExtraData
     {
-        return self::createCourseAndExtraDataFromCourseResource(
-            $this->courseApi->getCourseByIdentifier($identifier), $options);
+        $cachedCourse = $this->entityManager->getRepository(CachedCourse::class)->find($identifier);
+        if ($cachedCourse === null) {
+            throw new ApiException('course with ID not found: '.$identifier,
+                Response::HTTP_NOT_FOUND, true);
+        }
+
+        return self::createCourseAndExtraDataFromCachedCourse(
+            $cachedCourse,
+            $options);
     }
 
     /**
@@ -222,12 +238,26 @@ class PublicRestCourseApi implements CourseApiInterface
 
     public function getAttendeesByCourse(string $courseId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
-        return []; // TODO: implement this method using Public Rest API course registration service
+        $courseRegistrationApi = new CourseRegistrationApi($this->courseApi->getConnection());
+
+        $attendeeIds = [];
+        foreach ($courseRegistrationApi->getCourseRegistrationsByCourseUid($courseId) as $registrationResource) {
+            $attendeeIds[] = $registrationResource->getPersonUid();
+        }
+
+        return $attendeeIds;
     }
 
     public function getLecturersByCourse(string $courseId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
-        return []; // TODO: implement this method using Public Rest API course lectureship service
+        $lectureshipApi = new LectureshipApi($this->courseApi->getConnection());
+
+        $lecturerIds = [];
+        foreach ($lectureshipApi->getLectureshipsByCourseUid($courseId) as $lectureshipResource) {
+            $lecturerIds[] = $lectureshipResource->getPersonUid();
+        }
+
+        return $lecturerIds;
     }
 
     private static function createCourseAndExtraDataFromCourseResource(CourseResource $courseResource, array $options): CourseAndExtraData

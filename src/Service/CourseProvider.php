@@ -41,6 +41,14 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
         $this->eventDispatcher = new LocalDataEventDispatcher(Course::class, $eventDispatcher);
     }
 
+    /**
+     * @internal For testing purposes only
+     */
+    public function reset(): void
+    {
+        $this->courseApi = null;
+    }
+
     public function setCache(?CacheItemPoolInterface $cachePool, int $ttl): void
     {
         $this->cachePool = $cachePool;
@@ -167,9 +175,13 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
     {
         if ($this->courseApi === null) {
             if ($this->config['legacy']) {
-                $this->courseApi = new LegacyCourseApi($this->config, $this->cachePool, $this->cacheTTL, $this->clientHandler, $this->logger);
+                $this->courseApi = new LegacyCourseApi($this->config, $this->cachePool, $this->cacheTTL, $this->logger);
             } else {
-                $this->courseApi = new PublicRestCourseApi($this->entityManager, $this->config, $this->clientHandler, $this->logger);
+                $this->courseApi = new PublicRestCourseApi($this->entityManager, $this->config, $this->logger);
+            }
+
+            if ($this->clientHandler !== null) {
+                $this->courseApi->setClientHandler($this->clientHandler);
             }
         }
 

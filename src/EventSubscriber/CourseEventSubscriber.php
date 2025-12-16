@@ -16,6 +16,7 @@ use Dbp\Relay\CoreBundle\LocalData\LocalDataPostEvent;
 class CourseEventSubscriber extends AbstractLocalDataEventSubscriber
 {
     public const LECTURERS_LOCAL_DATA_ATTRIBUTE = 'lecturers';
+    public const ATTENDEES_LOCAL_DATA_ATTRIBUTE = 'attendees';
 
     protected static function getSubscribedEventNames(): array
     {
@@ -48,6 +49,16 @@ class CourseEventSubscriber extends AbstractLocalDataEventSubscriber
                     $course->getIdentifier(), 1, 9999);
             }
             $postEvent->setLocalDataAttribute(self::LECTURERS_LOCAL_DATA_ATTRIBUTE, $lecturerIds);
+        }
+        if ($postEvent->isLocalDataAttributeRequested(self::ATTENDEES_LOCAL_DATA_ATTRIBUTE)
+            && false === $this->courseProvider->isLegacy()) {
+            $course = $postEvent->getEntity();
+            assert($course instanceof Course);
+
+            $attendeeIds = $this->courseProvider->getAttendeesByCourse(
+                $course->getIdentifier(), 1, 9999);
+
+            $postEvent->setLocalDataAttribute(self::ATTENDEES_LOCAL_DATA_ATTRIBUTE, $attendeeIds);
         }
     }
 }

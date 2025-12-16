@@ -25,14 +25,14 @@ class LegacyCourseApi implements CourseApiInterface
     private Api $api;
 
     public function __construct(array $config, ?CacheItemPoolInterface $cachePool = null, int $cacheTTL = 0,
-        ?object $clientHandler = null, ?LoggerInterface $logger = null)
+        ?LoggerInterface $logger = null)
     {
         $baseUrl = $config['api_url'] ?? '';
         $accessToken = $config['api_token'] ?? '';
         $rootOrgUnitId = $config['org_root_id'] ?? '';
 
         $this->api = new Api($baseUrl, $accessToken, $rootOrgUnitId,
-            $logger, $cachePool, $cacheTTL, $clientHandler);
+            $logger, $cachePool, $cacheTTL);
     }
 
     /**
