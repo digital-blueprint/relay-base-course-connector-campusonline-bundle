@@ -33,7 +33,6 @@ class CourseProviderTest extends ApiTestCase
     private const SEMESTER_SOURCE_ATTRIBUTE_NAME = 'semesterKey';
 
     private ?CourseProvider $courseProvider = null;
-    private ?EventDispatcher $eventDispatcher = null;
     private ?EntityManagerInterface $entityManager = null;
     private ?CourseEventSubscriber $courseEventSubscriber = null;
 
@@ -64,20 +63,21 @@ class CourseProviderTest extends ApiTestCase
 
         $container = self::bootKernel()->getContainer();
 
-        $this->eventDispatcher = new EventDispatcher();
+        $eventDispatcher = null;
+        $eventDispatcher = new EventDispatcher();
         $this->entityManager = TestEntityManager::setUpEntityManager($container,
             DbpRelayBaseCourseConnectorCampusonlineExtension::ENTITY_MANAGER_ID);
 
         $this->createStagingTables();
 
-        $this->courseProvider = new CourseProvider($this->entityManager, $this->eventDispatcher);
+        $this->courseProvider = new CourseProvider($this->entityManager, $eventDispatcher);
         // $this->courseProvider->setConfig($this->getPublicRestApiConfig());
         $this->courseProvider->setCache(new ArrayAdapter(), 3600);
         $this->courseProvider->setLogger(new NullLogger());
 
         $this->courseEventSubscriber = new CourseEventSubscriber($this->courseProvider);
         // $this->courseEventSubscriber->setConfig(self::createEventSubscriberConfig(true));
-        $this->eventDispatcher->addSubscriber($this->courseEventSubscriber);
+        $eventDispatcher->addSubscriber($this->courseEventSubscriber);
     }
 
     private function mockResponses(array $responses, bool $mockAuthServerResponses = false): void
@@ -164,7 +164,7 @@ class CourseProviderTest extends ApiTestCase
 
         $options = [];
         Options::setLanguage($options, 'de');
-        $courses = $this->courseProvider->getCourses(1, 30, $options);
+        $courses = $this->courseProvider->getCourses(1, 3, $options);
         $this->assertCount(3, $courses);
         $course = $courses[0];
         $this->assertSame('1', $course->getIdentifier());

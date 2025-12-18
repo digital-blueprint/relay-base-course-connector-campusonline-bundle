@@ -21,6 +21,7 @@ use Dbp\Relay\CoreBundle\Rest\Query\Filter\Nodes\Node;
 use Dbp\Relay\CoreBundle\Rest\Query\Pagination\Pagination;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -224,14 +225,13 @@ class PublicRestCourseApi implements CourseApiInterface
             QueryHelper::addFilter($queryBuilder, $combinedFilter);
         }
 
-        $result = $queryBuilder
-            ->getQuery()
+        $paginator = new Paginator($queryBuilder->getQuery());
+        $paginator->getQuery()
             ->setFirstResult(Pagination::getFirstItemIndex($currentPageNumber, $maxNumItemsPerPage))
-            ->setMaxResults($maxNumItemsPerPage)
-            ->getResult();
+            ->setMaxResults($maxNumItemsPerPage);
 
         /** @var CachedCourse $cachedCourse */
-        foreach ($result as $cachedCourse) {
+        foreach ($paginator as $cachedCourse) {
             yield self::createCourseAndExtraDataFromCachedCourse($cachedCourse, $options);
         }
     }

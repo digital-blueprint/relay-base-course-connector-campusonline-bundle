@@ -32,7 +32,7 @@ final class Version20250703102300 extends EntityManagerMigration
         $languageTagColumn = CachedCourseTitle::LANGUAGE_TAG_COLUMN_NAME;
         $titleColumn = CachedCourseTitle::TITLE_COLUMN_NAME;
 
-        $createStatement = "CREATE TABLE $courseTitlesTableName ($courseUidColumn VARCHAR(32) NOT NULL, $languageTagColumn VARCHAR(2) NOT NULL, $titleColumn VARCHAR(255) NOT NULL, PRIMARY KEY($courseUidColumn, $languageTagColumn), FOREIGN KEY($courseUidColumn) REFERENCES courses($uidColumn) ON DELETE CASCADE)";
+        $createStatement = "CREATE TABLE $courseTitlesTableName ($courseUidColumn VARCHAR(32) NOT NULL, $languageTagColumn VARCHAR(2) NOT NULL, $titleColumn VARCHAR(255) NOT NULL, PRIMARY KEY($courseUidColumn, $languageTagColumn), FOREIGN KEY($courseUidColumn) REFERENCES $coursesTableName($uidColumn) ON DELETE CASCADE)";
         $this->addSql($createStatement);
     }
 
