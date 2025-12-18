@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.1.26
+
 - fix pagination for course collection
 
 ## v0.1.25
