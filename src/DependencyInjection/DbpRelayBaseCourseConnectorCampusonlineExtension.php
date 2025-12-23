@@ -32,7 +32,7 @@ class DbpRelayBaseCourseConnectorCampusonlineExtension extends ConfigurableExten
         $courseEventSubscriberDefinition->addMethodCall('setConfig', [$mergedConfig]);
     }
 
-    public function prepend(ContainerBuilder $container)
+    public function prepend(ContainerBuilder $container): void
     {
         $configs = $container->getExtensionConfig($this->getAlias());
         $config = $this->processConfiguration(new Configuration(), $configs);
