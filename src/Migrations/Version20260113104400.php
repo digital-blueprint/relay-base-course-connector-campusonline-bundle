@@ -6,11 +6,11 @@ namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 
-final class Version20250703102300 extends EntityManagerMigration
+final class Version20260113104400 extends EntityManagerMigration
 {
     public function getDescription(): string
     {
-        return 'creates the courses and the course_titles table';
+        return 'recreate cache tables because of schema changes';
     }
 
     public function up(Schema $schema): void

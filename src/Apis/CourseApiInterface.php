@@ -41,5 +41,8 @@ interface CourseApiInterface
      */
     public function getLecturersByCourse(string $courseId, int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array;
 
+    /**
+     * Public REST API only.
+     */
     public function recreateCoursesCache(): void;
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Apis;
 
-use Dbp\CampusonlineApi\LegacyWebService\ApiException;
+use Dbp\CampusonlineApi\Helpers\ApiException;
 use Dbp\CampusonlineApi\PublicRestApi\Connection;
 use Dbp\CampusonlineApi\PublicRestApi\Courses\CourseApi;
 use Dbp\CampusonlineApi\PublicRestApi\Courses\CourseRegistrationApi;
@@ -15,6 +15,7 @@ use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Entity\CachedCourse;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Entity\CachedCourseTitle;
 use Dbp\Relay\CoreBundle\Doctrine\QueryHelper;
 use Dbp\Relay\CoreBundle\Rest\Options;
+use Dbp\Relay\CoreBundle\Rest\Query\Filter\FilterException;
 use Dbp\Relay\CoreBundle\Rest\Query\Filter\FilterTreeBuilder;
 use Dbp\Relay\CoreBundle\Rest\Query\Filter\Nodes\ConditionNode;
 use Dbp\Relay\CoreBundle\Rest\Query\Filter\Nodes\Node;
@@ -56,7 +57,7 @@ class PublicRestCourseApi implements CourseApiInterface
      */
     public function checkConnection(): void
     {
-        $this->courseApi->getCoursesBySemesterKey(self::getSemesterKeys()[0]);
+        $this->courseApi->getCoursesBySemesterKeyCursorBased(self::getSemesterKeys()[0]);
     }
 
     public function setClientHandler(?object $handler): void
@@ -74,11 +75,11 @@ class PublicRestCourseApi implements CourseApiInterface
         $courseCodeColumn = CachedCourse::COURSE_CODE_COLUMN_NAME;
         $semesterKeyColumn = CachedCourse::SEMESTER_KEY_COLUMN_NAME;
         $courseTypeColumn = CachedCourse::COURSE_TYPE_KEY_COLUMN_NAME;
-        $lecturersColumn = CachedCourse::LECTURERS_COLUMN_NAME;
+        $courseIdentityCodeUidColumn = CachedCourse::COURSE_IDENTITY_CODE_UID_COLUMN_NAME;
 
         $insertIntoCoursesStagingStatement = <<<STMT
-            INSERT INTO $coursesStagingTable ($uidColumn, $courseCodeColumn, $semesterKeyColumn, $courseTypeColumn, $lecturersColumn)
-            VALUES (:$uidColumn, :$courseCodeColumn, :$semesterKeyColumn, :$courseTypeColumn, :$lecturersColumn)
+            INSERT INTO $coursesStagingTable ($uidColumn, $courseCodeColumn, $semesterKeyColumn, $courseTypeColumn, $courseIdentityCodeUidColumn)
+            VALUES (:$uidColumn, :$courseCodeColumn, :$semesterKeyColumn, :$courseTypeColumn, :$courseIdentityCodeUidColumn)
             STMT;
 
         $courseTitlesStagingTable = CachedCourseTitle::STAGING_TABLE_NAME;
@@ -96,7 +97,7 @@ class PublicRestCourseApi implements CourseApiInterface
             foreach (self::getSemesterKeys() as $semesterKey) {
                 $nextCursor = null;
                 do {
-                    $resourcePage = $this->courseApi->getCoursesBySemesterKey($semesterKey, $nextCursor, 1000);
+                    $resourcePage = $this->courseApi->getCoursesBySemesterKeyCursorBased($semesterKey, $nextCursor, 1000);
                     /** @var CourseResource $courseResource */
                     foreach ($resourcePage->getResources() as $courseResource) {
                         $connection->executeStatement($insertIntoCoursesStagingStatement, [
@@ -104,7 +105,7 @@ class PublicRestCourseApi implements CourseApiInterface
                             $courseCodeColumn => $courseResource->getCourseCode(),
                             $semesterKeyColumn => $courseResource->getSemesterKey(),
                             $courseTypeColumn => $courseResource->getCourseTypeKey(),
-                            $lecturersColumn => null, // $courseResource->getLecturers(),
+                            $courseIdentityCodeUidColumn => $courseResource->getCourseIdentityCodeUid(),
                         ]);
 
                         foreach ($courseResource->getTitle() as $languageTag => $title) {
@@ -161,7 +162,6 @@ class PublicRestCourseApi implements CourseApiInterface
 
     /**
      * @throws ApiException
-     * @throws \Exception
      */
     public function getCourses(int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): iterable
     {
@@ -170,17 +170,22 @@ class PublicRestCourseApi implements CourseApiInterface
 
         $combinedFilter = null;
         if ($searchTerm = $options[Course::SEARCH_PARAMETER_NAME] ?? null) {
-            $combinedFilter = FilterTreeBuilder::create()
-                ->or()
+            try {
+                $combinedFilter = FilterTreeBuilder::create()
+                    ->or()
                     ->and()
-                        ->iContains($CACHED_COURSE_TITLE_ENTITY_ALIAS.'.'.CachedCourseTitle::TITLE_COLUMN_NAME,
-                            $searchTerm)
-                        ->equals($CACHED_COURSE_TITLE_ENTITY_ALIAS.'.'.CachedCourseTitle::LANGUAGE_TAG_COLUMN_NAME,
-                            Options::getLanguage($options))
+                    ->iContains($CACHED_COURSE_TITLE_ENTITY_ALIAS.'.'.CachedCourseTitle::TITLE_COLUMN_NAME,
+                        $searchTerm)
+                    ->equals($CACHED_COURSE_TITLE_ENTITY_ALIAS.'.'.CachedCourseTitle::LANGUAGE_TAG_COLUMN_NAME,
+                        Options::getLanguage($options))
                     ->end()
                     ->iContains($CACHED_COURSE_ENTITY_ALIAS.'.'.CachedCourse::COURSE_CODE_COLUMN_NAME, $searchTerm)
-                ->end()
-                ->createFilter();
+                    ->end()
+                    ->createFilter();
+            } catch (FilterException $filterException) {
+                $this->logger->error('failed to build filter for organization search: '.$filterException->getMessage(), [$filterException]);
+                throw new ApiException('failed to build filter for organization search');
+            }
         }
 
         if ($filter = Options::getFilter($options)) {
@@ -211,8 +216,13 @@ class PublicRestCourseApi implements CourseApiInterface
                     return $node;
                 });
 
-            $combinedFilter = $combinedFilter ?
-                $combinedFilter->combineWith($filter) : $filter;
+            try {
+                $combinedFilter = $combinedFilter ?
+                    $combinedFilter->combineWith($filter) : $filter;
+            } catch (FilterException $filterException) {
+                $this->logger->error('failed to combine filters for course query: '.$filterException->getMessage(), [$filterException]);
+                throw new ApiException('failed to combine filters for course query');
+            }
         }
 
         $queryBuilder = $this->entityManager->createQueryBuilder();
@@ -221,8 +231,14 @@ class PublicRestCourseApi implements CourseApiInterface
             ->from(CachedCourse::class, $CACHED_COURSE_ENTITY_ALIAS)
             ->innerJoin(CachedCourseTitle::class, $CACHED_COURSE_TITLE_ENTITY_ALIAS, Join::WITH,
                 $CACHED_COURSE_ENTITY_ALIAS.'.'.CachedCourse::UID_COLUMN_NAME." = $CACHED_COURSE_TITLE_ENTITY_ALIAS.course");
+
         if ($combinedFilter !== null) {
-            QueryHelper::addFilter($queryBuilder, $combinedFilter);
+            try {
+                QueryHelper::addFilter($queryBuilder, $combinedFilter);
+            } catch (\Exception $exception) {
+                $this->logger->error('failed to apply filter to course query: '.$exception->getMessage(), [$exception]);
+                throw new ApiException('failed to apply filter to course query');
+            }
         }
 
         $paginator = new Paginator($queryBuilder->getQuery());
@@ -286,6 +302,7 @@ class PublicRestCourseApi implements CourseApiInterface
         return new CourseAndExtraData($course, [
             CachedCourse::COURSE_TYPE_KEY_COLUMN_NAME => $cachedCourse->getCourseTypeKey(),
             CachedCourse::SEMESTER_KEY_COLUMN_NAME => $cachedCourse->getSemesterKey(),
+            CachedCourse::COURSE_IDENTITY_CODE_UID_COLUMN_NAME => $cachedCourse->getCourseIdentityCodeUid(),
         ]);
     }
 

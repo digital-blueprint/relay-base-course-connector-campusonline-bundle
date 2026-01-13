@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Public REST API: Add attribute `courseIdentyCodeUid`
+- Add cache refresh cron job for the Public Rest API variant
+- Improve exception handling for Public Rest API variant
+
 ## v0.1.26
 
 - fix pagination for course collection

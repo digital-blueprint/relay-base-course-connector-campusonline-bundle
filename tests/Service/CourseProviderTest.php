@@ -31,6 +31,8 @@ class CourseProviderTest extends ApiTestCase
     private const SEMESTER_LOCAL_DATA_ATTRIBUTE_NAME = 'term';
     private const SEMESTER_LEGACY_SOURCE_ATTRIBUTE_NAME = 'teachingTerm';
     private const SEMESTER_SOURCE_ATTRIBUTE_NAME = 'semesterKey';
+    private const COURSE_IDENTITY_CODE_UID_LOCAL_DATA_ATTRIBUTE_NAME = 'course_identity_code';
+    private const COURSE_IDENTITY_CODE_UID_SOURCE_ATTRIBUTE_NAME = 'courseIdentityCodeUid';
 
     private ?CourseProvider $courseProvider = null;
     private ?EntityManagerInterface $entityManager = null;
@@ -52,6 +54,11 @@ class CourseProviderTest extends ApiTestCase
                     self::SEMESTER_SOURCE_ATTRIBUTE_NAME : self::SEMESTER_LEGACY_SOURCE_ATTRIBUTE_NAME,
                 'default_value' => '',
             ],
+            [
+                'local_data_attribute' => self::COURSE_IDENTITY_CODE_UID_LOCAL_DATA_ATTRIBUTE_NAME,
+                'source_attribute' => self::COURSE_IDENTITY_CODE_UID_SOURCE_ATTRIBUTE_NAME,
+                'default_value' => '',
+            ],
         ];
 
         return $config;
@@ -63,7 +70,6 @@ class CourseProviderTest extends ApiTestCase
 
         $container = self::bootKernel()->getContainer();
 
-        $eventDispatcher = null;
         $eventDispatcher = new EventDispatcher();
         $this->entityManager = TestEntityManager::setUpEntityManager($container,
             DbpRelayBaseCourseConnectorCampusonlineExtension::ENTITY_MANAGER_ID);
@@ -71,12 +77,10 @@ class CourseProviderTest extends ApiTestCase
         $this->createStagingTables();
 
         $this->courseProvider = new CourseProvider($this->entityManager, $eventDispatcher);
-        // $this->courseProvider->setConfig($this->getPublicRestApiConfig());
         $this->courseProvider->setCache(new ArrayAdapter(), 3600);
         $this->courseProvider->setLogger(new NullLogger());
 
         $this->courseEventSubscriber = new CourseEventSubscriber($this->courseProvider);
-        // $this->courseEventSubscriber->setConfig(self::createEventSubscriberConfig(true));
         $eventDispatcher->addSubscriber($this->courseEventSubscriber);
     }
 
@@ -110,6 +114,7 @@ class CourseProviderTest extends ApiTestCase
         Options::requestLocalDataAttributes($options, [
             self::COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME,
             self::SEMESTER_LOCAL_DATA_ATTRIBUTE_NAME,
+            self::COURSE_IDENTITY_CODE_UID_LOCAL_DATA_ATTRIBUTE_NAME,
         ]);
         $course = $this->courseProvider->getCourseById('2', $options);
         $this->assertSame('2', $course->getIdentifier());
@@ -117,6 +122,8 @@ class CourseProviderTest extends ApiTestCase
         $this->assertSame('UE', $course->getLocalDataValue(self::COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME));
         $this->assertSame(PublicRestCourseApi::getSemesterKeys()[0],
             $course->getLocalDataValue(self::SEMESTER_LOCAL_DATA_ATTRIBUTE_NAME));
+        $this->assertSame('1235',
+            $course->getLocalDataValue(self::COURSE_IDENTITY_CODE_UID_LOCAL_DATA_ATTRIBUTE_NAME));
     }
 
     public function testGetCourseByIdWithLecturersLocalDataAttribute(): void
@@ -188,6 +195,7 @@ class CourseProviderTest extends ApiTestCase
         Options::requestLocalDataAttributes($options, [
             self::COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME,
             self::SEMESTER_LOCAL_DATA_ATTRIBUTE_NAME,
+            self::COURSE_IDENTITY_CODE_UID_LOCAL_DATA_ATTRIBUTE_NAME,
         ]);
         Options::setLanguage($options, 'en');
         $courses = $this->courseProvider->getCourses(1, 30, $options);
@@ -199,6 +207,8 @@ class CourseProviderTest extends ApiTestCase
         $this->assertSame('VO', $course->getLocalDataValue(self::COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME));
         $this->assertSame(PublicRestCourseApi::getSemesterKeys()[0],
             $course->getLocalDataValue(self::SEMESTER_LOCAL_DATA_ATTRIBUTE_NAME));
+        $this->assertSame('1234',
+            $course->getLocalDataValue(self::COURSE_IDENTITY_CODE_UID_LOCAL_DATA_ATTRIBUTE_NAME));
         $course = $courses[1];
         $this->assertSame('2', $course->getIdentifier());
         $this->assertSame('Computational Science', $course->getName());
@@ -206,6 +216,8 @@ class CourseProviderTest extends ApiTestCase
         $this->assertSame('UE', $course->getLocalDataValue(self::COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME));
         $this->assertSame(PublicRestCourseApi::getSemesterKeys()[0],
             $course->getLocalDataValue(self::SEMESTER_LOCAL_DATA_ATTRIBUTE_NAME));
+        $this->assertSame('1235',
+            $course->getLocalDataValue(self::COURSE_IDENTITY_CODE_UID_LOCAL_DATA_ATTRIBUTE_NAME));
         $course = $courses[2];
         $this->assertSame('3', $course->getIdentifier());
         $this->assertSame('Computational Unintelligence', $course->getName());
@@ -213,6 +225,8 @@ class CourseProviderTest extends ApiTestCase
         $this->assertSame('SEM', $course->getLocalDataValue(self::COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME));
         $this->assertSame(PublicRestCourseApi::getSemesterKeys()[1],
             $course->getLocalDataValue(self::SEMESTER_LOCAL_DATA_ATTRIBUTE_NAME));
+        $this->assertSame('1236',
+            $course->getLocalDataValue(self::COURSE_IDENTITY_CODE_UID_LOCAL_DATA_ATTRIBUTE_NAME));
     }
 
     public function testGetCoursesEnWithLocalDataLecturers(): void
@@ -597,6 +611,7 @@ class CourseProviderTest extends ApiTestCase
                             'uid' => '1',
                             'courseCode' => '44_A',
                             'courseTypeKey' => 'VO',
+                            'courseIdentityCodeUid' => '1234',
                             'semesterKey' => $semesterKeys[0],
                             'title' => [
                                 'value' => [
@@ -615,6 +630,7 @@ class CourseProviderTest extends ApiTestCase
                             'uid' => '2',
                             'courseCode' => '44_B',
                             'courseTypeKey' => 'UE',
+                            'courseIdentityCodeUid' => '1235',
                             'semesterKey' => $semesterKeys[0],
                             'title' => [
                                 'value' => [
@@ -633,6 +649,7 @@ class CourseProviderTest extends ApiTestCase
                             'uid' => '3',
                             'courseCode' => '45_A',
                             'courseTypeKey' => 'SEM',
+                            'courseIdentityCodeUid' => '1236',
                             'semesterKey' => $semesterKeys[1],
                             'title' => [
                                 'value' => [
@@ -646,8 +663,9 @@ class CourseProviderTest extends ApiTestCase
         ];
         $this->mockResponses($coResponses, true);
         try {
+            // this is expected to fail, since sqlite does not support some operations
             $this->courseProvider->recreateCoursesCache();
-        } catch (\Throwable $exception) { // this is expected to not fail, since sqlite does not support some operations
+        } catch (\Throwable) {
             $coursesLiveTable = CachedCourse::TABLE_NAME;
             $coursesStagingTable = CachedCourse::STAGING_TABLE_NAME;
             $coursesTempTable = 'courses_old';

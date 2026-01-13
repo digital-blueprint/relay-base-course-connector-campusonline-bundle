@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\DependencyInjection;
 
+use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Cron\CacheRefreshCronJob;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\EventSubscriber\CourseEventSubscriber;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -17,6 +18,7 @@ class Configuration implements ConfigurationInterface
     public const BASE_URL_NODE = 'base_url';
     public const CLIENT_ID_NODE = 'client_id';
     public const CLIENT_SECRET_NODE = 'client_secret';
+    public const CACHE_REFRESH_INTERVAL_NODE = 'cache_refresh_interval';
 
     private const DATABASE_URL_DEFAULT = 'sqlite:///%kernel.project_dir%/var/courses_cache.db';
 
@@ -40,6 +42,9 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode(self::CLIENT_ID_NODE)->end()
                         ->scalarNode(self::CLIENT_SECRET_NODE)->end()
                     ->end()
+                ->end()
+                ->scalarNode(self::CACHE_REFRESH_INTERVAL_NODE)
+                    ->defaultValue(CacheRefreshCronJob::DEFAULT_INTERVAL)
                 ->end()
                 ->append(CourseEventSubscriber::getLocalDataMappingConfigNodeDefinition())
             ->end();

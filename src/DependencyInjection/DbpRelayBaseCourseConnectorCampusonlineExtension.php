@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\DependencyInjection;
 
+use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Cron\CacheRefreshCronJob;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\EventSubscriber\CourseEventSubscriber;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider;
 use Dbp\Relay\CoreBundle\Doctrine\DoctrineConfiguration;
@@ -25,11 +26,14 @@ class DbpRelayBaseCourseConnectorCampusonlineExtension extends ConfigurableExten
         );
         $loader->load('services.yaml');
 
-        $courseProviderDefinition = $container->getDefinition(CourseProvider::class);
-        $courseProviderDefinition->addMethodCall('setConfig', [$mergedConfig]);
+        $container->getDefinition(CourseProvider::class)
+            ->addMethodCall('setConfig', [$mergedConfig]);
 
-        $courseEventSubscriberDefinition = $container->getDefinition(CourseEventSubscriber::class);
-        $courseEventSubscriberDefinition->addMethodCall('setConfig', [$mergedConfig]);
+        $container->getDefinition(CourseEventSubscriber::class)
+            ->addMethodCall('setConfig', [$mergedConfig]);
+
+        $container->getDefinition(CacheRefreshCronJob::class)
+            ->addMethodCall('setConfig', [$mergedConfig]);
     }
 
     public function prepend(ContainerBuilder $container): void

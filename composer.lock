@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6733547318dd31b6a2dd3bb537486c6e",
+    "content-hash": "75deb31638eaffbd5a07dd0d56c6100a",
     "packages": [
         {
             "name": "api-platform/documentation",
@@ -981,16 +981,16 @@
         },
         {
             "name": "dbp/campusonline-api",
-            "version": "v0.3.28",
+            "version": "v0.3.29",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/campusonline-api.git",
-                "reference": "f98fc964afc66f6b69f664ff9c4554666d5528b2"
+                "reference": "15a1824b168e40a190d5332ffd0b9cd7fc93e08f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/f98fc964afc66f6b69f664ff9c4554666d5528b2",
-                "reference": "f98fc964afc66f6b69f664ff9c4554666d5528b2",
+                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/15a1824b168e40a190d5332ffd0b9cd7fc93e08f",
+                "reference": "15a1824b168e40a190d5332ffd0b9cd7fc93e08f",
                 "shasum": ""
             },
             "require": {
@@ -1025,9 +1025,9 @@
             ],
             "support": {
                 "issues": "https://github.com/digital-blueprint/campusonline-api/issues",
-                "source": "https://github.com/digital-blueprint/campusonline-api/tree/v0.3.28"
+                "source": "https://github.com/digital-blueprint/campusonline-api/tree/v0.3.29"
             },
-            "time": "2025-12-17T11:01:57+00:00"
+            "time": "2026-01-13T09:28:15+00:00"
         },
         {
             "name": "dbp/relay-base-course-bundle",
@@ -12522,5 +12522,5 @@
     "platform-overrides": {
         "php": "8.2"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }

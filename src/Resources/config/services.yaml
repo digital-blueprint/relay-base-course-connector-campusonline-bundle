@@ -1,24 +1,28 @@
 services:
- Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider:
+  Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider:
+     autowire: true
+     autoconfigure: true
+     arguments:
+       $entityManager: '@doctrine.orm.dbp_relay_base_course_connector_campusonline_bundle_entity_manager'
+     calls:
+       - setCache: [ '@dbp.relay.base_course_connector_campusonline.cache.campus_online', 87000 ] # one day
+
+  Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\HealthCheck:
     autowire: true
     autoconfigure: true
-    arguments:
-      $entityManager: '@doctrine.orm.dbp_relay_base_course_connector_campusonline_bundle_entity_manager'
-    calls:
-      - setCache: [ '@dbp.relay.base_course_connector_campusonline.cache.campus_online', 87000 ] # one day
 
- Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\HealthCheck:
-   autowire: true
-   autoconfigure: true
+  Dbp\Relay\BaseCourseConnectorCampusonlineBundle\EventSubscriber\CourseEventSubscriber:
+    autowire: true
+    autoconfigure: true
 
- Dbp\Relay\BaseCourseConnectorCampusonlineBundle\EventSubscriber\CourseEventSubscriber:
-   autowire: true
-   autoconfigure: true
+  Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Cron\CacheRefreshCronJob:
+    autowire: true
+    autoconfigure: true
 
- Dbp\Relay\BaseCourseBundle\API\CourseProviderInterface:
+  Dbp\Relay\BaseCourseBundle\API\CourseProviderInterface:
     '@Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider'
 
- dbp.relay.base_course_connector_campusonline.cache.campus_online:
+  dbp.relay.base_course_connector_campusonline.cache.campus_online:
     parent: cache.app
     tags:
       - { name: 'cache.pool', default_lifetime: 60 }

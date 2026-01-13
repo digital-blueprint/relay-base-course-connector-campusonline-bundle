@@ -19,14 +19,14 @@ class CachedCourse
     public const COURSE_CODE_COLUMN_NAME = 'courseCode';
     public const SEMESTER_KEY_COLUMN_NAME = 'semesterKey';
     public const COURSE_TYPE_KEY_COLUMN_NAME = 'courseTypeKey';
-    public const LECTURERS_COLUMN_NAME = 'lecturers';
+    public const COURSE_IDENTITY_CODE_UID_COLUMN_NAME = 'courseIdentityCodeUid';
 
     public const ALL_COLUMN_NAMES = [
         self::UID_COLUMN_NAME,
         self::COURSE_CODE_COLUMN_NAME,
         self::SEMESTER_KEY_COLUMN_NAME,
         self::COURSE_TYPE_KEY_COLUMN_NAME,
-        self::LECTURERS_COLUMN_NAME,
+        self::COURSE_IDENTITY_CODE_UID_COLUMN_NAME,
     ];
 
     #[ORM\Id]
@@ -34,16 +34,12 @@ class CachedCourse
     private ?string $uid = null;
     #[ORM\Column(name: self::COURSE_CODE_COLUMN_NAME, type: 'string', length: 32)]
     private ?string $courseCode = null;
-    #[ORM\Column(name: self::SEMESTER_KEY_COLUMN_NAME, type: 'string', length: 5)]
+    #[ORM\Column(name: self::SEMESTER_KEY_COLUMN_NAME, type: 'string', length: 5, nullable: true)]
     private ?string $semesterKey = null;
-    #[ORM\Column(name: self::COURSE_TYPE_KEY_COLUMN_NAME, type: 'string', length: 8)]
+    #[ORM\Column(name: self::COURSE_TYPE_KEY_COLUMN_NAME, type: 'string', length: 8, nullable: true)]
     private ?string $courseTypeKey = null;
-
-    /**
-     * @var string[]|null
-     */
-    #[ORM\Column(name: self::LECTURERS_COLUMN_NAME, type: 'json', nullable: true)]
-    private ?array $lecturers = null;
+    #[ORM\Column(name: self::COURSE_IDENTITY_CODE_UID_COLUMN_NAME, type: 'string', length: 16, nullable: true)]
+    private ?string $courseIdentityCodeUid = null;
 
     #[ORM\OneToMany(targetEntity: CachedCourseTitle::class, mappedBy: 'course')]
     private Collection $titles;
@@ -93,6 +89,16 @@ class CachedCourse
         $this->courseTypeKey = $courseTypeKey;
     }
 
+    public function getCourseIdentityCodeUid(): ?string
+    {
+        return $this->courseIdentityCodeUid;
+    }
+
+    public function setCourseIdentityCodeUid(?string $courseIdentityCodeUid): void
+    {
+        $this->courseIdentityCodeUid = $courseIdentityCodeUid;
+    }
+
     public function getTitles(): Collection
     {
         return $this->titles;
@@ -101,21 +107,5 @@ class CachedCourse
     public function setTitles(Collection $titles): void
     {
         $this->titles = $titles;
-    }
-
-    /**
-     * @return string[]|null
-     */
-    public function getLecturers(): ?array
-    {
-        return $this->lecturers;
-    }
-
-    /**
-     * @param string[]|null $lecturers
-     */
-    public function setLecturers(?array $lecturers): void
-    {
-        $this->lecturers = $lecturers;
     }
 }
