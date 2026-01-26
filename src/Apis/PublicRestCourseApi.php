@@ -320,8 +320,8 @@ class PublicRestCourseApi implements CourseApiInterface
             $summerYear = $winterStartYear + 1;
 
             return ["{$winterStartYear}W", "{$summerYear}S"];
-        } else { // in summer
-            return ["{$year}S", "{$year}W"];
-        }
+        }   // in summer
+
+        return ["{$year}S", "{$year}W"];
     }
 }
