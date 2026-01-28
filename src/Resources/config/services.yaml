@@ -4,8 +4,6 @@ services:
      autoconfigure: true
      arguments:
        $entityManager: '@doctrine.orm.dbp_relay_base_course_connector_campusonline_bundle_entity_manager'
-     calls:
-       - setCache: [ '@dbp.relay.base_course_connector_campusonline.cache.campus_online', 87000 ] # one day
 
   Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\HealthCheck:
     autowire: true
@@ -15,14 +13,13 @@ services:
     autowire: true
     autoconfigure: true
 
+  Dbp\Relay\BaseCourseConnectorCampusonlineBundle\EventSubscriber\CourseEventEventSubscriber:
+    autowire: true
+    autoconfigure: true
+
   Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Cron\CacheRefreshCronJob:
     autowire: true
     autoconfigure: true
 
   Dbp\Relay\BaseCourseBundle\API\CourseProviderInterface:
     '@Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider'
-
-  dbp.relay.base_course_connector_campusonline.cache.campus_online:
-    parent: cache.app
-    tags:
-      - { name: 'cache.pool', default_lifetime: 60 }

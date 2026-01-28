@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event;
 
-use Dbp\Relay\BaseCourseBundle\Entity\Course;
+use Dbp\Relay\BaseCourseBundle\Entity\CourseEvent;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider;
 use Dbp\Relay\CoreBundle\LocalData\LocalDataPostEvent;
 
-class CoursePostEvent extends LocalDataPostEvent
+class CourseEventPostEvent extends LocalDataPostEvent
 {
     private CourseProvider $courseProvider;
 
-    public function __construct(Course $entity, array $sourceData, CourseProvider $courseApi, array $options)
+    public function __construct(CourseEvent $entity, array $sourceData, CourseProvider $courseApi, array $options)
     {
         parent::__construct($entity, $sourceData, $options);
 

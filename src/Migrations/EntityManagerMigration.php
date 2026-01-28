@@ -33,6 +33,9 @@ abstract class EntityManagerMigration extends AbstractEntityManagerMigration
         $semesterKeyColumn = CachedCourse::SEMESTER_KEY_COLUMN_NAME;
         $courseTypeColumn = CachedCourse::COURSE_TYPE_KEY_COLUMN_NAME;
         $courseIdentityCodeUidColumn = CachedCourse::COURSE_IDENTITY_CODE_UID_COLUMN_NAME;
+        $organizationUidColumn = CachedCourse::ORGANIZATION_UID_COLUMN_NAME;
+        $semesterHoursColumn = CachedCourse::SEMESTER_HOURS_COLUMN_NAME;
+        $mainLanguageOfInstructionColumn = CachedCourse::MAIN_LANGUAGE_OF_INSTRUCTION_COLUMN_NAME;
 
         $createStatement = <<<STMT
                CREATE TABLE $coursesTableName (
@@ -41,6 +44,9 @@ abstract class EntityManagerMigration extends AbstractEntityManagerMigration
                    $semesterKeyColumn VARCHAR(5) DEFAULT NULL,
                    $courseTypeColumn VARCHAR(8) DEFAULT NULL,
                    $courseIdentityCodeUidColumn VARCHAR(16) DEFAULT NULL,
+                   $organizationUidColumn VARCHAR(32) DEFAULT NULL,
+                   $semesterHoursColumn FLOAT DEFAULT NULL,
+                   $mainLanguageOfInstructionColumn VARCHAR(8) DEFAULT NULL,
                    PRIMARY KEY($uidColumn)
                ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
             STMT;

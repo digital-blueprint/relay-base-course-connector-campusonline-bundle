@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Apis;
+namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service;
 
 use Dbp\Relay\BaseCourseBundle\Entity\Course;
 

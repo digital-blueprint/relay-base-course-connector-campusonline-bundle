@@ -20,6 +20,9 @@ class CachedCourse
     public const SEMESTER_KEY_COLUMN_NAME = 'semesterKey';
     public const COURSE_TYPE_KEY_COLUMN_NAME = 'courseTypeKey';
     public const COURSE_IDENTITY_CODE_UID_COLUMN_NAME = 'courseIdentityCodeUid';
+    public const ORGANIZATION_UID_COLUMN_NAME = 'organizationUid';
+    public const SEMESTER_HOURS_COLUMN_NAME = 'semesterHours';
+    public const MAIN_LANGUAGE_OF_INSTRUCTION_COLUMN_NAME = 'mainLanguageOfInstruction';
 
     public const ALL_COLUMN_NAMES = [
         self::UID_COLUMN_NAME,
@@ -27,6 +30,9 @@ class CachedCourse
         self::SEMESTER_KEY_COLUMN_NAME,
         self::COURSE_TYPE_KEY_COLUMN_NAME,
         self::COURSE_IDENTITY_CODE_UID_COLUMN_NAME,
+        self::ORGANIZATION_UID_COLUMN_NAME,
+        self::SEMESTER_HOURS_COLUMN_NAME,
+        self::MAIN_LANGUAGE_OF_INSTRUCTION_COLUMN_NAME,
     ];
 
     #[ORM\Id]
@@ -40,6 +46,12 @@ class CachedCourse
     private ?string $courseTypeKey = null;
     #[ORM\Column(name: self::COURSE_IDENTITY_CODE_UID_COLUMN_NAME, type: 'string', length: 16, nullable: true)]
     private ?string $courseIdentityCodeUid = null;
+    #[ORM\Column(name: self::ORGANIZATION_UID_COLUMN_NAME, type: 'string', length: 32, nullable: true)]
+    private ?string $organizationUid = null;
+    #[ORM\Column(name: self::SEMESTER_HOURS_COLUMN_NAME, type: 'float', nullable: true)]
+    private ?int $semesterHours = null;
+    #[ORM\Column(name: self::MAIN_LANGUAGE_OF_INSTRUCTION_COLUMN_NAME, type: 'string', length: 8, nullable: true)]
+    private ?string $mainLanguageOfInstruction = null;
 
     #[ORM\OneToMany(targetEntity: CachedCourseTitle::class, mappedBy: 'course')]
     private Collection $titles;
@@ -97,6 +109,36 @@ class CachedCourse
     public function setCourseIdentityCodeUid(?string $courseIdentityCodeUid): void
     {
         $this->courseIdentityCodeUid = $courseIdentityCodeUid;
+    }
+
+    public function getOrganizationUid(): ?string
+    {
+        return $this->organizationUid;
+    }
+
+    public function setOrganizationUid(?string $organizationUid): void
+    {
+        $this->organizationUid = $organizationUid;
+    }
+
+    public function getSemesterHours(): ?int
+    {
+        return $this->semesterHours;
+    }
+
+    public function setSemesterHours(?int $semesterHours): void
+    {
+        $this->semesterHours = $semesterHours;
+    }
+
+    public function getMainLanguageOfInstruction(): ?string
+    {
+        return $this->mainLanguageOfInstruction;
+    }
+
+    public function setMainLanguageOfInstruction(?string $mainLanguageOfInstruction): void
+    {
+        $this->mainLanguageOfInstruction = $mainLanguageOfInstruction;
     }
 
     public function getTitles(): Collection

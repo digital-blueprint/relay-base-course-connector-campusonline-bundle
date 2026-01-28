@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\DependencyInjection;
 
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Cron\CacheRefreshCronJob;
+use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\EventSubscriber\CourseEventEventSubscriber;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\EventSubscriber\CourseEventSubscriber;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider;
 use Dbp\Relay\CoreBundle\Doctrine\DoctrineConfiguration;
@@ -30,6 +31,9 @@ class DbpRelayBaseCourseConnectorCampusonlineExtension extends ConfigurableExten
             ->addMethodCall('setConfig', [$mergedConfig]);
 
         $container->getDefinition(CourseEventSubscriber::class)
+            ->addMethodCall('setConfig', [$mergedConfig]);
+
+        $container->getDefinition(CourseEventEventSubscriber::class)
             ->addMethodCall('setConfig', [$mergedConfig]);
 
         $container->getDefinition(CacheRefreshCronJob::class)

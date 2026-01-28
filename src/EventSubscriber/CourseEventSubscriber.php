@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\EventSubscriber;
 
-use Dbp\CampusonlineApi\LegacyWebService\Course\CourseData;
-use Dbp\CampusonlineApi\LegacyWebService\ResourceData;
 use Dbp\Relay\BaseCourseBundle\Entity\Course;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CoursePostEvent;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CoursePreEvent;
@@ -15,8 +13,15 @@ use Dbp\Relay\CoreBundle\LocalData\LocalDataPostEvent;
 
 class CourseEventSubscriber extends AbstractLocalDataEventSubscriber
 {
-    public const LECTURERS_LOCAL_DATA_ATTRIBUTE = 'lecturers';
-    public const ATTENDEES_LOCAL_DATA_ATTRIBUTE = 'attendees';
+    public const LECTURERS_SOURCE_DATA_ATTRIBUTE = 'lecturers';
+    public const ATTENDEES_SOURCE_DATA_ATTRIBUTE = 'attendees';
+    public const COURSE_GROUPS_SOURCE_DATA_ATTRIBUTE = 'courseGroups';
+    public const DESCRIPTION_SOURCE_DATA_ATTRIBUTE = 'description';
+    public const STATUS_WITHIN_CURRICULUM_URL_SOURCE_DATA_ATTRIBUTE = 'statusWithinCurriculumUrl';
+    public const OBJECTIVE_SOURCE_DATA_ATTRIBUTE = 'objective';
+    public const ATTENDEE_GROUP_LIST_URL_SOURCE_DATA_ATTRIBUTE = 'attendeeGroupListUrl';
+    public const TYPE_NAME_SOURCE_DATA_ATTRIBUTE = 'typeName';
+    public const COURSE_TYPE_KEY_SOURCE_ATTRIBUTE = 'courseTypeKey';
 
     protected static function getSubscribedEventNames(): array
     {
@@ -28,37 +33,48 @@ class CourseEventSubscriber extends AbstractLocalDataEventSubscriber
 
     public function __construct(private readonly CourseProvider $courseProvider)
     {
+        parent::__construct('BaseCourse');
     }
 
-    protected function onPostEvent(LocalDataPostEvent $postEvent, array &$localDataAttributes): void
+    protected function getAttributeValue(LocalDataPostEvent $postEvent, array $attributeMapEntry): mixed
     {
-        parent::onPostEvent($postEvent, $localDataAttributes);
+        $course = $postEvent->getEntity();
+        assert($course instanceof Course);
 
-        if ($postEvent->isLocalDataAttributeRequested(self::LECTURERS_LOCAL_DATA_ATTRIBUTE)) {
-            if ($this->courseProvider->isLegacy()) {
-                $lecturerIds = [];
-                foreach ($postEvent->getSourceData()[CourseData::CONTACTS_ATTRIBUTE] ?? [] as $contactData) {
-                    if ($lecturerId = $contactData[ResourceData::IDENTIFIER_ATTRIBUTE] ?? null) {
-                        $lecturerIds[] = $lecturerId;
-                    }
-                }
-            } else {
-                $course = $postEvent->getEntity();
-                assert($course instanceof Course);
-                $lecturerIds = $this->courseProvider->getLecturersByCourse(
-                    $course->getIdentifier(), 1, 9999);
-            }
-            $postEvent->setLocalDataAttribute(self::LECTURERS_LOCAL_DATA_ATTRIBUTE, $lecturerIds);
+        switch ($attributeMapEntry[self::SOURCE_ATTRIBUTE_KEY]) {
+            case self::LECTURERS_SOURCE_DATA_ATTRIBUTE:
+                return $this->courseProvider->getLecturersByCourse(
+                    $course->getIdentifier());
+
+            case self::ATTENDEES_SOURCE_DATA_ATTRIBUTE:
+                return $this->courseProvider->getAttendeesByCourse(
+                    $course->getIdentifier());
+
+            case self::COURSE_GROUPS_SOURCE_DATA_ATTRIBUTE:
+                return $this->courseProvider->getGroupsByCourse(
+                    $course->getIdentifier(), $postEvent->getOptions());
+
+            case self::DESCRIPTION_SOURCE_DATA_ATTRIBUTE:
+                return $this->courseProvider->getDescriptionByCourse(
+                    $course->getIdentifier(), $postEvent->getOptions());
+
+            case self::STATUS_WITHIN_CURRICULUM_URL_SOURCE_DATA_ATTRIBUTE:
+                return $this->courseProvider->getCampusOnlineWebBaseUrl().
+                    'ee/rest/pages/slc.tm.cp/course-position-in-curriculum/'.$course->getIdentifier();
+
+            case self::OBJECTIVE_SOURCE_DATA_ATTRIBUTE:
+                return $this->courseProvider->getObjectiveByCourse(
+                    $course->getIdentifier(), $postEvent->getOptions());
+
+            case self::ATTENDEE_GROUP_LIST_URL_SOURCE_DATA_ATTRIBUTE:
+                return $this->courseProvider->getCampusOnlineWebBaseUrl().
+                    'ee/rest/pages/slc.tm.cp/course-registration/'.$course->getIdentifier();
+
+            case self::TYPE_NAME_SOURCE_DATA_ATTRIBUTE:
+                return ($courseTypeKey = $postEvent->getSourceData()[self::COURSE_TYPE_KEY_SOURCE_ATTRIBUTE] ?? null) !== null ?
+                    $this->courseProvider->getLocalizedTypeNameForTypeKey($courseTypeKey, $postEvent->getOptions()) : null;
         }
-        if ($postEvent->isLocalDataAttributeRequested(self::ATTENDEES_LOCAL_DATA_ATTRIBUTE)
-            && false === $this->courseProvider->isLegacy()) {
-            $course = $postEvent->getEntity();
-            assert($course instanceof Course);
 
-            $attendeeIds = $this->courseProvider->getAttendeesByCourse(
-                $course->getIdentifier(), 1, 9999);
-
-            $postEvent->setLocalDataAttribute(self::ATTENDEES_LOCAL_DATA_ATTRIBUTE, $attendeeIds);
-        }
+        return parent::getAttributeValue($postEvent, $attributeMapEntry);
     }
 }

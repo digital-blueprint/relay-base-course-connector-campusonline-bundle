@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "75deb31638eaffbd5a07dd0d56c6100a",
+    "content-hash": "8788033fce83cc09b226b2e0136bb35d",
     "packages": [
         {
             "name": "api-platform/documentation",
@@ -981,16 +981,16 @@
         },
         {
             "name": "dbp/campusonline-api",
-            "version": "v0.3.29",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/campusonline-api.git",
-                "reference": "15a1824b168e40a190d5332ffd0b9cd7fc93e08f"
+                "reference": "4c316df3f40260ebc0eab7f58d76612c8a00fedd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/15a1824b168e40a190d5332ffd0b9cd7fc93e08f",
-                "reference": "15a1824b168e40a190d5332ffd0b9cd7fc93e08f",
+                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/4c316df3f40260ebc0eab7f58d76612c8a00fedd",
+                "reference": "4c316df3f40260ebc0eab7f58d76612c8a00fedd",
                 "shasum": ""
             },
             "require": {
@@ -1013,6 +1013,7 @@
                 "symfony/cache": "^5.4 || ^6.4.3",
                 "symfony/phpunit-bridge": "^7.0.7"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -1025,22 +1026,22 @@
             ],
             "support": {
                 "issues": "https://github.com/digital-blueprint/campusonline-api/issues",
-                "source": "https://github.com/digital-blueprint/campusonline-api/tree/v0.3.29"
+                "source": "https://github.com/digital-blueprint/campusonline-api/tree/main"
             },
-            "time": "2026-01-13T09:28:15+00:00"
+            "time": "2026-01-28T10:28:27+00:00"
         },
         {
             "name": "dbp/relay-base-course-bundle",
-            "version": "v0.2.16",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-base-course-bundle.git",
-                "reference": "38a6f12e76445c8fb0da8a2f7e39ba8b3ba35f42"
+                "reference": "27dcf9064d97bcb9bca0d43ff98ffee2664a4850"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-base-course-bundle/zipball/38a6f12e76445c8fb0da8a2f7e39ba8b3ba35f42",
-                "reference": "38a6f12e76445c8fb0da8a2f7e39ba8b3ba35f42",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-base-course-bundle/zipball/27dcf9064d97bcb9bca0d43ff98ffee2664a4850",
+                "reference": "27dcf9064d97bcb9bca0d43ff98ffee2664a4850",
                 "shasum": ""
             },
             "require": {
@@ -1072,6 +1073,7 @@
                 "symfony/phpunit-bridge": "^6.4 || ^7.4",
                 "symfony/runtime": "^6.4 || ^7.4"
             },
+            "default-branch": true,
             "type": "symfony-bundle",
             "autoload": {
                 "psr-4": {
@@ -1084,22 +1086,22 @@
             ],
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-base-course-bundle/issues",
-                "source": "https://github.com/digital-blueprint/relay-base-course-bundle/tree/v0.2.16"
+                "source": "https://github.com/digital-blueprint/relay-base-course-bundle/tree/main"
             },
-            "time": "2025-12-09T13:19:18+00:00"
+            "time": "2026-01-27T13:29:33+00:00"
         },
         {
             "name": "dbp/relay-core-bundle",
-            "version": "v0.1.227",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-core-bundle.git",
-                "reference": "1e079830ead1e034f046abbf59348d4cb6ef0094"
+                "reference": "76722f2d54c705f602aa9166667028ccc644aabf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-core-bundle/zipball/1e079830ead1e034f046abbf59348d4cb6ef0094",
-                "reference": "1e079830ead1e034f046abbf59348d4cb6ef0094",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-core-bundle/zipball/76722f2d54c705f602aa9166667028ccc644aabf",
+                "reference": "76722f2d54c705f602aa9166667028ccc644aabf",
                 "shasum": ""
             },
             "require": {
@@ -1183,6 +1185,7 @@
                 "symfony/phpunit-bridge": "^6.4 || ^7.4",
                 "symfony/runtime": "^6.4 || ^7.4"
             },
+            "default-branch": true,
             "type": "symfony-bundle",
             "autoload": {
                 "psr-4": {
@@ -1196,9 +1199,9 @@
             "description": "The core bundle of the Relay API gateway",
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-core-bundle/issues",
-                "source": "https://github.com/digital-blueprint/relay-core-bundle/tree/v0.1.227"
+                "source": "https://github.com/digital-blueprint/relay-core-bundle/tree/main"
             },
-            "time": "2025-12-09T10:49:41+00:00"
+            "time": "2026-01-26T14:32:46+00:00"
         },
         {
             "name": "doctrine/collections",
@@ -12509,9 +12512,32 @@
             "time": "2025-11-17T20:03:58+00:00"
         }
     ],
-    "aliases": [],
+    "aliases": [
+        {
+            "package": "dbp/campusonline-api",
+            "version": "dev-main",
+            "alias": "0.3.29",
+            "alias_normalized": "0.3.29.0"
+        },
+        {
+            "package": "dbp/relay-base-course-bundle",
+            "version": "dev-main",
+            "alias": "0.2.16",
+            "alias_normalized": "0.2.16.0"
+        },
+        {
+            "package": "dbp/relay-core-bundle",
+            "version": "dev-main",
+            "alias": "0.1.227",
+            "alias_normalized": "0.1.227.0"
+        }
+    ],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "dbp/campusonline-api": 20,
+        "dbp/relay-base-course-bundle": 20,
+        "dbp/relay-core-bundle": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
@@ -12522,5 +12548,5 @@
     "platform-overrides": {
         "php": "8.2"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }
