@@ -597,11 +597,11 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
         if ($currentMonth >= 10 || $currentMonth <= 2) { // in winter
             $winterStartYear = ($currentMonth >= 10 && $currentMonth <= 12) ? $currentYear : $currentYear - 1;
             $summerYear = $winterStartYear + 1;
-            $yearBefore = $winterStartYear - 1;
-            $semesterKeys = ["{$yearBefore}W", "{$winterStartYear}S", "{$winterStartYear}W", "{$summerYear}S"];
+            // $yearBefore = $winterStartYear - 1;
+            $semesterKeys = [/* "{$yearBefore}W", */ "{$winterStartYear}S", "{$winterStartYear}W", "{$summerYear}S"];
         } else { // in summer
             $yearBefore = $currentYear - 1;
-            $semesterKeys = ["{$yearBefore}S", "{$yearBefore}W", "{$currentYear}S", "{$currentYear}W"];
+            $semesterKeys = [/* "{$yearBefore}S", */ "{$yearBefore}W", "{$currentYear}S", "{$currentYear}W"];
         }
 
         return $semesterKeys;

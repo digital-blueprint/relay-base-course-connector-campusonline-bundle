@@ -299,10 +299,10 @@ class CourseProviderTest extends ApiTestCase
 
     public function testGetSemesterKeys(): void
     {
-        $this->assertEquals(['2024S', '2024W', '2025S', '2025W'], CourseProvider::getSemesterKeys(new \DateTimeImmutable('2025-09-30')));
-        $this->assertEquals(['2024W', '2025S', '2025W', '2026S'], CourseProvider::getSemesterKeys(new \DateTimeImmutable('2025-10-01')));
-        $this->assertEquals(['2024W', '2025S', '2025W', '2026S'], CourseProvider::getSemesterKeys(new \DateTimeImmutable('2026-02-28')));
-        $this->assertEquals(['2025S', '2025W', '2026S', '2026W'], CourseProvider::getSemesterKeys(new \DateTimeImmutable('2026-03-01')));
+        $this->assertEquals([/* '2024S', */ '2024W', '2025S', '2025W'], CourseProvider::getSemesterKeys(new \DateTimeImmutable('2025-09-30')));
+        $this->assertEquals([/* '2024W', */ '2025S', '2025W', '2026S'], CourseProvider::getSemesterKeys(new \DateTimeImmutable('2025-10-01')));
+        $this->assertEquals([/* '2024W', */ '2025S', '2025W', '2026S'], CourseProvider::getSemesterKeys(new \DateTimeImmutable('2026-02-28')));
+        $this->assertEquals([/* '2025S', */ '2025W', '2026S', '2026W'], CourseProvider::getSemesterKeys(new \DateTimeImmutable('2026-03-01')));
     }
 
     private static function createMockAuthServerResponses(): array
