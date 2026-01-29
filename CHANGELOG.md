@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.2.0
+
 - Remove Legacy XML API variant
 - Add implementation for BaseCourseEvent
 - Add various local data source attributes (course groups, description, learning objectives, etc.)
