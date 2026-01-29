@@ -591,20 +591,20 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
     public static function getSemesterKeys(?\DateTimeImmutable $now = null): array
     {
         $now ??= new \DateTimeImmutable();
-        $month = (int) $now->format('n');
-        $year = (int) $now->format('Y');
+        $currentMonth = (int) $now->format('n');
+        $currentYear = (int) $now->format('Y');
 
-        if ($month >= 10 || $month <= 2) { // in winter
-            $winterStartYear = ($month >= 10 && $month <= 12) ? $year : $year - 1;
+        if ($currentMonth >= 10 || $currentMonth <= 2) { // in winter
+            $winterStartYear = ($currentMonth >= 10 && $currentMonth <= 12) ? $currentYear : $currentYear - 1;
             $summerYear = $winterStartYear + 1;
             $yearBefore = $winterStartYear - 1;
-
-            return ["{$yearBefore}W", "{$winterStartYear}S", "{$winterStartYear}W", "{$summerYear}S"];
+            $semesterKeys = ["{$yearBefore}W", "{$winterStartYear}S", "{$winterStartYear}W", "{$summerYear}S"];
         } else { // in summer
-            $yearBefore = $year - 1;
-
-            return ["{$yearBefore}S", "{$yearBefore}W", "{$year}S", "{$year}W"];
+            $yearBefore = $currentYear - 1;
+            $semesterKeys = ["{$yearBefore}S", "{$yearBefore}W", "{$currentYear}S", "{$currentYear}W"];
         }
+
+        return $semesterKeys;
     }
 
     private static function createCourseAndExtraDataFromCachedCourse(CachedCourse $cachedCourse, array $options): CourseAndExtraData
