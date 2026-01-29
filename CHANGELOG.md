@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## v0.2.1
+
+- for a start only cache one semster back and ahead to not overcrowd existing course selectors which don't filter by semester yet
 
 ## v0.2.0
 
