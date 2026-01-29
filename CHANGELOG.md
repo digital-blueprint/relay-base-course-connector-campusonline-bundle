@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Remove Legacy XML API variant
+- Add implementation for BaseCourseEvent
+- Add various local data source attributes (course groups, description, learning objectives, etc.)
+
 ## v0.1.27
 
 - Public REST API: Add attribute `courseIdentyCodeUid`
