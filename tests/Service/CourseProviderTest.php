@@ -143,6 +143,29 @@ class CourseProviderTest extends ApiTestCase
                         ],
                     ],
                 ])),
+            new Response(200, ['Content-Type' => 'applicateion/json;charset=utf-8'],
+                json_encode([
+                    'items' => [
+                        [
+                            'key' => 'PRIM_LEC',
+                            'name' => [
+                                'value' => [
+                                    'de' => 'Leiter*in',
+                                    'en' => 'Main lecturer',
+                                ],
+                            ],
+                        ],
+                        [
+                            'key' => 'SEC_LEC',
+                            'name' => [
+                                'value' => [
+                                    'de' => 'Mitarbeiter*in',
+                                    'en' => 'Co-lecturer',
+                                ],
+                            ],
+                        ],
+                    ],
+                ])),
         ];
 
         $this->mockResponses($coResponses);
@@ -160,11 +183,11 @@ class CourseProviderTest extends ApiTestCase
         $lecturer = $lecturers[0];
         $this->assertSame('DEADBEEF2', $lecturer['personIdentifier']);
         $this->assertSame('PRIM_LEC', $lecturer['functionKey']);
-        $this->assertSame([], $lecturer['courseGroupIdentifiers']);
+        $this->assertSame('Leiter*in', $lecturer['functionName']);
         $lecturer = $lecturers[1];
         $this->assertSame('DEADBEEF3', $lecturer['personIdentifier']);
         $this->assertSame('SEC_LEC', $lecturer['functionKey']);
-        $this->assertSame([], $lecturer['courseGroupIdentifiers']);
+        $this->assertSame('Mitarbeiter*in', $lecturer['functionName']);
     }
 
     public function testGetCoursesDe(): void
@@ -243,6 +266,29 @@ class CourseProviderTest extends ApiTestCase
                 ])),
             new Response(200, ['Content-Type' => 'applicateion/json;charset=utf-8'],
                 json_encode([
+                    'items' => [
+                        [
+                            'key' => 'PRIM_LEC',
+                            'name' => [
+                                'value' => [
+                                    'de' => 'Leiter*in',
+                                    'en' => 'Main lecturer',
+                                ],
+                            ],
+                        ],
+                        [
+                            'key' => 'SEC_LEC',
+                            'name' => [
+                                'value' => [
+                                    'de' => 'Mitarbeiter*in',
+                                    'en' => 'Co-lecturer',
+                                ],
+                            ],
+                        ],
+                    ],
+                ])),
+            new Response(200, ['Content-Type' => 'applicateion/json;charset=utf-8'],
+                json_encode([
                     'items' => [], // no lecturers for course 2
                 ])),
             new Response(200, ['Content-Type' => 'applicateion/json;charset=utf-8'],
@@ -279,7 +325,7 @@ class CourseProviderTest extends ApiTestCase
         $lecturer = $lecturers[0];
         $this->assertSame('DEADBEEF1', $lecturer['personIdentifier']);
         $this->assertSame('PRIM_LEC', $lecturer['functionKey']);
-        $this->assertSame([], $lecturer['courseGroupIdentifiers']);
+        $this->assertSame('Main lecturer', $lecturer['functionName']);
         $course = $courses[1];
         $this->assertSame('2', $course->getIdentifier());
         $this->assertSame([], $course->getLocalDataValue(self::LECTURERS_LOCAL_DATA_ATTRIBUTE_NAME));
@@ -290,11 +336,11 @@ class CourseProviderTest extends ApiTestCase
         $lecturer = $lecturers[0];
         $this->assertSame('DEADBEEF2', $lecturer['personIdentifier']);
         $this->assertSame('PRIM_LEC', $lecturer['functionKey']);
-        $this->assertSame([], $lecturer['courseGroupIdentifiers']);
+        $this->assertSame('Main lecturer', $lecturer['functionName']);
         $lecturer = $lecturers[1];
         $this->assertSame('DEADBEEF3', $lecturer['personIdentifier']);
         $this->assertSame('SEC_LEC', $lecturer['functionKey']);
-        $this->assertSame([], $lecturer['courseGroupIdentifiers']);
+        $this->assertSame('Co-lecturer', $lecturer['functionName']);
     }
 
     public function testGetSemesterKeys(): void

@@ -44,11 +44,11 @@ class CourseEventSubscriber extends AbstractLocalDataEventSubscriber
         switch ($attributeMapEntry[self::SOURCE_ATTRIBUTE_KEY]) {
             case self::LECTURERS_SOURCE_DATA_ATTRIBUTE:
                 return $this->courseProvider->getLecturersByCourse(
-                    $course->getIdentifier());
+                    $course->getIdentifier(), $postEvent->getOptions());
 
             case self::ATTENDEES_SOURCE_DATA_ATTRIBUTE:
                 return $this->courseProvider->getAttendeesByCourse(
-                    $course->getIdentifier());
+                    $course->getIdentifier(), $postEvent->getOptions());
 
             case self::COURSE_GROUPS_SOURCE_DATA_ATTRIBUTE:
                 return $this->courseProvider->getGroupsByCourse(
@@ -72,7 +72,7 @@ class CourseEventSubscriber extends AbstractLocalDataEventSubscriber
 
             case self::TYPE_NAME_SOURCE_DATA_ATTRIBUTE:
                 return ($courseTypeKey = $postEvent->getSourceData()[self::COURSE_TYPE_KEY_SOURCE_ATTRIBUTE] ?? null) !== null ?
-                    $this->courseProvider->getLocalizedTypeNameForTypeKey($courseTypeKey, $postEvent->getOptions()) : null;
+                    $this->courseProvider->getLocalizedTypeNameByKey($courseTypeKey, $postEvent->getOptions()) : null;
         }
 
         return parent::getAttributeValue($postEvent, $attributeMapEntry);

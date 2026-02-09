@@ -13,9 +13,12 @@ use Dbp\CampusonlineApi\PublicRestApi\Courses\CourseDescriptionApi;
 use Dbp\CampusonlineApi\PublicRestApi\Courses\CourseDescriptionResource;
 use Dbp\CampusonlineApi\PublicRestApi\Courses\CourseGroupApi;
 use Dbp\CampusonlineApi\PublicRestApi\Courses\CourseRegistrationApi;
+use Dbp\CampusonlineApi\PublicRestApi\Courses\CourseRegistrationResource;
 use Dbp\CampusonlineApi\PublicRestApi\Courses\CourseResource;
 use Dbp\CampusonlineApi\PublicRestApi\Courses\CourseTypeApi;
 use Dbp\CampusonlineApi\PublicRestApi\Courses\LectureshipApi;
+use Dbp\CampusonlineApi\PublicRestApi\Courses\LectureshipFunctionsApi;
+use Dbp\CampusonlineApi\PublicRestApi\Courses\LectureshipResource;
 use Dbp\Relay\BaseCourseBundle\API\CourseProviderInterface;
 use Dbp\Relay\BaseCourseBundle\Entity\Course;
 use Dbp\Relay\BaseCourseBundle\Entity\CourseEvent;
@@ -58,7 +61,22 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
     /**
      * array<string, array> request cache for localized type names.
      */
-    private ?array $localizedTypeNameCache = null;
+    private ?array $localizedTypeNameRequestCache = null;
+
+    /**
+     * array<string, array> request cache for localized lectureship function names.
+     */
+    private ?array $localizedLectureshipFunctionNameRequestCache = null;
+
+    /**
+     * array<string, CourseRegistrationResource>.
+     */
+    private array $courseRegistrationsRequestCache = [];
+
+    /**
+     * array<string, LectureshipResource>.
+     */
+    private array $lectureshipRequestCache = [];
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
@@ -304,23 +322,16 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
      *
      * @throws ApiError
      */
-    public function getAttendeesByCourse(string $courseId, array $options = []): array
+    public function getAttendeesByCourse(string $courseIdentifier, array $options = []): array
     {
-        try {
-            $courseRegistrationApi = new CourseRegistrationApi($this->getCourseApi()->getConnection());
-
-            $attendeeIds = [];
-            foreach ($courseRegistrationApi->getCourseRegistrationsByCourseUid($courseId) as $registrationResource) {
-                $attendeeIds[] = [
-                    'personIdentifier' => $registrationResource->getPersonUid(),
-                    'courseGroupIdentifier' => $registrationResource->getCourseGroupUid(),
-                ];
-            }
-
-            return $attendeeIds;
-        } catch (ApiException $apiException) {
-            throw self::dispatchException($apiException);
+        $attendeeIds = [];
+        foreach ($this->getCourseRegistrationResourcesCached($courseIdentifier) as $registrationResource) {
+            $attendeeIds[] = [
+                'personIdentifier' => $registrationResource->getPersonUid(),
+            ];
         }
+
+        return $attendeeIds;
     }
 
     /**
@@ -328,17 +339,16 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
      *
      * @throws ApiError
      */
-    public function getLecturersByCourse(string $courseId, array $options = []): array
+    public function getLecturersByCourse(string $courseIdentifier, array $options = []): array
     {
         try {
-            $lectureshipApi = new LectureshipApi($this->getCourseApi()->getConnection());
-
             $lecturerIds = [];
-            foreach ($lectureshipApi->getLectureshipsByCourseUid($courseId) as $lectureshipResource) {
+            foreach ($this->getLectureshipResourcesCached($courseIdentifier) as $lectureshipResource) {
+                $functionKey = $lectureshipResource->getFunctionKey();
                 $lecturerIds[] = [
                     'personIdentifier' => $lectureshipResource->getPersonUid(),
-                    'functionKey' => $lectureshipResource->getFunctionKey(),
-                    'courseGroupIdentifiers' => $lectureshipResource->getGroupUids(),
+                    'functionKey' => $functionKey,
+                    'functionName' => $this->getLocalizedLectureshipFunctionNameByKey($functionKey, $options),
                 ];
             }
 
@@ -356,11 +366,38 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
         try {
             $courseGroupApi = new CourseGroupApi($this->getCourseApi()->getConnection());
 
+            $courseGroupPeopleMap = [];
+            foreach ($this->getCourseRegistrationResourcesCached($courseIdentifier) as $registrationResource) {
+                $courseGroupIdentifier = $registrationResource->getCourseGroupUid();
+                if (null === ($courseGroupPeopleMap[$courseGroupIdentifier] ?? null)) {
+                    $courseGroupPeople = [
+                        'lecturerIdentifiers' => [],
+                        'attendeeIdentifiers' => [],
+                    ];
+                    $courseGroupPeopleMap[$courseGroupIdentifier] = $courseGroupPeople;
+                }
+                $courseGroupPeopleMap[$courseGroupIdentifier]['attendeeIdentifiers'][] = $registrationResource->getPersonUid();
+            }
+            foreach ($this->getLectureshipResourcesCached($courseIdentifier) as $lectureshipResource) {
+                foreach ($lectureshipResource->getGroupUids() as $courseGroupIdentifier) {
+                    if (null === ($courseGroupPeopleMap[$courseGroupIdentifier] ?? null)) {
+                        $courseGroupPeople = [
+                            'lecturerIdentifiers' => [],
+                            'attendeeIdentifiers' => [],
+                        ];
+                        $courseGroupPeopleMap[$courseGroupIdentifier] = $courseGroupPeople;
+                    }
+                    $courseGroupPeopleMap[$courseGroupIdentifier]['lecturerIdentifiers'][] = $lectureshipResource->getPersonUid();
+                }
+            }
+
             $courseGroups = [];
-            foreach ($courseGroupApi->getCourseGroupsByCourseUid($courseIdentifier) as $courseGroup) {
+            foreach ($courseGroupApi->getCourseGroupsByCourseUid($courseIdentifier) as $courseGroupPeople) {
                 $courseGroups[] = [
-                    'identifier' => $courseGroup->getUid(),
-                    'name' => $courseGroup->getName(Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG),
+                    'identifier' => $courseGroupPeople->getUid(),
+                    'name' => $courseGroupPeople->getName(Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG),
+                    'attendeeIdentifiers' => $courseGroupPeopleMap[$courseGroupPeople->getUid()]['attendeeIdentifiers'] ?? [],
+                    'lecturerIdentifiers' => $courseGroupPeopleMap[$courseGroupPeople->getUid()]['lecturerIdentifiers'] ?? [],
                 ];
             }
 
@@ -390,18 +427,32 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
         }
     }
 
-    public function getLocalizedTypeNameForTypeKey(string $typeKey, array $options = []): ?string
+    public function getLocalizedTypeNameByKey(string $key, array $options = []): ?string
     {
-        if ($this->localizedTypeNameCache === null) {
+        if ($this->localizedTypeNameRequestCache === null) {
             $courseTypeApi = new CourseTypeApi($this->getCourseApi()->getConnection());
             foreach ($courseTypeApi->getCourseTypes() as $courseTypeResource) {
-                if (($key = $courseTypeResource->getKey()) && ($name = $courseTypeResource->getName())) {
-                    $this->localizedTypeNameCache[$key] = $name;
+                if (($currentKey = $courseTypeResource->getKey()) && ($currentName = $courseTypeResource->getName())) {
+                    $this->localizedTypeNameRequestCache[$currentKey] = $currentName;
                 }
             }
         }
 
-        return $this->localizedTypeNameCache[$typeKey][Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG] ?? null;
+        return $this->localizedTypeNameRequestCache[$key][Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG] ?? null;
+    }
+
+    public function getLocalizedLectureshipFunctionNameByKey(string $key, array $options = []): ?string
+    {
+        if ($this->localizedLectureshipFunctionNameRequestCache === null) {
+            $lectureshipFunctionsApi = new LectureshipFunctionsApi($this->getCourseApi()->getConnection());
+            foreach ($lectureshipFunctionsApi->getLectureshipFunctions() as $lectureshipFunction) {
+                if (($currentKey = $lectureshipFunction->getKey()) && ($currentName = $lectureshipFunction->getName())) {
+                    $this->localizedLectureshipFunctionNameRequestCache[$currentKey] = $currentName;
+                }
+            }
+        }
+
+        return $this->localizedLectureshipFunctionNameRequestCache[$key][Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG] ?? null;
     }
 
     /**
@@ -665,5 +716,46 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
         }
 
         return new ApiError(Response::HTTP_INTERNAL_SERVER_ERROR, 'failed to get course(s): '.$apiException->getMessage());
+    }
+
+    /**
+     * @return CourseRegistrationResource[]
+     */
+    private function getCourseRegistrationResourcesCached(string $courseId): array
+    {
+        if (null === ($courseRegistrationResources = $this->courseRegistrationsRequestCache[$courseId] ?? null)) {
+            $courseRegistrationApi = new CourseRegistrationApi($this->getConnection());
+            try {
+                $courseRegistrationResources = iterator_to_array($courseRegistrationApi->getCourseRegistrationsByCourseUid($courseId));
+                $this->courseRegistrationsRequestCache[$courseId] = $courseRegistrationResources;
+            } catch (ApiException $apiException) {
+                throw self::dispatchException($apiException);
+            }
+        }
+
+        return $courseRegistrationResources;
+    }
+
+    /**
+     * @return LectureshipResource[]
+     */
+    private function getLectureshipResourcesCached(string $courseIdentifier): array
+    {
+        if (null === ($lectureshipResources = $this->lectureshipRequestCache[$courseIdentifier] ?? null)) {
+            $lectureshipApi = new LectureshipApi($this->getConnection());
+            try {
+                $lectureshipResources = iterator_to_array($lectureshipApi->getLectureshipsByCourseUid($courseIdentifier));
+                $this->lectureshipRequestCache[$courseIdentifier] = $lectureshipResources;
+            } catch (ApiException $apiException) {
+                throw self::dispatchException($apiException);
+            }
+        }
+
+        return $lectureshipResources;
+    }
+
+    private function getConnection(): Connection
+    {
+        return $this->getCourseApi()->getConnection();
     }
 }
