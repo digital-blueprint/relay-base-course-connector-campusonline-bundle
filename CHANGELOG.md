@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.2.2
+
 - Move group affiliation of attendees and lecturers to the `courseGroups` attribute to have it encapsulated there
 
 ## v0.2.1
