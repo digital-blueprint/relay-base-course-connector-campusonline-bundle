@@ -399,10 +399,8 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
                 $courseGroups[] = [
                     'identifier' => $courseGroupPeople->getUid(),
                     'name' => $courseGroupPeople->getName(Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG),
-                    $ATTENDEE_PERSON_IDENTIFIERS_KEY =>
-                        $courseGroupPeopleMap[$courseGroupPeople->getUid()][$ATTENDEE_PERSON_IDENTIFIERS_KEY] ?? [],
-                    $LECTURER_PERSON_IDENTIFIERS_KEY =>
-                        $courseGroupPeopleMap[$courseGroupPeople->getUid()][$LECTURER_PERSON_IDENTIFIERS_KEY] ?? [],
+                    $ATTENDEE_PERSON_IDENTIFIERS_KEY => $courseGroupPeopleMap[$courseGroupPeople->getUid()][$ATTENDEE_PERSON_IDENTIFIERS_KEY] ?? [],
+                    $LECTURER_PERSON_IDENTIFIERS_KEY => $courseGroupPeopleMap[$courseGroupPeople->getUid()][$LECTURER_PERSON_IDENTIFIERS_KEY] ?? [],
                 ];
             }
 
