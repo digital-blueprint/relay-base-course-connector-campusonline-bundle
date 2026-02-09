@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## v0.2.3
+
+- Rename courseGroup attendee/lecturerIdentifiers to attendee/lecturerPersonIdentifiers
+
 ## v0.2.2
 
 - Move group affiliation of attendees and lecturers to the `courseGroups` attribute to have it encapsulated there

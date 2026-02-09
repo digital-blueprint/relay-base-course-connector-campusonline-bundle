@@ -366,28 +366,31 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
         try {
             $courseGroupApi = new CourseGroupApi($this->getCourseApi()->getConnection());
 
+            $ATTENDEE_PERSON_IDENTIFIERS_KEY = 'attendeePersonIdentifiers';
+            $LECTURER_PERSON_IDENTIFIERS_KEY = 'lecturerPersonIdentifiers';
+
             $courseGroupPeopleMap = [];
             foreach ($this->getCourseRegistrationResourcesCached($courseIdentifier) as $registrationResource) {
                 $courseGroupIdentifier = $registrationResource->getCourseGroupUid();
                 if (null === ($courseGroupPeopleMap[$courseGroupIdentifier] ?? null)) {
                     $courseGroupPeople = [
-                        'lecturerIdentifiers' => [],
-                        'attendeeIdentifiers' => [],
+                        $ATTENDEE_PERSON_IDENTIFIERS_KEY => [],
+                        $LECTURER_PERSON_IDENTIFIERS_KEY => [],
                     ];
                     $courseGroupPeopleMap[$courseGroupIdentifier] = $courseGroupPeople;
                 }
-                $courseGroupPeopleMap[$courseGroupIdentifier]['attendeeIdentifiers'][] = $registrationResource->getPersonUid();
+                $courseGroupPeopleMap[$courseGroupIdentifier][$ATTENDEE_PERSON_IDENTIFIERS_KEY][] = $registrationResource->getPersonUid();
             }
             foreach ($this->getLectureshipResourcesCached($courseIdentifier) as $lectureshipResource) {
                 foreach ($lectureshipResource->getGroupUids() as $courseGroupIdentifier) {
                     if (null === ($courseGroupPeopleMap[$courseGroupIdentifier] ?? null)) {
                         $courseGroupPeople = [
-                            'lecturerIdentifiers' => [],
-                            'attendeeIdentifiers' => [],
+                            $ATTENDEE_PERSON_IDENTIFIERS_KEY => [],
+                            $LECTURER_PERSON_IDENTIFIERS_KEY => [],
                         ];
                         $courseGroupPeopleMap[$courseGroupIdentifier] = $courseGroupPeople;
                     }
-                    $courseGroupPeopleMap[$courseGroupIdentifier]['lecturerIdentifiers'][] = $lectureshipResource->getPersonUid();
+                    $courseGroupPeopleMap[$courseGroupIdentifier][$LECTURER_PERSON_IDENTIFIERS_KEY][] = $lectureshipResource->getPersonUid();
                 }
             }
 
@@ -396,8 +399,10 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
                 $courseGroups[] = [
                     'identifier' => $courseGroupPeople->getUid(),
                     'name' => $courseGroupPeople->getName(Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG),
-                    'attendeeIdentifiers' => $courseGroupPeopleMap[$courseGroupPeople->getUid()]['attendeeIdentifiers'] ?? [],
-                    'lecturerIdentifiers' => $courseGroupPeopleMap[$courseGroupPeople->getUid()]['lecturerIdentifiers'] ?? [],
+                    $ATTENDEE_PERSON_IDENTIFIERS_KEY =>
+                        $courseGroupPeopleMap[$courseGroupPeople->getUid()][$ATTENDEE_PERSON_IDENTIFIERS_KEY] ?? [],
+                    $LECTURER_PERSON_IDENTIFIERS_KEY =>
+                        $courseGroupPeopleMap[$courseGroupPeople->getUid()][$LECTURER_PERSON_IDENTIFIERS_KEY] ?? [],
                 ];
             }
 
