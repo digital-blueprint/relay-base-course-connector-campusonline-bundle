@@ -981,16 +981,16 @@
         },
         {
             "name": "dbp/campusonline-api",
-            "version": "v0.3.31",
+            "version": "v0.3.32",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/campusonline-api.git",
-                "reference": "09e937ed1207dbbb09dda2baab68f3fd6d25d326"
+                "reference": "ff3d1e89ea4bd4561ebf8bc2178a864cc42f1723"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/09e937ed1207dbbb09dda2baab68f3fd6d25d326",
-                "reference": "09e937ed1207dbbb09dda2baab68f3fd6d25d326",
+                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/ff3d1e89ea4bd4561ebf8bc2178a864cc42f1723",
+                "reference": "ff3d1e89ea4bd4561ebf8bc2178a864cc42f1723",
                 "shasum": ""
             },
             "require": {
@@ -1025,9 +1025,9 @@
             ],
             "support": {
                 "issues": "https://github.com/digital-blueprint/campusonline-api/issues",
-                "source": "https://github.com/digital-blueprint/campusonline-api/tree/v0.3.31"
+                "source": "https://github.com/digital-blueprint/campusonline-api/tree/v0.3.32"
             },
-            "time": "2026-02-06T07:36:18+00:00"
+            "time": "2026-02-12T09:38:05+00:00"
         },
         {
             "name": "dbp/relay-base-course-bundle",
@@ -1090,16 +1090,16 @@
         },
         {
             "name": "dbp/relay-core-bundle",
-            "version": "v0.1.228",
+            "version": "v0.1.229",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-core-bundle.git",
-                "reference": "aa8b13b9c26a7bf7448f9b4fa6fbd5486383d09a"
+                "reference": "fea333e28ccc4bfb20c7fc6178c18c256aa72427"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-core-bundle/zipball/aa8b13b9c26a7bf7448f9b4fa6fbd5486383d09a",
-                "reference": "aa8b13b9c26a7bf7448f9b4fa6fbd5486383d09a",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-core-bundle/zipball/fea333e28ccc4bfb20c7fc6178c18c256aa72427",
+                "reference": "fea333e28ccc4bfb20c7fc6178c18c256aa72427",
                 "shasum": ""
             },
             "require": {
@@ -1196,9 +1196,9 @@
             "description": "The core bundle of the Relay API gateway",
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-core-bundle/issues",
-                "source": "https://github.com/digital-blueprint/relay-core-bundle/tree/v0.1.228"
+                "source": "https://github.com/digital-blueprint/relay-core-bundle/tree/v0.1.229"
             },
-            "time": "2026-01-29T07:50:36+00:00"
+            "time": "2026-02-12T09:41:50+00:00"
         },
         {
             "name": "doctrine/collections",
@@ -10150,16 +10150,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "11.5.52",
+            "version": "11.5.53",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "b287d32c26f78768e391843c5a59395f24b62605"
+                "reference": "a997a653a82845f1240d73ee73a8a4e97e4b0607"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/b287d32c26f78768e391843c5a59395f24b62605",
-                "reference": "b287d32c26f78768e391843c5a59395f24b62605",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/a997a653a82845f1240d73ee73a8a4e97e4b0607",
+                "reference": "a997a653a82845f1240d73ee73a8a4e97e4b0607",
                 "shasum": ""
             },
             "require": {
@@ -10232,7 +10232,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.5.52"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.5.53"
             },
             "funding": [
                 {
@@ -10256,7 +10256,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-02-08T07:05:14+00:00"
+            "time": "2026-02-10T12:28:25+00:00"
         },
         {
             "name": "react/cache",
@@ -12535,5 +12535,5 @@
     "platform-overrides": {
         "php": "8.2"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
