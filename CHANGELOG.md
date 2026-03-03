@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## v0.2.4
+
+- Undo: Rename courseGroup attendee/lecturerIdentifiers to attendee/lecturerPersonIdentifiers
+
 ## v0.2.3
 
 - Rename courseGroup attendee/lecturerIdentifiers to attendee/lecturerPersonIdentifiers
