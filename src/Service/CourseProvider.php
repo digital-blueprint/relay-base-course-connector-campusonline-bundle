@@ -366,8 +366,8 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
         try {
             $courseGroupApi = new CourseGroupApi($this->getCourseApi()->getConnection());
 
-            $ATTENDEE_PERSON_IDENTIFIERS_KEY = 'attendeePersonIdentifiers';
-            $LECTURER_PERSON_IDENTIFIERS_KEY = 'lecturerPersonIdentifiers';
+            $ATTENDEE_PERSON_IDENTIFIERS_KEY = 'attendeeIdentifiers';
+            $LECTURER_PERSON_IDENTIFIERS_KEY = 'lecturerIdentifiers';
 
             $courseGroupPeopleMap = [];
             foreach ($this->getCourseRegistrationResourcesCached($courseIdentifier) as $registrationResource) {
