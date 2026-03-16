@@ -126,7 +126,7 @@ class CourseProviderTest extends ApiTestCase
     {
         $courseUid = '3';
         $coResponses = [
-            new Response(200, ['Content-Type' => 'applicateion/json;charset=utf-8'],
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'],
                 json_encode([
                     'items' => [
                         [
@@ -143,7 +143,7 @@ class CourseProviderTest extends ApiTestCase
                         ],
                     ],
                 ])),
-            new Response(200, ['Content-Type' => 'applicateion/json;charset=utf-8'],
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'],
                 json_encode([
                     'items' => [
                         [
@@ -253,7 +253,7 @@ class CourseProviderTest extends ApiTestCase
     public function testGetCoursesEnWithLocalDataLecturers(): void
     {
         $coResponses = [
-            new Response(200, ['Content-Type' => 'applicateion/json;charset=utf-8'],
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'],
                 json_encode([
                     'items' => [
                         [
@@ -264,7 +264,7 @@ class CourseProviderTest extends ApiTestCase
                         ],
                     ],
                 ])),
-            new Response(200, ['Content-Type' => 'applicateion/json;charset=utf-8'],
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'],
                 json_encode([
                     'items' => [
                         [
@@ -287,11 +287,11 @@ class CourseProviderTest extends ApiTestCase
                         ],
                     ],
                 ])),
-            new Response(200, ['Content-Type' => 'applicateion/json;charset=utf-8'],
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'],
                 json_encode([
                     'items' => [], // no lecturers for course 2
                 ])),
-            new Response(200, ['Content-Type' => 'applicateion/json;charset=utf-8'],
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'],
                 json_encode([
                     'items' => [
                         [
@@ -365,7 +365,7 @@ class CourseProviderTest extends ApiTestCase
         $semesterKeys = CourseProvider::getSemesterKeys();
         $coResponses = [
             // first semester responses:
-            new Response(200, ['Content-Type' => 'applicateion/json;charset=utf-8'],
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'],
                 json_encode([
                     'items' => [
                         [
@@ -384,7 +384,7 @@ class CourseProviderTest extends ApiTestCase
                     ],
                     'nextCursor' => 'cursor123',
                 ])),
-            new Response(200, ['Content-Type' => 'applicateion/json;charset=utf-8'],
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'],
                 json_encode([
                     'items' => [
                         [
@@ -403,7 +403,7 @@ class CourseProviderTest extends ApiTestCase
                     ],
                 ])),
             // second semester response:
-            new Response(200, ['Content-Type' => 'applicateion/json;charset=utf-8'],
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'],
                 json_encode([
                     'items' => [
                         [
