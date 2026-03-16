@@ -49,7 +49,7 @@ class CachedCourse
     #[ORM\Column(name: self::ORGANIZATION_UID_COLUMN_NAME, type: 'string', length: 32, nullable: true)]
     private ?string $organizationUid = null;
     #[ORM\Column(name: self::SEMESTER_HOURS_COLUMN_NAME, type: 'float', nullable: true)]
-    private ?int $semesterHours = null;
+    private ?float $semesterHours = null;
     #[ORM\Column(name: self::MAIN_LANGUAGE_OF_INSTRUCTION_COLUMN_NAME, type: 'string', length: 8, nullable: true)]
     private ?string $mainLanguageOfInstruction = null;
 
@@ -121,12 +121,12 @@ class CachedCourse
         $this->organizationUid = $organizationUid;
     }
 
-    public function getSemesterHours(): ?int
+    public function getSemesterHours(): ?float
     {
         return $this->semesterHours;
     }
 
-    public function setSemesterHours(?int $semesterHours): void
+    public function setSemesterHours(?float $semesterHours): void
     {
         $this->semesterHours = $semesterHours;
     }
