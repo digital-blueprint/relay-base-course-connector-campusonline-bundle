@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+
+## v0.2.5
+
+- Fix event startAt/endAt being parsed with the system timezone instead of the event timezone.
+
 ## v0.2.4
 
 - Undo: Rename courseGroup attendee/lecturerIdentifiers to attendee/lecturerPersonIdentifiers
