@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Tests\Service;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use Dbp\CampusonlineApi\PublicRestApi\Appointments\AppointmentResource;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\DependencyInjection\Configuration;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\DependencyInjection\DbpRelayBaseCourseConnectorCampusonlineExtension;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Entity\CachedCourse;
@@ -345,10 +346,31 @@ class CourseProviderTest extends ApiTestCase
 
     public function testGetSemesterKeys(): void
     {
-        $this->assertEquals([/* '2024S', */ '2024W', '2025S', '2025W'], CourseProvider::getSemesterKeys(new \DateTimeImmutable('2025-09-30')));
-        $this->assertEquals([/* '2024W', */ '2025S', '2025W', '2026S'], CourseProvider::getSemesterKeys(new \DateTimeImmutable('2025-10-01')));
-        $this->assertEquals([/* '2024W', */ '2025S', '2025W', '2026S'], CourseProvider::getSemesterKeys(new \DateTimeImmutable('2026-02-28')));
-        $this->assertEquals([/* '2025S', */ '2025W', '2026S', '2026W'], CourseProvider::getSemesterKeys(new \DateTimeImmutable('2026-03-01')));
+        $this->assertEquals([/* '2024S', */ '2024W', '2025S', '2025W'], CourseProvider::getSemesterKeys(new \DateTimeImmutable('2025-09-30', new \DateTimeZone('UTC'))));
+        $this->assertEquals([/* '2024W', */ '2025S', '2025W', '2026S'], CourseProvider::getSemesterKeys(new \DateTimeImmutable('2025-10-01', new \DateTimeZone('UTC'))));
+        $this->assertEquals([/* '2024W', */ '2025S', '2025W', '2026S'], CourseProvider::getSemesterKeys(new \DateTimeImmutable('2026-02-28', new \DateTimeZone('UTC'))));
+        $this->assertEquals([/* '2025S', */ '2025W', '2026S', '2026W'], CourseProvider::getSemesterKeys(new \DateTimeImmutable('2026-03-01', new \DateTimeZone('UTC'))));
+    }
+
+    public function testCreateCourseEventFromAppointmentResource(): void
+    {
+        $appointmentResource = new AppointmentResource([
+            'uid' => 'event-1',
+            'courseUid' => 'course-1',
+            'startAt' => '2026-01-15T10:15:00',
+            'endAt' => '2026-01-15T11:45:00',
+            'eventTypeKey' => AppointmentResource::REGULAR_CLASS_EVENT_TYPE_KEY,
+        ]);
+
+        $courseEvent = $this->courseProvider->createCourseEventFromAppointmentResource($appointmentResource);
+
+        $this->assertSame('event-1', $courseEvent->getIdentifier());
+        $this->assertSame('course-1', $courseEvent->getCourseIdentifier());
+        $this->assertEquals(new \DateTimeImmutable('2026-01-15T10:15:00', new \DateTimeZone('Europe/Vienna')),
+            $courseEvent->getStartAt());
+        $this->assertEquals(new \DateTimeImmutable('2026-01-15T11:45:00', new \DateTimeZone('Europe/Vienna')),
+            $courseEvent->getEndAt());
+        $this->assertSame('CLASS', $courseEvent->getTypeKey());
     }
 
     private static function createMockAuthServerResponses(): array
@@ -474,6 +496,7 @@ class CourseProviderTest extends ApiTestCase
             'base_url' => 'https://campusonline.at/campusonline/ws/public/rest/',
             'client_id' => 'client',
             'client_secret' => 'secret',
+            'event_time_zone' => 'Europe/Vienna',
         ];
 
         return $config;

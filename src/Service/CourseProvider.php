@@ -78,6 +78,8 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
      */
     private array $lectureshipRequestCache = [];
 
+    private ?\DateTimeZone $eventTimeZone = null;
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         EventDispatcherInterface $eventDispatcher)
@@ -88,6 +90,14 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
     public function setConfig(array $config): void
     {
         $this->config = $config[Configuration::CAMPUS_ONLINE_NODE];
+        $this->eventTimeZone = new \DateTimeZone($this->config['event_time_zone']);
+    }
+
+    private function getEventTimeZone(): \DateTimeZone
+    {
+        assert($this->eventTimeZone !== null);
+
+        return $this->eventTimeZone;
     }
 
     /**
@@ -600,22 +610,16 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
         return $courseEventAndExtraData->getCourseEvent();
     }
 
-    private function createCourseEventFromAppointmentResource(AppointmentResource $appointmentResource): CourseEvent
+    public function createCourseEventFromAppointmentResource(AppointmentResource $appointmentResource): CourseEvent
     {
         $courseEvent = new CourseEvent();
         $courseEvent->setIdentifier($appointmentResource->getUid());
         $courseEvent->setCourseIdentifier($appointmentResource->getCourseUid());
         if (($eventStart = $appointmentResource->getStartAt()) !== null) {
-            try {
-                $courseEvent->setStartAt(new \DateTimeImmutable($eventStart));
-            } catch (\Exception) {
-            }
+            $courseEvent->setStartAt(new \DateTimeImmutable($eventStart, $this->getEventTimeZone()));
         }
         if (($eventEnd = $appointmentResource->getEndAt()) !== null) {
-            try {
-                $courseEvent->setEndAt(new \DateTimeImmutable($eventEnd));
-            } catch (\Exception) {
-            }
+            $courseEvent->setEndAt(new \DateTimeImmutable($eventEnd, $this->getEventTimeZone()));
         }
 
         $courseEvent->setTypeKey(
@@ -644,7 +648,7 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
      */
     public static function getSemesterKeys(?\DateTimeImmutable $now = null): array
     {
-        $now ??= new \DateTimeImmutable();
+        $now ??= new \DateTimeImmutable(timezone: new \DateTimeZone('UTC'));
         $currentMonth = (int) $now->format('n');
         $currentYear = (int) $now->format('Y');
 
