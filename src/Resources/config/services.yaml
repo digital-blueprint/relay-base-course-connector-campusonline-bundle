@@ -21,5 +21,9 @@ services:
     autowire: true
     autoconfigure: true
 
+  Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Command\RecreateCacheCommand:
+    autowire: true
+    autoconfigure: true
+
   Dbp\Relay\BaseCourseBundle\API\CourseProviderInterface:
     '@Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service\CourseProvider'

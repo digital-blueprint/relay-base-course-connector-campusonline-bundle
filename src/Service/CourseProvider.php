@@ -87,10 +87,14 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
         $this->eventDispatcher = new LocalDataEventDispatcher('', $eventDispatcher);
     }
 
+    /**
+     * @throws \DateInvalidTimeZoneException
+     */
     public function setConfig(array $config): void
     {
-        $this->config = $config[Configuration::CAMPUS_ONLINE_NODE];
-        $this->eventTimeZone = new \DateTimeZone($this->config['event_time_zone']);
+        $this->config = $config;
+        $this->eventTimeZone = new \DateTimeZone(
+            $this->config[Configuration::CAMPUS_ONLINE_NODE][Configuration::EVENT_TIME_ZONE_NODE]);
     }
 
     private function getEventTimeZone(): \DateTimeZone
@@ -115,7 +119,7 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
      */
     public function checkConnection(): void
     {
-        $this->getCourseApi()->getCoursesBySemesterKeyCursorBased(self::getSemesterKeys()[0]);
+        $this->getCourseApi()->getCoursesBySemesterKeyCursorBased(self::getMostRecentSemesterKeys(1)[0]);
     }
 
     /**
@@ -152,8 +156,9 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
             STMT;
 
         $connection = $this->entityManager->getConnection();
+        $numSemestersToGet = $this->config[Configuration::NUM_SEMESTERS_TO_PROVIDE];
         try {
-            foreach (self::getSemesterKeys() as $semesterKey) {
+            foreach (self::getMostRecentSemesterKeys($numSemestersToGet) as $semesterKey) {
                 $nextCursor = null;
                 do {
                     $resourcePage = $this->getCourseApi()->getCoursesBySemesterKeyCursorBased($semesterKey, $nextCursor, 1000);
@@ -473,7 +478,7 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
      */
     public function getCampusOnlineWebBaseUrl(): string
     {
-        $url = $this->config[Configuration::BASE_URL_NODE] ?? '';
+        $url = $this->config[Configuration::CAMPUS_ONLINE_NODE][Configuration::BASE_URL_NODE] ?? '';
         if ($url) {
             $url = rtrim($url, '/');
             $lastSlashPos = strrpos($url, '/');
@@ -490,9 +495,9 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
         if ($this->courseApi === null) {
             $this->courseApi = new CourseApi(
                 new Connection(
-                    $this->config['base_url'],
-                    $this->config['client_id'],
-                    $this->config['client_secret']
+                    $this->config[Configuration::CAMPUS_ONLINE_NODE][Configuration::BASE_URL_NODE] ?? '',
+                    $this->config[Configuration::CAMPUS_ONLINE_NODE][Configuration::CLIENT_ID_NODE] ?? '',
+                    $this->config[Configuration::CAMPUS_ONLINE_NODE][Configuration::CLIENT_SECRET_NODE] ?? ''
                 )
             );
         }
@@ -529,6 +534,7 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
         }
 
         if ($filter = Options::getFilter($options)) {
+            dump($filter);
             $pathMapping = [
                 'identifier' => $CACHED_COURSE_ENTITY_ALIAS.'.'.CachedCourse::UID_COLUMN_NAME,
                 'code' => $CACHED_COURSE_ENTITY_ALIAS.'.'.CachedCourse::COURSE_CODE_COLUMN_NAME,
@@ -644,22 +650,35 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
     }
 
     /**
+     * Provides the $numSemesters most recent semester keys, where the most recent one is at index 0 of the array.
+     *
+     * @param \DateTimeImmutable|null $now For testing purposes
+     *
      * @return string[]
      */
-    public static function getSemesterKeys(?\DateTimeImmutable $now = null): array
+    public static function getMostRecentSemesterKeys(int $numSemesters, ?\DateTimeImmutable $now = null): array
     {
+        if ($numSemesters < 0) {
+            throw new \InvalidArgumentException('number of semesters must be non-negative');
+        }
+
         $now ??= new \DateTimeImmutable(timezone: new \DateTimeZone('UTC'));
         $currentMonth = (int) $now->format('n');
         $currentYear = (int) $now->format('Y');
 
         if ($currentMonth >= 10 || $currentMonth <= 2) { // in winter
-            $winterStartYear = ($currentMonth >= 10 && $currentMonth <= 12) ? $currentYear : $currentYear - 1;
-            $summerYear = $winterStartYear + 1;
-            // $yearBefore = $winterStartYear - 1;
-            $semesterKeys = [/* "{$yearBefore}W", */ "{$winterStartYear}S", "{$winterStartYear}W", "{$summerYear}S"];
+            $currentSemesterYear = ($currentMonth >= 10 && $currentMonth <= 12) ? $currentYear + 1 : $currentYear;
+            $currentSemesterSeason = 'S';
         } else { // in summer
-            $yearBefore = $currentYear - 1;
-            $semesterKeys = [/* "{$yearBefore}S", */ "{$yearBefore}W", "{$currentYear}S", "{$currentYear}W"];
+            $currentSemesterYear = $currentYear;
+            $currentSemesterSeason = 'W';
+        }
+
+        $semesterKeys = [];
+        for ($semesterCounter = 0; $semesterCounter < $numSemesters; ++$semesterCounter) {
+            $semesterKeys[] = $currentSemesterYear.$currentSemesterSeason;
+            $currentSemesterYear = ($currentSemesterSeason === 'W') ? $currentSemesterYear : $currentSemesterYear - 1;
+            $currentSemesterSeason = ($currentSemesterSeason === 'W') ? 'S' : 'W';
         }
 
         return $semesterKeys;

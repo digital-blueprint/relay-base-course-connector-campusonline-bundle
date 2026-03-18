@@ -35,35 +35,6 @@ class CourseProviderTest extends ApiTestCase
     private ?EntityManagerInterface $entityManager = null;
     private ?CourseEventSubscriber $courseEventSubscriber = null;
 
-    private static function createEventSubscriberConfig(): array
-    {
-        $config = [];
-        $config['local_data_mapping'] = [
-            [
-                'local_data_attribute' => self::COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME,
-                'source_attribute' => self::COURSE_TYPE_SOURCE_ATTRIBUTE_NAME,
-                'default_value' => '',
-            ],
-            [
-                'local_data_attribute' => self::SEMESTER_LOCAL_DATA_ATTRIBUTE_NAME,
-                'source_attribute' => self::SEMESTER_SOURCE_ATTRIBUTE_NAME,
-                'default_value' => '',
-            ],
-            [
-                'local_data_attribute' => self::COURSE_IDENTITY_CODE_UID_LOCAL_DATA_ATTRIBUTE_NAME,
-                'source_attribute' => self::COURSE_IDENTITY_CODE_UID_SOURCE_ATTRIBUTE_NAME,
-                'default_value' => '',
-            ],
-            [
-                'local_data_attribute' => self::LECTURERS_LOCAL_DATA_ATTRIBUTE_NAME,
-                'source_attribute' => CourseEventSubscriber::LECTURERS_SOURCE_DATA_ATTRIBUTE,
-                'is_array' => true,
-            ],
-        ];
-
-        return $config;
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -78,11 +49,13 @@ class CourseProviderTest extends ApiTestCase
 
         $this->courseProvider = new CourseProvider($this->entityManager, $eventDispatcher);
         $this->courseProvider->setLogger(new NullLogger());
+        $this->courseProvider->setConfig($this->createTestConfig());
 
         $this->courseEventSubscriber = new CourseEventSubscriber($this->courseProvider);
+        $this->courseEventSubscriber->setConfig(self::createTestConfig());
         $eventDispatcher->addSubscriber($this->courseEventSubscriber);
 
-        $this->setUpPublicRestApi();
+        $this->recreateCourseCache();
     }
 
     private function mockResponses(array $responses, bool $mockAuthServerResponses = false): void
@@ -117,7 +90,7 @@ class CourseProviderTest extends ApiTestCase
         $this->assertSame('2', $course->getIdentifier());
         $this->assertSame('Komputationswissenschaft', $course->getName());
         $this->assertSame('UE', $course->getLocalDataValue(self::COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME));
-        $this->assertSame(CourseProvider::getSemesterKeys()[0],
+        $this->assertSame(CourseProvider::getMostRecentSemesterKeys(1)[0],
             $course->getLocalDataValue(self::SEMESTER_LOCAL_DATA_ATTRIBUTE_NAME));
         $this->assertSame('1235',
             $course->getLocalDataValue(self::COURSE_IDENTITY_CODE_UID_LOCAL_DATA_ATTRIBUTE_NAME));
@@ -227,7 +200,7 @@ class CourseProviderTest extends ApiTestCase
         $this->assertSame('Computational Intelligence', $course->getName());
         $this->assertSame('44_A', $course->getCode());
         $this->assertSame('VO', $course->getLocalDataValue(self::COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME));
-        $this->assertSame(CourseProvider::getSemesterKeys()[0],
+        $this->assertSame(CourseProvider::getMostRecentSemesterKeys(2)[0],
             $course->getLocalDataValue(self::SEMESTER_LOCAL_DATA_ATTRIBUTE_NAME));
         $this->assertSame('1234',
             $course->getLocalDataValue(self::COURSE_IDENTITY_CODE_UID_LOCAL_DATA_ATTRIBUTE_NAME));
@@ -236,7 +209,7 @@ class CourseProviderTest extends ApiTestCase
         $this->assertSame('Computational Science', $course->getName());
         $this->assertSame('44_B', $course->getCode());
         $this->assertSame('UE', $course->getLocalDataValue(self::COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME));
-        $this->assertSame(CourseProvider::getSemesterKeys()[0],
+        $this->assertSame(CourseProvider::getMostRecentSemesterKeys(2)[0],
             $course->getLocalDataValue(self::SEMESTER_LOCAL_DATA_ATTRIBUTE_NAME));
         $this->assertSame('1235',
             $course->getLocalDataValue(self::COURSE_IDENTITY_CODE_UID_LOCAL_DATA_ATTRIBUTE_NAME));
@@ -245,7 +218,7 @@ class CourseProviderTest extends ApiTestCase
         $this->assertSame('Computational Unintelligence', $course->getName());
         $this->assertSame('45_A', $course->getCode());
         $this->assertSame('SEM', $course->getLocalDataValue(self::COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME));
-        $this->assertSame(CourseProvider::getSemesterKeys()[1],
+        $this->assertSame(CourseProvider::getMostRecentSemesterKeys(2)[1],
             $course->getLocalDataValue(self::SEMESTER_LOCAL_DATA_ATTRIBUTE_NAME));
         $this->assertSame('1236',
             $course->getLocalDataValue(self::COURSE_IDENTITY_CODE_UID_LOCAL_DATA_ATTRIBUTE_NAME));
@@ -346,10 +319,10 @@ class CourseProviderTest extends ApiTestCase
 
     public function testGetSemesterKeys(): void
     {
-        $this->assertEquals([/* '2024S', */ '2024W', '2025S', '2025W'], CourseProvider::getSemesterKeys(new \DateTimeImmutable('2025-09-30', new \DateTimeZone('UTC'))));
-        $this->assertEquals([/* '2024W', */ '2025S', '2025W', '2026S'], CourseProvider::getSemesterKeys(new \DateTimeImmutable('2025-10-01', new \DateTimeZone('UTC'))));
-        $this->assertEquals([/* '2024W', */ '2025S', '2025W', '2026S'], CourseProvider::getSemesterKeys(new \DateTimeImmutable('2026-02-28', new \DateTimeZone('UTC'))));
-        $this->assertEquals([/* '2025S', */ '2025W', '2026S', '2026W'], CourseProvider::getSemesterKeys(new \DateTimeImmutable('2026-03-01', new \DateTimeZone('UTC'))));
+        $this->assertEquals(['2025W', '2025S', '2024W', '2024S'], CourseProvider::getMostRecentSemesterKeys(4, new \DateTimeImmutable('2025-09-30')));
+        $this->assertEquals(['2026S', '2025W', '2025S', '2024W'], CourseProvider::getMostRecentSemesterKeys(4, new \DateTimeImmutable('2025-10-01')));
+        $this->assertEquals(['2026S', '2025W', '2025S', '2024W'], CourseProvider::getMostRecentSemesterKeys(4, new \DateTimeImmutable('2026-02-28')));
+        $this->assertEquals(['2026W', '2026S', '2025W', '2025S'], CourseProvider::getMostRecentSemesterKeys(4, new \DateTimeImmutable('2026-03-01')));
     }
 
     public function testCreateCourseEventFromAppointmentResource(): void
@@ -384,7 +357,7 @@ class CourseProviderTest extends ApiTestCase
 
     private function recreateCourseCache(): void
     {
-        $semesterKeys = CourseProvider::getSemesterKeys();
+        $semesterKeys = CourseProvider::getMostRecentSemesterKeys(2);
         $coResponses = [
             // first semester responses:
             new Response(200, ['Content-Type' => 'application/json;charset=utf-8'],
@@ -480,23 +453,40 @@ class CourseProviderTest extends ApiTestCase
             "CREATE TABLE $courseTitlesStagingTableName AS SELECT * FROM $courseTitlesTableName");
     }
 
-    private function setUpPublicRestApi(): void
+    private static function createTestConfig(): array
     {
-        $this->courseProvider->setConfig($this->getPublicRestApiConfig());
-        $this->courseEventSubscriber->setConfig(self::createEventSubscriberConfig());
+        $config = [
+            Configuration::DATABASE_URL => 'sqlite:///:memory:',
+            Configuration::NUM_SEMESTERS_TO_PROVIDE => 2,
+            Configuration::CAMPUS_ONLINE_NODE => [
+                Configuration::BASE_URL_NODE => 'https://campusonline.net',
+                Configuration::CLIENT_ID_NODE => 'client-id',
+                Configuration::CLIENT_SECRET_NODE => 'client-secret',
+                Configuration::EVENT_TIME_ZONE_NODE => 'Europe/Vienna',
+            ],
+        ];
 
-        $this->recreateCourseCache();
-    }
-
-    private function getPublicRestApiConfig(): array
-    {
-        $config = [];
-        $config[Configuration::CAMPUS_ONLINE_NODE] = [
-            'legacy' => false,
-            'base_url' => 'https://campusonline.at/campusonline/ws/public/rest/',
-            'client_id' => 'client',
-            'client_secret' => 'secret',
-            'event_time_zone' => 'Europe/Vienna',
+        $config['local_data_mapping'] = [
+            [
+                'local_data_attribute' => self::COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME,
+                'source_attribute' => self::COURSE_TYPE_SOURCE_ATTRIBUTE_NAME,
+                'default_value' => '',
+            ],
+            [
+                'local_data_attribute' => self::SEMESTER_LOCAL_DATA_ATTRIBUTE_NAME,
+                'source_attribute' => self::SEMESTER_SOURCE_ATTRIBUTE_NAME,
+                'default_value' => '',
+            ],
+            [
+                'local_data_attribute' => self::COURSE_IDENTITY_CODE_UID_LOCAL_DATA_ATTRIBUTE_NAME,
+                'source_attribute' => self::COURSE_IDENTITY_CODE_UID_SOURCE_ATTRIBUTE_NAME,
+                'default_value' => '',
+            ],
+            [
+                'local_data_attribute' => self::LECTURERS_LOCAL_DATA_ATTRIBUTE_NAME,
+                'source_attribute' => CourseEventSubscriber::LECTURERS_SOURCE_DATA_ATTRIBUTE,
+                'is_array' => true,
+            ],
         ];
 
         return $config;

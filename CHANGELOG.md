@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- add recreate cache command
+- make number of semesters to cache configurable
 
 ## v0.2.5
 

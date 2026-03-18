@@ -57,6 +57,11 @@ class Kernel extends BaseKernel
 
         $container->extension(Configuration::ROOT_NODE, [
             Configuration::DATABASE_URL => 'sqlite:///:memory:',
+            Configuration::CAMPUS_ONLINE_NODE => [
+                Configuration::BASE_URL_NODE => 'https://campusonline.net',
+                Configuration::CLIENT_ID_NODE => 'client-id',
+                Configuration::CLIENT_SECRET_NODE => 'client-secret',
+            ],
         ]);
     }
 }
