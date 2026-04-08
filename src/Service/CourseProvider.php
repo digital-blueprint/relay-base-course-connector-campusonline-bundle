@@ -516,17 +516,21 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
         $combinedFilter = null;
         if ($searchTerm = $options[Course::SEARCH_PARAMETER_NAME] ?? null) {
             try {
-                $combinedFilter = FilterTreeBuilder::create()
-                    ->or()
-                    ->and()
-                    ->iContains($CACHED_COURSE_TITLE_ENTITY_ALIAS.'.'.CachedCourseTitle::TITLE_COLUMN_NAME,
-                        $searchTerm)
-                    ->equals($CACHED_COURSE_TITLE_ENTITY_ALIAS.'.'.CachedCourseTitle::LANGUAGE_TAG_COLUMN_NAME,
-                        Options::getLanguage($options))
-                    ->end()
-                    ->iContains($CACHED_COURSE_ENTITY_ALIAS.'.'.CachedCourse::COURSE_CODE_COLUMN_NAME, $searchTerm)
-                    ->end()
-                    ->createFilter();
+                $filterTreeBuilder = FilterTreeBuilder::create();
+                // ALL search terms must be contained either in the course code or the course title (in the specified language)
+                foreach (explode(' ', $searchTerm) as $term) {
+                    $filterTreeBuilder
+                        ->or()
+                            ->iContains($CACHED_COURSE_ENTITY_ALIAS.'.'.CachedCourse::COURSE_CODE_COLUMN_NAME, $term)
+                            ->and()
+                                ->iContains($CACHED_COURSE_TITLE_ENTITY_ALIAS.'.'.CachedCourseTitle::TITLE_COLUMN_NAME,
+                                    $term)
+                                ->equals($CACHED_COURSE_TITLE_ENTITY_ALIAS.'.'.CachedCourseTitle::LANGUAGE_TAG_COLUMN_NAME,
+                                    Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG)
+                            ->end() // end and
+                        ->end(); // end or
+                }
+                $combinedFilter = $filterTreeBuilder->createFilter();
             } catch (FilterException $filterException) {
                 $this->logger->error('failed to build filter for organization search: '.$filterException->getMessage(), [$filterException]);
                 throw new \RuntimeException('failed to build filter for organization search');
@@ -690,7 +694,7 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
         $course->setIdentifier($cachedCourse->getUid());
         $course->setCode($cachedCourse->getCourseCode());
         foreach ($cachedCourse->getTitles() as $cachedTitle) {
-            if ($cachedTitle->getLanguageTag() === Options::getLanguage($options)) {
+            if ($cachedTitle->getLanguageTag() === (Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG)) {
                 $course->setName($cachedTitle->getTitle());
             }
         }

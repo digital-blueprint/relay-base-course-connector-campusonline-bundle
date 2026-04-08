@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add support for multi-term search parameters
+
 ## v0.2.6
 
 - add recreate cache command

@@ -6,6 +6,7 @@ namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Tests\Service;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use Dbp\CampusonlineApi\PublicRestApi\Appointments\AppointmentResource;
+use Dbp\Relay\BaseCourseBundle\Entity\Course;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\DependencyInjection\Configuration;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\DependencyInjection\DbpRelayBaseCourseConnectorCampusonlineExtension;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Entity\CachedCourse;
@@ -182,6 +183,52 @@ class CourseProviderTest extends ApiTestCase
         $this->assertSame('3', $course->getIdentifier());
         $this->assertSame('Komputationshalbwissenschaft', $course->getName());
         $this->assertSame('45_A', $course->getCode());
+    }
+
+    public function testGetCoursesWithSearchParameter(): void
+    {
+        $options = [
+            Course::SEARCH_PARAMETER_NAME => 'halb',
+        ];
+        $courses = $this->courseProvider->getCourses(1, 3, $options);
+        $this->assertCount(1, $courses);
+        $course = $courses[0];
+        $this->assertSame('3', $course->getIdentifier());
+        $this->assertSame('Komputationshalbwissenschaft', $course->getName());
+        $this->assertSame('45_A', $course->getCode());
+
+        $options = [
+            Course::SEARCH_PARAMETER_NAME => '44',
+        ];
+        $courses = $this->courseProvider->getCourses(1, 3, $options);
+        $this->assertCount(2, $courses);
+        $course = $courses[0];
+        $this->assertSame('1', $course->getIdentifier());
+        $this->assertSame('Komputationsbesserwissenschaft', $course->getName());
+        $this->assertSame('44_A', $course->getCode());
+        $course = $courses[1];
+        $this->assertSame('2', $course->getIdentifier());
+        $this->assertSame('Komputationswissenschaft', $course->getName());
+        $this->assertSame('44_B', $course->getCode());
+    }
+
+    public function testGetCoursesWithMulittermSearchParameter(): void
+    {
+        $options = [
+            Course::SEARCH_PARAMETER_NAME => 'kompu 45',
+        ];
+        $courses = $this->courseProvider->getCourses(1, 3, $options);
+        $this->assertCount(1, $courses);
+        $course = $courses[0];
+        $this->assertSame('3', $course->getIdentifier());
+        $this->assertSame('Komputationshalbwissenschaft', $course->getName());
+        $this->assertSame('45_A', $course->getCode());
+
+        $options = [
+            Course::SEARCH_PARAMETER_NAME => '45 besser',
+        ];
+        $courses = $this->courseProvider->getCourses(1, 3, $options);
+        $this->assertCount(0, $courses);
     }
 
     public function testGetCoursesEnWithLocalData(): void
