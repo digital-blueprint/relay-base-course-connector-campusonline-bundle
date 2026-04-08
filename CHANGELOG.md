@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.2.7
+
 - Add support for multi-term search parameters
 
 ## v0.2.6
