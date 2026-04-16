@@ -22,6 +22,9 @@ class CourseEventSubscriber extends AbstractLocalDataEventSubscriber
     public const ATTENDEE_GROUP_LIST_URL_SOURCE_DATA_ATTRIBUTE = 'attendeeGroupListUrl';
     public const TYPE_NAME_SOURCE_DATA_ATTRIBUTE = 'typeName';
     public const COURSE_TYPE_KEY_SOURCE_ATTRIBUTE = 'courseTypeKey';
+    public const TEACHING_METHOD_KEY_SOURCE_DATA_ATTRIBUTE = 'teachingMethodKey';
+    public const TEACHING_METHOD_DESCRIPTION_SOURCE_DATA_ATTRIBUTE = 'teachingMethodDescription';
+    public const EXPECTED_PREVIOUS_KNOWLEDGE_SOURCE_DATA_ATTRIBUTE = 'expectedPreviousKnowledge';
 
     protected static function getSubscribedEventNames(): array
     {
@@ -58,13 +61,25 @@ class CourseEventSubscriber extends AbstractLocalDataEventSubscriber
                 return $this->courseProvider->getDescriptionByCourse(
                     $course->getIdentifier(), $postEvent->getOptions());
 
-            case self::STATUS_WITHIN_CURRICULUM_URL_SOURCE_DATA_ATTRIBUTE:
-                return $this->courseProvider->getCampusOnlineWebBaseUrl().
-                    'ee/rest/pages/slc.tm.cp/course-position-in-curriculum/'.$course->getIdentifier();
-
             case self::OBJECTIVE_SOURCE_DATA_ATTRIBUTE:
                 return $this->courseProvider->getObjectiveByCourse(
                     $course->getIdentifier(), $postEvent->getOptions());
+
+            case self::TEACHING_METHOD_KEY_SOURCE_DATA_ATTRIBUTE:
+                return $this->courseProvider->getTeachingMethodKeyByCourse(
+                    $course->getIdentifier());
+
+            case self::TEACHING_METHOD_DESCRIPTION_SOURCE_DATA_ATTRIBUTE:
+                return $this->courseProvider->getTeachingMethodDescriptionByCourse(
+                    $course->getIdentifier(), $postEvent->getOptions());
+
+            case self::EXPECTED_PREVIOUS_KNOWLEDGE_SOURCE_DATA_ATTRIBUTE:
+                return $this->courseProvider->getExpectedPreviousKnowledgeByCourse(
+                    $course->getIdentifier(), $postEvent->getOptions());
+
+            case self::STATUS_WITHIN_CURRICULUM_URL_SOURCE_DATA_ATTRIBUTE:
+                return $this->courseProvider->getCampusOnlineWebBaseUrl().
+                    'ee/rest/pages/slc.tm.cp/course-position-in-curriculum/'.$course->getIdentifier();
 
             case self::ATTENDEE_GROUP_LIST_URL_SOURCE_DATA_ATTRIBUTE:
                 return $this->courseProvider->getCampusOnlineWebBaseUrl().

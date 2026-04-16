@@ -27,6 +27,13 @@ class CourseProviderTest extends ApiTestCase
     private const COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME = 'type';
     private const COURSE_TYPE_SOURCE_ATTRIBUTE_NAME = 'courseTypeKey';
     private const SEMESTER_LOCAL_DATA_ATTRIBUTE_NAME = 'term';
+    private const EXPECTED_PREVIOUS_KNOWLEDGE_LOCAL_DATA_ATTRIBUTE = 'expectedPreviousKnowledge';
+
+    private const TEACHING_METHOD_DESCRIPTION_LOCAL_DATA_ATTRIBUTE = 'teachingMethodDescription';
+    private const TEACHING_METHOD_KEY_LOCAL_DATA_ATTRIBUTE = 'teachingMethodKey';
+    private const DESCRIPTION_LOCAL_DATA_ATTRIBUTE = 'description';
+    private const OBJECTIVE_LOCAL_DATA_ATTRIBUTE = 'objective';
+
     private const SEMESTER_SOURCE_ATTRIBUTE_NAME = 'semesterKey';
     private const COURSE_IDENTITY_CODE_UID_LOCAL_DATA_ATTRIBUTE_NAME = 'course_identity_code';
     private const COURSE_IDENTITY_CODE_UID_SOURCE_ATTRIBUTE_NAME = 'courseIdentityCodeUid';
@@ -59,7 +66,7 @@ class CourseProviderTest extends ApiTestCase
         $this->recreateCourseCache();
     }
 
-    private function mockResponses(array $responses, bool $mockAuthServerResponses = false): void
+    private function mockResponses(array $responses, bool $mockAuthServerResponses = true): void
     {
         if ($mockAuthServerResponses) {
             $responses = array_merge(self::createMockAuthServerResponses(), $responses);
@@ -364,6 +371,176 @@ class CourseProviderTest extends ApiTestCase
         $this->assertSame('Co-lecturer', $lecturer['functionName']);
     }
 
+    public function testGetCourseByIdWithExpectedPreviousKnowledgeLocalDataAttribute(): void
+    {
+        $descriptionJson = file_get_contents(__DIR__.'/course_descriptions_api_response.json');
+        $coResponses = [
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'], $descriptionJson),
+        ];
+
+        $this->mockResponses($coResponses);
+
+        $options = [];
+        Options::requestLocalDataAttributes($options, [self::EXPECTED_PREVIOUS_KNOWLEDGE_LOCAL_DATA_ATTRIBUTE]);
+        Options::setLanguage($options, 'de');
+
+        $course = $this->courseProvider->getCourseById('1', $options);
+
+        $this->assertSame('1', $course->getIdentifier());
+        $this->assertSame('Keines', $course->getLocalDataValue(self::EXPECTED_PREVIOUS_KNOWLEDGE_LOCAL_DATA_ATTRIBUTE));
+    }
+
+    public function testGetCourseByIdWithTeachingMethodDescriptionLocalDataAttribute(): void
+    {
+        $descriptionJson = file_get_contents(__DIR__.'/course_descriptions_api_response.json');
+        $coResponses = [
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'], $descriptionJson),
+        ];
+
+        $this->mockResponses($coResponses);
+
+        $options = [];
+        Options::requestLocalDataAttributes($options, [self::TEACHING_METHOD_DESCRIPTION_LOCAL_DATA_ATTRIBUTE]);
+        Options::setLanguage($options, 'de');
+
+        $course = $this->courseProvider->getCourseById('1', $options);
+
+        $this->assertSame('1', $course->getIdentifier());
+        $this->assertSame('interaktiv', $course->getLocalDataValue(self::TEACHING_METHOD_DESCRIPTION_LOCAL_DATA_ATTRIBUTE));
+    }
+
+    public function testGetCourseByIdWithTeachingMethodKeyLocalDataAttribute(): void
+    {
+        $descriptionJson = file_get_contents(__DIR__.'/course_descriptions_api_response.json');
+        $coResponses = [
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'], $descriptionJson),
+        ];
+
+        $this->mockResponses($coResponses);
+
+        $options = [];
+        Options::requestLocalDataAttributes($options, [self::TEACHING_METHOD_KEY_LOCAL_DATA_ATTRIBUTE]);
+
+        $course = $this->courseProvider->getCourseById('1', $options);
+
+        $this->assertSame('1', $course->getIdentifier());
+        $this->assertSame('VU', $course->getLocalDataValue(self::TEACHING_METHOD_KEY_LOCAL_DATA_ATTRIBUTE));
+    }
+
+    public function testGetCourseByIdWithExpectedPreviousKnowledgeLocalDataAttributeEn(): void
+    {
+        $descriptionJson = file_get_contents(__DIR__.'/course_descriptions_api_response.json');
+        $coResponses = [
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'], $descriptionJson),
+        ];
+
+        $this->mockResponses($coResponses);
+
+        $options = [];
+        Options::requestLocalDataAttributes($options, [self::EXPECTED_PREVIOUS_KNOWLEDGE_LOCAL_DATA_ATTRIBUTE]);
+        Options::setLanguage($options, 'en');
+
+        $course = $this->courseProvider->getCourseById('1', $options);
+
+        $this->assertSame('1', $course->getIdentifier());
+        $this->assertSame('None', $course->getLocalDataValue(self::EXPECTED_PREVIOUS_KNOWLEDGE_LOCAL_DATA_ATTRIBUTE));
+    }
+
+    public function testGetCourseByIdWithTeachingMethodDescriptionLocalDataAttributeEn(): void
+    {
+        $descriptionJson = file_get_contents(__DIR__.'/course_descriptions_api_response.json');
+        $coResponses = [
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'], $descriptionJson),
+        ];
+
+        $this->mockResponses($coResponses);
+
+        $options = [];
+        Options::requestLocalDataAttributes($options, [self::TEACHING_METHOD_DESCRIPTION_LOCAL_DATA_ATTRIBUTE]);
+        Options::setLanguage($options, 'en');
+
+        $course = $this->courseProvider->getCourseById('1', $options);
+
+        $this->assertSame('1', $course->getIdentifier());
+        $this->assertSame('interactive', $course->getLocalDataValue(self::TEACHING_METHOD_DESCRIPTION_LOCAL_DATA_ATTRIBUTE));
+    }
+
+    public function testGetCourseByIdWithDescriptionLocalDataAttribute(): void
+    {
+        $descriptionJson = file_get_contents(__DIR__.'/course_descriptions_api_response.json');
+        $coResponses = [
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'], $descriptionJson),
+        ];
+
+        $this->mockResponses($coResponses);
+
+        $options = [];
+        Options::requestLocalDataAttributes($options, [self::DESCRIPTION_LOCAL_DATA_ATTRIBUTE]);
+        Options::setLanguage($options, 'de');
+
+        $course = $this->courseProvider->getCourseById('1', $options);
+
+        $this->assertSame('1', $course->getIdentifier());
+        $this->assertSame('Inhalt', $course->getLocalDataValue(self::DESCRIPTION_LOCAL_DATA_ATTRIBUTE));
+    }
+
+    public function testGetCourseByIdWithObjectiveLocalDataAttribute(): void
+    {
+        $descriptionJson = file_get_contents(__DIR__.'/course_descriptions_api_response.json');
+        $coResponses = [
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'], $descriptionJson),
+        ];
+
+        $this->mockResponses($coResponses);
+
+        $options = [];
+        Options::requestLocalDataAttributes($options, [self::OBJECTIVE_LOCAL_DATA_ATTRIBUTE]);
+        Options::setLanguage($options, 'de');
+
+        $course = $this->courseProvider->getCourseById('1', $options);
+
+        $this->assertSame('1', $course->getIdentifier());
+        $this->assertSame('Weisheit', $course->getLocalDataValue(self::OBJECTIVE_LOCAL_DATA_ATTRIBUTE));
+    }
+
+    public function testGetCourseByIdWithDescriptionLocalDataAttributeEn(): void
+    {
+        $descriptionJson = file_get_contents(__DIR__.'/course_descriptions_api_response.json');
+        $coResponses = [
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'], $descriptionJson),
+        ];
+
+        $this->mockResponses($coResponses);
+
+        $options = [];
+        Options::requestLocalDataAttributes($options, [self::DESCRIPTION_LOCAL_DATA_ATTRIBUTE]);
+        Options::setLanguage($options, 'en');
+
+        $course = $this->courseProvider->getCourseById('1', $options);
+
+        $this->assertSame('1', $course->getIdentifier());
+        $this->assertSame('Content', $course->getLocalDataValue(self::DESCRIPTION_LOCAL_DATA_ATTRIBUTE));
+    }
+
+    public function testGetCourseByIdWithObjectiveLocalDataAttributeEn(): void
+    {
+        $descriptionJson = file_get_contents(__DIR__.'/course_descriptions_api_response.json');
+        $coResponses = [
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'], $descriptionJson),
+        ];
+
+        $this->mockResponses($coResponses);
+
+        $options = [];
+        Options::requestLocalDataAttributes($options, [self::OBJECTIVE_LOCAL_DATA_ATTRIBUTE]);
+        Options::setLanguage($options, 'en');
+
+        $course = $this->courseProvider->getCourseById('1', $options);
+
+        $this->assertSame('1', $course->getIdentifier());
+        $this->assertSame('Wisdom', $course->getLocalDataValue(self::OBJECTIVE_LOCAL_DATA_ATTRIBUTE));
+    }
+
     public function testGetSemesterKeys(): void
     {
         $this->assertEquals(['2025W', '2025S', '2024W', '2024S'], CourseProvider::getMostRecentSemesterKeys(4, new \DateTimeImmutable('2025-09-30')));
@@ -464,7 +641,7 @@ class CourseProviderTest extends ApiTestCase
                     ],
                 ])),
         ];
-        $this->mockResponses($coResponses, true);
+        $this->mockResponses($coResponses);
         try {
             // this is expected to fail, since sqlite does not support some operations
             $this->courseProvider->recreateCoursesCache();
@@ -482,6 +659,8 @@ class CourseProviderTest extends ApiTestCase
             $connection->executeStatement("ALTER TABLE $courseTitlesLiveTable RENAME TO $courseTitlesTempTable;");
             $connection->executeStatement("ALTER TABLE $courseTitlesStagingTable RENAME TO $courseTitlesLiveTable;");
             $connection->executeStatement("ALTER TABLE $courseTitlesTempTable RENAME TO $courseTitlesStagingTable;");
+        } finally {
+            $this->courseProvider->reset();
         }
     }
 
@@ -527,6 +706,31 @@ class CourseProviderTest extends ApiTestCase
             [
                 'local_data_attribute' => self::COURSE_IDENTITY_CODE_UID_LOCAL_DATA_ATTRIBUTE_NAME,
                 'source_attribute' => self::COURSE_IDENTITY_CODE_UID_SOURCE_ATTRIBUTE_NAME,
+                'default_value' => '',
+            ],
+            [
+                'local_data_attribute' => self::EXPECTED_PREVIOUS_KNOWLEDGE_LOCAL_DATA_ATTRIBUTE,
+                'source_attribute' => CourseEventSubscriber::EXPECTED_PREVIOUS_KNOWLEDGE_SOURCE_DATA_ATTRIBUTE,
+                'default_value' => '',
+            ],
+            [
+                'local_data_attribute' => self::TEACHING_METHOD_DESCRIPTION_LOCAL_DATA_ATTRIBUTE,
+                'source_attribute' => CourseEventSubscriber::TEACHING_METHOD_DESCRIPTION_SOURCE_DATA_ATTRIBUTE,
+                'default_value' => '',
+            ],
+            [
+                'local_data_attribute' => self::TEACHING_METHOD_KEY_LOCAL_DATA_ATTRIBUTE,
+                'source_attribute' => CourseEventSubscriber::TEACHING_METHOD_KEY_SOURCE_DATA_ATTRIBUTE,
+                'default_value' => '',
+            ],
+            [
+                'local_data_attribute' => self::DESCRIPTION_LOCAL_DATA_ATTRIBUTE,
+                'source_attribute' => CourseEventSubscriber::DESCRIPTION_SOURCE_DATA_ATTRIBUTE,
+                'default_value' => '',
+            ],
+            [
+                'local_data_attribute' => self::OBJECTIVE_LOCAL_DATA_ATTRIBUTE,
+                'source_attribute' => CourseEventSubscriber::OBJECTIVE_SOURCE_DATA_ATTRIBUTE,
                 'default_value' => '',
             ],
             [

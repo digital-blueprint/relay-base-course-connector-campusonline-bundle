@@ -1,0 +1,39 @@
+{
+  "items": [
+    {
+      "uid": "1",
+      "content": {
+        "value": {
+          "de": "Inhalt",
+          "en": "Content"
+        }
+      },
+      "courseRegistrationInfo": {
+        "value": {
+          "de": "Anmeldung über CampusOnline",
+          "en": "Registration via CampusOnline"
+        }
+      },
+      "expectedPreviousKnowledge": {
+        "value": {
+          "de": "Keines",
+          "en": "None"
+        }
+      },
+      "objective": {
+        "value": {
+          "de": "Weisheit",
+          "en": "Wisdom"
+        }
+      },
+      "onlineInfos": [],
+      "teachingMethodDescription": {
+        "value": {
+          "de": "interaktiv",
+          "en": "interactive"
+        }
+      },
+      "teachingMethodKey": "VU"
+    }
+  ]
+}

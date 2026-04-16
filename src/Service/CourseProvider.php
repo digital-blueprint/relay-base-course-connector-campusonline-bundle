@@ -88,6 +88,14 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
     }
 
     /**
+     * Just for unit testing.
+     */
+    public function reset(): void
+    {
+        $this->courseApi = null;
+    }
+
+    /**
      * @throws \DateInvalidTimeZoneException
      */
     public function setConfig(array $config): void
@@ -429,7 +437,7 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
     {
         try {
             return $this->getFirstOrNullDescriptionResource($courseIdentifier)
-            ?->getContent(Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG);
+            ?->getContentLocalized(Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG);
         } catch (ApiException $apiException) {
             throw self::dispatchException($apiException);
         }
@@ -439,7 +447,37 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
     {
         try {
             return $this->getFirstOrNullDescriptionResource($courseIdentifier)
-                ?->getObjective(Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG);
+                ?->getObjectiveLocalized(Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG);
+        } catch (ApiException $apiException) {
+            throw self::dispatchException($apiException);
+        }
+    }
+
+    public function getTeachingMethodKeyByCourse(string $courseIdentifier): ?string
+    {
+        try {
+            return $this->getFirstOrNullDescriptionResource($courseIdentifier)
+                ?->getTeachingMethodKey();
+        } catch (ApiException $apiException) {
+            throw self::dispatchException($apiException);
+        }
+    }
+
+    public function getTeachingMethodDescriptionByCourse(string $courseIdentifier, array $options = []): ?string
+    {
+        try {
+            return $this->getFirstOrNullDescriptionResource($courseIdentifier)
+                ?->getTeachingMethodDescriptionLocalized(Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG);
+        } catch (ApiException $apiException) {
+            throw self::dispatchException($apiException);
+        }
+    }
+
+    public function getExpectedPreviousKnowledgeByCourse(string $courseIdentifier, array $options = []): ?string
+    {
+        try {
+            return $this->getFirstOrNullDescriptionResource($courseIdentifier)
+                ?->getExpectedPreviousKnowledgeLocalized(Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG);
         } catch (ApiException $apiException) {
             throw self::dispatchException($apiException);
         }

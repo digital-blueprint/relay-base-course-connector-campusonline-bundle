@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add local data source attributes expectedPreviousKnowledge, teachingMethodKey, and teachingMethodDescription
+
 ## v0.2.7
 
 - Add support for multi-term search parameters
