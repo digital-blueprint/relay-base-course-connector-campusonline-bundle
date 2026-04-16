@@ -747,18 +747,6 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
         ]);
     }
 
-    private static function createCourseAndExtraDataFromCourseResource(CourseResource $courseResource, array $options): CourseAndExtraData
-    {
-        $course = new Course();
-        $course->setIdentifier($courseResource->getUid());
-        $course->setCode($courseResource->getCourseCode());
-        if ($localizedTitle = $courseResource->getTitle()) {
-            $course->setName($localizedTitle[Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG] ?? $localizedTitle[0]);
-        }
-
-        return new CourseAndExtraData($course, $courseResource->getResourceData());
-    }
-
     /**
      * NOTE: Campusonline returns '401 unauthorized' for some resources that are not found. So we can't
      * safely return '404' in all cases because '401' is also returned by CO if e.g. the token is not valid.

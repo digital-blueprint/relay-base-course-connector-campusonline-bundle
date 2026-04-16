@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.2.8
+
 - Add local data source attributes expectedPreviousKnowledge, teachingMethodKey, and teachingMethodDescription
 
 ## v0.2.7
