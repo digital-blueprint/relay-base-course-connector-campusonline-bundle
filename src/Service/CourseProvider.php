@@ -338,20 +338,24 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
     }
 
     /**
-     * @param array $options Available options:
-     *                       * Locale::LANGUAGE_OPTION (language in ISO 639‑1 format)
+     * @param string|null $registrationStatus if specified, only attendees with the given registration status are returned, otherwise all attendees are returned
      *
      * @return array<int, array<string, mixed>>
      *
      * @throws ApiError
      */
-    public function getAttendeesByCourse(string $courseIdentifier, array $options = []): array
+    public function getAttendeesByCourse(
+        string $courseIdentifier,
+        ?string $registrationStatus = CourseRegistrationResource::REGISTRATION_STATUS_FIXED): array
     {
         $attendeeIds = [];
         foreach ($this->getCourseRegistrationResourcesCached($courseIdentifier) as $registrationResource) {
-            $attendeeIds[] = [
-                'personIdentifier' => $registrationResource->getPersonUid(),
-            ];
+            if ($registrationStatus === null
+                || $registrationStatus === $registrationResource->getRegistrationStatus()) {
+                $attendeeIds[] = [
+                    'personIdentifier' => $registrationResource->getPersonUid(),
+                ];
+            }
         }
 
         return $attendeeIds;
@@ -390,6 +394,7 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
             $courseGroupApi = new CourseGroupApi($this->getCourseApi()->getConnection());
 
             $ATTENDEE_PERSON_IDENTIFIERS_KEY = 'attendeeIdentifiers';
+            $ATTENDEE_WAITING_LIST_PERSON_IDENTIFIERS_KEY = 'attendeeWaitingListIdentifiers';
             $LECTURER_PERSON_IDENTIFIERS_KEY = 'lecturerIdentifiers';
 
             $courseGroupPeopleMap = [];
@@ -398,17 +403,26 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
                 if (null === ($courseGroupPeopleMap[$courseGroupIdentifier] ?? null)) {
                     $courseGroupPeople = [
                         $ATTENDEE_PERSON_IDENTIFIERS_KEY => [],
+                        $ATTENDEE_WAITING_LIST_PERSON_IDENTIFIERS_KEY => [],
                         $LECTURER_PERSON_IDENTIFIERS_KEY => [],
                     ];
                     $courseGroupPeopleMap[$courseGroupIdentifier] = $courseGroupPeople;
                 }
-                $courseGroupPeopleMap[$courseGroupIdentifier][$ATTENDEE_PERSON_IDENTIFIERS_KEY][] = $registrationResource->getPersonUid();
+                switch ($registrationResource->getRegistrationStatus()) {
+                    case CourseRegistrationResource::REGISTRATION_STATUS_FIXED:
+                        $courseGroupPeopleMap[$courseGroupIdentifier][$ATTENDEE_PERSON_IDENTIFIERS_KEY][] = $registrationResource->getPersonUid();
+                        break;
+                    case CourseRegistrationResource::REGISTRATION_STATUS_WAITING_LIST:
+                        $courseGroupPeopleMap[$courseGroupIdentifier][$ATTENDEE_WAITING_LIST_PERSON_IDENTIFIERS_KEY][] = $registrationResource->getPersonUid();
+                        break;
+                }
             }
             foreach ($this->getLectureshipResourcesCached($courseIdentifier) as $lectureshipResource) {
                 foreach ($lectureshipResource->getGroupUids() as $courseGroupIdentifier) {
                     if (null === ($courseGroupPeopleMap[$courseGroupIdentifier] ?? null)) {
                         $courseGroupPeople = [
                             $ATTENDEE_PERSON_IDENTIFIERS_KEY => [],
+                            $ATTENDEE_WAITING_LIST_PERSON_IDENTIFIERS_KEY => [],
                             $LECTURER_PERSON_IDENTIFIERS_KEY => [],
                         ];
                         $courseGroupPeopleMap[$courseGroupIdentifier] = $courseGroupPeople;
@@ -423,6 +437,7 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
                     'identifier' => $courseGroupPeople->getUid(),
                     'name' => $courseGroupPeople->getName(Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG),
                     $ATTENDEE_PERSON_IDENTIFIERS_KEY => $courseGroupPeopleMap[$courseGroupPeople->getUid()][$ATTENDEE_PERSON_IDENTIFIERS_KEY] ?? [],
+                    $ATTENDEE_WAITING_LIST_PERSON_IDENTIFIERS_KEY => $courseGroupPeopleMap[$courseGroupPeople->getUid()][$ATTENDEE_WAITING_LIST_PERSON_IDENTIFIERS_KEY] ?? [],
                     $LECTURER_PERSON_IDENTIFIERS_KEY => $courseGroupPeopleMap[$courseGroupPeople->getUid()][$LECTURER_PERSON_IDENTIFIERS_KEY] ?? [],
                 ];
             }
@@ -538,6 +553,7 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
                     $this->config[Configuration::CAMPUS_ONLINE_NODE][Configuration::CLIENT_SECRET_NODE] ?? ''
                 )
             );
+            $this->courseApi->setLogger($this->logger);
         }
 
         return $this->courseApi;
@@ -576,7 +592,6 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
         }
 
         if ($filter = Options::getFilter($options)) {
-            dump($filter);
             $pathMapping = [
                 'identifier' => $CACHED_COURSE_ENTITY_ALIAS.'.'.CachedCourse::UID_COLUMN_NAME,
                 'code' => $CACHED_COURSE_ENTITY_ALIAS.'.'.CachedCourse::COURSE_CODE_COLUMN_NAME,

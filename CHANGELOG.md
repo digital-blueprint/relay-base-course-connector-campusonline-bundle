@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add local data attribute attendeeWaitingList
+
 ## v0.2.8
 
 - Add local data source attributes expectedPreviousKnowledge, teachingMethodKey, and teachingMethodDescription

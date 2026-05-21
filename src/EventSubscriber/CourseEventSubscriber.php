@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\EventSubscriber;
 
+use Dbp\CampusonlineApi\PublicRestApi\Courses\CourseRegistrationResource;
 use Dbp\Relay\BaseCourseBundle\Entity\Course;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CoursePostEvent;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CoursePreEvent;
@@ -15,6 +16,7 @@ class CourseEventSubscriber extends AbstractLocalDataEventSubscriber
 {
     public const LECTURERS_SOURCE_DATA_ATTRIBUTE = 'lecturers';
     public const ATTENDEES_SOURCE_DATA_ATTRIBUTE = 'attendees';
+    public const ATTENDEE_WAITING_LIST_SOURCE_DATA_ATTRIBUTE = 'attendeeWaitingList';
     public const COURSE_GROUPS_SOURCE_DATA_ATTRIBUTE = 'courseGroups';
     public const DESCRIPTION_SOURCE_DATA_ATTRIBUTE = 'description';
     public const STATUS_WITHIN_CURRICULUM_URL_SOURCE_DATA_ATTRIBUTE = 'statusWithinCurriculumUrl';
@@ -51,7 +53,11 @@ class CourseEventSubscriber extends AbstractLocalDataEventSubscriber
 
             case self::ATTENDEES_SOURCE_DATA_ATTRIBUTE:
                 return $this->courseProvider->getAttendeesByCourse(
-                    $course->getIdentifier(), $postEvent->getOptions());
+                    $course->getIdentifier(), CourseRegistrationResource::REGISTRATION_STATUS_FIXED);
+
+            case self::ATTENDEE_WAITING_LIST_SOURCE_DATA_ATTRIBUTE:
+                return $this->courseProvider->getAttendeesByCourse(
+                    $course->getIdentifier(), CourseRegistrationResource::REGISTRATION_STATUS_WAITING_LIST);
 
             case self::COURSE_GROUPS_SOURCE_DATA_ATTRIBUTE:
                 return $this->courseProvider->getGroupsByCourse(
