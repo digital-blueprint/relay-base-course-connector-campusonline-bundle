@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.2.9
+
 - Add local data attribute attendeeWaitingList
 
 ## v0.2.8
