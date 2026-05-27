@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add courseGroupRegistration source attribute. Deprecate attendees in courseGroup source attribute.
+
 ## v0.2.9
 
 - Add local data attribute attendeeWaitingList

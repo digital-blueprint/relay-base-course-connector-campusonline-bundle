@@ -18,6 +18,7 @@ class CourseEventSubscriber extends AbstractLocalDataEventSubscriber
     public const ATTENDEES_SOURCE_DATA_ATTRIBUTE = 'attendees';
     public const ATTENDEE_WAITING_LIST_SOURCE_DATA_ATTRIBUTE = 'attendeeWaitingList';
     public const COURSE_GROUPS_SOURCE_DATA_ATTRIBUTE = 'courseGroups';
+    public const COURSE_GROUP_REGISTRATIONS_SOURCE_DATA_ATTRIBUTE = 'courseGroupRegistrations';
     public const DESCRIPTION_SOURCE_DATA_ATTRIBUTE = 'description';
     public const STATUS_WITHIN_CURRICULUM_URL_SOURCE_DATA_ATTRIBUTE = 'statusWithinCurriculumUrl';
     public const OBJECTIVE_SOURCE_DATA_ATTRIBUTE = 'objective';
@@ -60,8 +61,12 @@ class CourseEventSubscriber extends AbstractLocalDataEventSubscriber
                     $course->getIdentifier(), CourseRegistrationResource::REGISTRATION_STATUS_WAITING_LIST);
 
             case self::COURSE_GROUPS_SOURCE_DATA_ATTRIBUTE:
-                return $this->courseProvider->getGroupsByCourse(
+                return $this->courseProvider->getCourseGroupsByCourse(
                     $course->getIdentifier(), $postEvent->getOptions());
+
+            case self::COURSE_GROUP_REGISTRATIONS_SOURCE_DATA_ATTRIBUTE:
+                return $this->courseProvider->getCourseGroupRegistrationsByCourse(
+                    $course->getIdentifier());
 
             case self::DESCRIPTION_SOURCE_DATA_ATTRIBUTE:
                 return $this->courseProvider->getDescriptionByCourse(
