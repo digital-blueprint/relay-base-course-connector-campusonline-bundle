@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.2.10
+
 - Add courseGroupRegistration source attribute. Deprecate attendees in courseGroup source attribute.
 
 ## v0.2.9
