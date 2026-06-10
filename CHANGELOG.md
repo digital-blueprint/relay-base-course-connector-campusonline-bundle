@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.2.11
+
 - Apply filters to the get course item operation as well
 - Adapt to the new signature of CourseProviderInterface
 - Request cache course descriptions
