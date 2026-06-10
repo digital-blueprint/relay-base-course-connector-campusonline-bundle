@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "294844f89419fff30dcd579828b9178b",
+    "content-hash": "12fcb1f9f4386be55d40e97ea5172d5f",
     "packages": [
         {
             "name": "api-platform/documentation",
@@ -984,16 +984,16 @@
         },
         {
             "name": "dbp/campusonline-api",
-            "version": "v0.3.43",
+            "version": "v0.3.44",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/campusonline-api.git",
-                "reference": "bf7bc73c85c89e97724988aebcdd34698a294c83"
+                "reference": "91555cdbb776027f775c30f032c29711a526e536"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/bf7bc73c85c89e97724988aebcdd34698a294c83",
-                "reference": "bf7bc73c85c89e97724988aebcdd34698a294c83",
+                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/91555cdbb776027f775c30f032c29711a526e536",
+                "reference": "91555cdbb776027f775c30f032c29711a526e536",
                 "shasum": ""
             },
             "require": {
@@ -1028,22 +1028,22 @@
             ],
             "support": {
                 "issues": "https://github.com/digital-blueprint/campusonline-api/issues",
-                "source": "https://github.com/digital-blueprint/campusonline-api/tree/v0.3.43"
+                "source": "https://github.com/digital-blueprint/campusonline-api/tree/v0.3.44"
             },
-            "time": "2026-05-21T07:09:52+00:00"
+            "time": "2026-06-10T07:21:55+00:00"
         },
         {
             "name": "dbp/relay-base-course-bundle",
-            "version": "v0.2.19",
+            "version": "v0.2.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/relay-base-course-bundle.git",
-                "reference": "8a4e44ab8c3e63f5ae1ee2b832e95500aa864d7a"
+                "reference": "7b8d938ecb5fcd8177f529e2fa435bac1dfddcb2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/relay-base-course-bundle/zipball/8a4e44ab8c3e63f5ae1ee2b832e95500aa864d7a",
-                "reference": "8a4e44ab8c3e63f5ae1ee2b832e95500aa864d7a",
+                "url": "https://api.github.com/repos/digital-blueprint/relay-base-course-bundle/zipball/7b8d938ecb5fcd8177f529e2fa435bac1dfddcb2",
+                "reference": "7b8d938ecb5fcd8177f529e2fa435bac1dfddcb2",
                 "shasum": ""
             },
             "require": {
@@ -1087,9 +1087,9 @@
             ],
             "support": {
                 "issues": "https://github.com/digital-blueprint/relay-base-course-bundle/issues",
-                "source": "https://github.com/digital-blueprint/relay-base-course-bundle/tree/v0.2.19"
+                "source": "https://github.com/digital-blueprint/relay-base-course-bundle/tree/v0.2.20"
             },
-            "time": "2026-03-16T14:10:03+00:00"
+            "time": "2026-06-10T07:23:03+00:00"
         },
         {
             "name": "dbp/relay-core-bundle",

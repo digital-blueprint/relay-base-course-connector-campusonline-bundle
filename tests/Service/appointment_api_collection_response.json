@@ -1,0 +1,64 @@
+{
+  "items": [
+    {
+      "uid": "1",
+      "applicationTypeKey": "LEH",
+      "courseGroupUid": "1",
+      "courseUid": "42",
+      "endAt": "2026-03-11T11:45:00",
+      "eventTypeKey": "REGULAR",
+      "externalObjectUid": "76",
+      "resourceUId": "121",
+      "resourceUrl": "https://campusonline.at/ee/rest/pages/slc.cp.apt/resource/4207",
+      "roomUid": "2",
+      "startAt": "2026-03-11T10:15:00",
+      "statusTypeKey": "CONFIRMED",
+      "comment": "First class"
+    },
+    {
+      "uid": "2",
+      "applicationTypeKey": "LEH",
+      "courseGroupUid": "1",
+      "courseUid": "42",
+      "endAt": "2026-03-18T11:45:00",
+      "eventTypeKey": "REGULAR",
+      "externalObjectUid": "76",
+      "resourceUId": "121",
+      "resourceUrl": "https://campusonline.at/ee/rest/pages/slc.cp.apt/resource/4207",
+      "roomUid": "2",
+      "startAt": "2026-03-18T10:15:00",
+      "statusTypeKey": "CONFIRMED"
+    },
+    {
+      "uid": "3",
+      "applicationTypeKey": "LEH",
+      "courseGroupUid": "1",
+      "courseUid": "42",
+      "endAt": "2026-03-25T11:45:00",
+      "eventTypeKey": "REGULAR",
+      "externalObjectUid": "76",
+      "resourceUId": "121",
+      "resourceUrl": "https://campusonline.at/ee/rest/pages/slc.cp.apt/resource/4207",
+      "roomUid": "2",
+      "startAt": "2026-03-25T10:15:00",
+      "statusTypeKey": "CONFIRMED"
+    },
+    {
+      "uid": "4",
+      "applicationTypeKey": "PV",
+      "courseGroupUid": "1",
+      "courseUid": "42",
+      "endAt": "2026-06-25T15:00:00",
+      "eventTypeKey": "EXAM_DATE",
+      "examEventUid": "67",
+      "externalObjectUid": "76",
+      "resourceUId": "123",
+      "resourceUrl": "https://campusonline.at/ee/rest/pages/slc.cp.apt/resource/16471",
+      "roomUid": "2",
+      "startAt": "2026-06-25T13:00:00",
+      "statusTypeKey": "CONFIRMED",
+      "comment": "Prepare well!"
+    }
+  ],
+  "limit": 100
+}

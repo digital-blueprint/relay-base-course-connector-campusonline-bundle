@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Apply filters to the get course item operation as well
+- Adapt to the new signature of CourseProviderInterface
+- Request cache course descriptions
+- Add more unit tests
+
 ## v0.2.10
 
 - Add courseGroupRegistration source attribute. Deprecate attendees in courseGroup source attribute.

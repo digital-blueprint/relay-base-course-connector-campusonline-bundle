@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Service;
 
-use Dbp\CampusonlineApi\LegacyWebService\ApiException;
+use Dbp\CampusonlineApi\Helpers\ApiException;
 use Dbp\CampusonlineApi\PublicRestApi\Appointments\AppointmentApi;
 use Dbp\CampusonlineApi\PublicRestApi\Appointments\AppointmentResource;
 use Dbp\CampusonlineApi\PublicRestApi\Connection;
@@ -27,12 +27,14 @@ use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\DependencyInjection\Configur
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Entity\CachedCourse;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Entity\CachedCourseTitle;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CourseEventPostEvent;
+use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CourseEventPreEvent;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CoursePostEvent;
 use Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Event\CoursePreEvent;
 use Dbp\Relay\CoreBundle\Doctrine\QueryHelper;
 use Dbp\Relay\CoreBundle\Exception\ApiError;
 use Dbp\Relay\CoreBundle\LocalData\LocalDataEventDispatcher;
 use Dbp\Relay\CoreBundle\Rest\Options;
+use Dbp\Relay\CoreBundle\Rest\Query\Filter\Filter;
 use Dbp\Relay\CoreBundle\Rest\Query\Filter\FilterException;
 use Dbp\Relay\CoreBundle\Rest\Query\Filter\FilterTreeBuilder;
 use Dbp\Relay\CoreBundle\Rest\Query\Filter\Nodes\ConditionNode;
@@ -54,10 +56,14 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
     private const DEFAULT_LANGUAGE_TAG = 'de';
 
     private ?CourseApi $courseApi = null;
-    private LocalDataEventDispatcher $eventDispatcher;
     private array $config = [];
     private ?CacheItemPoolInterface $cachePool = null;
     private int $cacheTTL = 0;
+
+    /**
+     * @var string[]
+     */
+    private array $currentResponseCourseIdentifierCache = [];
 
     /**
      * array<string, array> request cache for localized type names.
@@ -70,27 +76,66 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
     private array $localizedLectureshipFunctionNameRequestCache = [];
 
     /**
-     * array<string, CourseRegistrationResource>.
+     * @var array<string, CourseDescriptionResource|null>|null
      */
-    private array $courseRegistrationsRequestCache = [];
+    private ?array $courseDescriptionRequestCache = null;
 
     /**
-     * array<string, LectureshipResource>.
+     * array<string, CourseRegistrationResource[]>|null.
      */
-    private array $lectureshipRequestCache = [];
+    private ?array $courseRegistrationsRequestCache = null;
 
     /**
-     * array<string, CourseGroupResource>.
+     * array<string, LectureshipResource[]>|null.
      */
-    private array $courseGroupRequestCache = [];
+    private ?array $lectureshipRequestCache = null;
+
+    /**
+     * array<string, CourseGroupResource>|null.
+     */
+    private ?array $courseGroupRequestCache = null;
 
     private ?\DateTimeZone $eventTimeZone = null;
 
+    /**
+     * Provides the $numSemesters most recent semester keys, where the most recent one is at index 0 of the array.
+     *
+     * @param \DateTimeImmutable|null $now For testing purposes
+     *
+     * @return string[]
+     */
+    public static function getMostRecentSemesterKeys(int $numSemesters, ?\DateTimeImmutable $now = null): array
+    {
+        if ($numSemesters < 0) {
+            throw new \InvalidArgumentException('number of semesters must be non-negative');
+        }
+
+        $now ??= new \DateTimeImmutable(timezone: new \DateTimeZone('UTC'));
+        $currentMonth = (int) $now->format('n');
+        $currentYear = (int) $now->format('Y');
+
+        if ($currentMonth >= 10 || $currentMonth <= 2) { // in winter
+            $currentSemesterYear = ($currentMonth >= 10 && $currentMonth <= 12) ? $currentYear + 1 : $currentYear;
+            $currentSemesterSeason = 'S';
+        } else { // in summer
+            $currentSemesterYear = $currentYear;
+            $currentSemesterSeason = 'W';
+        }
+
+        $semesterKeys = [];
+        for ($semesterCounter = 0; $semesterCounter < $numSemesters; ++$semesterCounter) {
+            $semesterKeys[] = $currentSemesterYear.$currentSemesterSeason;
+            $currentSemesterYear = ($currentSemesterSeason === 'W') ? $currentSemesterYear : $currentSemesterYear - 1;
+            $currentSemesterSeason = ($currentSemesterSeason === 'W') ? 'S' : 'W';
+        }
+
+        return $semesterKeys;
+    }
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        EventDispatcherInterface $eventDispatcher)
+        private readonly EventDispatcherInterface $eventDispatcher)
     {
-        $this->eventDispatcher = new LocalDataEventDispatcher('', $eventDispatcher);
     }
 
     /**
@@ -99,11 +144,13 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
     public function reset(): void
     {
         $this->courseApi = null;
+        $this->currentResponseCourseIdentifierCache = [];
         $this->localizedLectureshipFunctionNameRequestCache = [];
         $this->localizedTypeNameRequestCache = [];
-        $this->courseRegistrationsRequestCache = [];
-        $this->lectureshipRequestCache = [];
-        $this->courseGroupRequestCache = [];
+        $this->courseDescriptionRequestCache = null;
+        $this->courseRegistrationsRequestCache = null;
+        $this->lectureshipRequestCache = null;
+        $this->courseGroupRequestCache = null;
     }
 
     /**
@@ -237,21 +284,29 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
      *
      * @throws ApiError
      */
-    public function getCourseById(string $identifier, array $options = []): ?Course
+    public function getCourseById(string $identifier, array $options = []): Course
     {
-        $this->eventDispatcher->onNewOperation($options);
+        $options = $this->preProcessCourseOptions($options);
+
         try {
-            $cachedCourse = $this->entityManager->getRepository(CachedCourse::class)->find($identifier);
-            if ($cachedCourse === null) {
-                throw new ApiError(Response::HTTP_NOT_FOUND, 'course with ID not found: '.$identifier);
-            }
-        } catch (ApiException $apiException) {
-            throw self::dispatchException($apiException, $identifier);
+            $filter = FilterTreeBuilder::create()
+                ->equals('identifier', $identifier)
+                ->createFilter();
+        } catch (FilterException $filterException) {
+            $this->logger->error('failed to build filter for course identifier query: '.$filterException->getMessage(), [$filterException]);
+            throw new \RuntimeException('failed to build filter for person identifier query');
         }
 
-        return $this->postProcessCourse(
-            self::createCourseAndExtraDataFromCachedCourse($cachedCourse, $options), $options
-        );
+        $courses = $this->getCoursesInternal(1, 2, $filter, $options);
+        $numCourses = count($courses);
+        if ($numCourses === 0) {
+            throw ApiError::withDetails(Response::HTTP_NOT_FOUND,
+                sprintf("course with identifier '%s' could not be found!", $identifier));
+        } elseif ($numCourses > 1) {
+            throw new \RuntimeException(sprintf("multiple persons found for identifier '%s'", $identifier));
+        }
+
+        return $courses[0];
     }
 
     /**
@@ -266,27 +321,39 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
      */
     public function getCourses(int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): array
     {
-        $this->eventDispatcher->onNewOperation($options);
+        $options = $this->preProcessCourseOptions($options);
 
-        $preEvent = new CoursePreEvent($options);
-        $this->eventDispatcher->dispatch($preEvent);
-        $options = $preEvent->getOptions();
-        $courses = [];
-
-        try {
-            foreach ($this->getCoursesInternal($currentPageNumber, $maxNumItemsPerPage, $options) as $courseAndExtraData) {
-                $courses[] = $this->postProcessCourse($courseAndExtraData, $options);
+        $filter = null;
+        if ($searchTerm = $options[Course::SEARCH_PARAMETER_NAME] ?? null) {
+            try {
+                $CACHED_COURSE_ENTITY_ALIAS = 'c';
+                $CACHED_COURSE_TITLE_ENTITY_ALIAS = 't';
+                $filterTreeBuilder = FilterTreeBuilder::create();
+                // ALL search terms must be contained either in the course code or the course title (in the specified language)
+                foreach (explode(' ', $searchTerm) as $term) {
+                    $filterTreeBuilder
+                        ->or()
+                            ->iContains($CACHED_COURSE_ENTITY_ALIAS.'.'.CachedCourse::COURSE_CODE_COLUMN_NAME, $term)
+                            ->and()
+                                ->iContains($CACHED_COURSE_TITLE_ENTITY_ALIAS.'.'.CachedCourseTitle::TITLE_COLUMN_NAME,
+                                    $term)
+                                ->equals($CACHED_COURSE_TITLE_ENTITY_ALIAS.'.'.CachedCourseTitle::LANGUAGE_TAG_COLUMN_NAME,
+                                    Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG)
+                            ->end() // end and
+                        ->end(); // end or
+                }
+                $filter = $filterTreeBuilder->createFilter();
+            } catch (FilterException $filterException) {
+                $this->dispatchException($filterException, 'failed to build filter for course search: '.$filterException->getMessage());
             }
-        } catch (ApiException $apiException) {
-            throw self::dispatchException($apiException);
         }
 
-        return $courses;
+        return $this->getCoursesInternal($currentPageNumber, $maxNumItemsPerPage, $filter, $options);
     }
 
     public function getCourseEventById(string $identifier, array $options = []): CourseEvent
     {
-        $this->eventDispatcher->onNewOperation($options);
+        $options = $this->preProcessCourseEventOptions($options);
 
         try {
             $courseAppointmentApi = new AppointmentApi($this->getCourseApi()->getConnection());
@@ -296,13 +363,14 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
             return $this->postProcessCourseEvent(
                 new CourseEventAndExtraData($courseEvent, $appointmentResource->getResourceData()), $options);
         } catch (ApiException $apiException) {
-            throw self::dispatchException($apiException);
+            throw $this->dispatchException($apiException, 'failed to get course event');
         }
     }
 
-    public function getCourseEvents(int $currentPageNumber, int $maxNumItemsPerPage, array $filters = [], array $options = []): array
+    public function getCourseEventsByCourseId(string $courseIdentifier,
+        int $currentPageNumber, int $maxNumItemsPerPage, array $filters = [], array $options = []): array
     {
-        $this->eventDispatcher->onNewOperation($options);
+        $options = $this->preProcessCourseEventOptions($options);
 
         try {
             $appointmentApi = new AppointmentApi($this->getCourseApi()->getConnection());
@@ -312,7 +380,7 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
                 // first, get the initial page to obtain the cursor -> only works if maxNumItems doesn't exceed the allowed maximum
                 // TODO: handle case when maxNumItems exceeds allowed maximum -> generalize page-based <-> cursor-based pagination
                 $resourcePage = $appointmentApi->getAppointmentsByCourseUidCursorBased(
-                    $filters[CourseEvent::COURSE_IDENTIFIER_QUERY_PARAMETER],
+                    $courseIdentifier,
                     maxNumItems: Pagination::getFirstItemIndex($currentPageNumber, $maxNumItemsPerPage));
                 $nextCursor = $resourcePage->getNextCursor();
             }
@@ -326,7 +394,7 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
             $courseEvents = [];
             do {
                 $resourcesAndCursor = $appointmentApi->getAppointmentsByCourseUidCursorBased(
-                    $filters[CourseEvent::COURSE_IDENTIFIER_QUERY_PARAMETER],
+                    $courseIdentifier,
                     cursor: $nextCursor,
                     maxNumItems: $typeKeyQueryParameter !== null ? 1000 : $maxNumItemsPerPage);
 
@@ -344,7 +412,7 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
 
             return $courseEvents;
         } catch (ApiException $apiException) {
-            throw self::dispatchException($apiException);
+            throw $this->dispatchException($apiException, 'failed to get course events');
         }
     }
 
@@ -392,7 +460,7 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
 
             return $lecturerIds;
         } catch (ApiException $apiException) {
-            throw self::dispatchException($apiException);
+            throw $this->dispatchException($apiException);
         }
     }
 
@@ -449,14 +517,14 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
 
             return $courseGroups;
         } catch (ApiException $apiException) {
-            throw self::dispatchException($apiException);
+            throw $this->dispatchException($apiException);
         }
     }
 
     /**
      * @return array<array<string, mixed>>
      */
-    public function getCourseGroupRegistrationsByCourse(?string $courseIdentifier): array
+    public function getCourseGroupRegistrationsByCourse(string $courseIdentifier): array
     {
         try {
             $ATTENDEE_PERSON_IDENTIFIERS_KEY = 'attendeeIdentifiers';
@@ -493,57 +561,57 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
 
             return $courseGroups;
         } catch (ApiException $apiException) {
-            throw self::dispatchException($apiException);
+            throw $this->dispatchException($apiException);
         }
     }
 
     public function getDescriptionByCourse(string $courseIdentifier, array $options = []): ?string
     {
         try {
-            return $this->getFirstOrNullDescriptionResource($courseIdentifier)
+            return $this->getCourseDescriptionResourceCached($courseIdentifier)
             ?->getContentLocalized(Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG);
         } catch (ApiException $apiException) {
-            throw self::dispatchException($apiException);
+            throw $this->dispatchException($apiException);
         }
     }
 
     public function getObjectiveByCourse(string $courseIdentifier, array $options = []): ?string
     {
         try {
-            return $this->getFirstOrNullDescriptionResource($courseIdentifier)
+            return $this->getCourseDescriptionResourceCached($courseIdentifier)
                 ?->getObjectiveLocalized(Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG);
         } catch (ApiException $apiException) {
-            throw self::dispatchException($apiException);
+            throw $this->dispatchException($apiException);
         }
     }
 
     public function getTeachingMethodKeyByCourse(string $courseIdentifier): ?string
     {
         try {
-            return $this->getFirstOrNullDescriptionResource($courseIdentifier)
+            return $this->getCourseDescriptionResourceCached($courseIdentifier)
                 ?->getTeachingMethodKey();
         } catch (ApiException $apiException) {
-            throw self::dispatchException($apiException);
+            throw $this->dispatchException($apiException);
         }
     }
 
     public function getTeachingMethodDescriptionByCourse(string $courseIdentifier, array $options = []): ?string
     {
         try {
-            return $this->getFirstOrNullDescriptionResource($courseIdentifier)
+            return $this->getCourseDescriptionResourceCached($courseIdentifier)
                 ?->getTeachingMethodDescriptionLocalized(Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG);
         } catch (ApiException $apiException) {
-            throw self::dispatchException($apiException);
+            throw $this->dispatchException($apiException);
         }
     }
 
     public function getExpectedPreviousKnowledgeByCourse(string $courseIdentifier, array $options = []): ?string
     {
         try {
-            return $this->getFirstOrNullDescriptionResource($courseIdentifier)
+            return $this->getCourseDescriptionResourceCached($courseIdentifier)
                 ?->getExpectedPreviousKnowledgeLocalized(Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG);
         } catch (ApiException $apiException) {
-            throw self::dispatchException($apiException);
+            throw $this->dispatchException($apiException);
         }
     }
 
@@ -611,36 +679,40 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
     /**
      * @returns iterable<CourseAndExtraData>
      */
-    public function getCoursesInternal(int $currentPageNumber, int $maxNumItemsPerPage, array $options = []): iterable
+    public function getCoursesInternal(int $currentPageNumber, int $maxNumItemsPerPage, ?Filter $filter, array $options = []): iterable
+    {
+        $courseAndExtraData = $this->getCoursesFromCache(
+            Pagination::getFirstItemIndex($currentPageNumber, $maxNumItemsPerPage),
+            $maxNumItemsPerPage,
+            $filter,
+            $options
+        );
+
+        // NOTE: post-processing is done after all persons of been collected, so that API requests for additional data (e.g. person claims)
+        // can be optimized by caching results for the whole page instead of doing individual requests for each person during post-processing
+        return array_map(
+            fn (CourseAndExtraData $courseAndExtraData) => $this->postProcessCourse($courseAndExtraData, $options),
+            $courseAndExtraData
+        );
+    }
+
+    /**
+     * @returns iterable<CourseAndExtraData>
+     */
+    private function getCoursesFromCache(int $firstItemIndex, int $maxNumItems, ?Filter $filter, array $options = []): iterable
     {
         $CACHED_COURSE_ENTITY_ALIAS = 'c';
         $CACHED_COURSE_TITLE_ENTITY_ALIAS = 't';
 
-        $combinedFilter = null;
-        if ($searchTerm = $options[Course::SEARCH_PARAMETER_NAME] ?? null) {
-            try {
-                $filterTreeBuilder = FilterTreeBuilder::create();
-                // ALL search terms must be contained either in the course code or the course title (in the specified language)
-                foreach (explode(' ', $searchTerm) as $term) {
-                    $filterTreeBuilder
-                        ->or()
-                            ->iContains($CACHED_COURSE_ENTITY_ALIAS.'.'.CachedCourse::COURSE_CODE_COLUMN_NAME, $term)
-                            ->and()
-                                ->iContains($CACHED_COURSE_TITLE_ENTITY_ALIAS.'.'.CachedCourseTitle::TITLE_COLUMN_NAME,
-                                    $term)
-                                ->equals($CACHED_COURSE_TITLE_ENTITY_ALIAS.'.'.CachedCourseTitle::LANGUAGE_TAG_COLUMN_NAME,
-                                    Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG)
-                            ->end() // end and
-                        ->end(); // end or
-                }
-                $combinedFilter = $filterTreeBuilder->createFilter();
-            } catch (FilterException $filterException) {
-                $this->logger->error('failed to build filter for organization search: '.$filterException->getMessage(), [$filterException]);
-                throw new \RuntimeException('failed to build filter for organization search');
+        try {
+            $combinedFilter = FilterTreeBuilder::create()->createFilter();
+            if ($filter) {
+                $combinedFilter->combineWith($filter);
             }
-        }
+            if ($filterFromOptions = Options::getFilter($options)) {
+                $combinedFilter->combineWith($filterFromOptions);
+            }
 
-        if ($filter = Options::getFilter($options)) {
             $pathMapping = [
                 'identifier' => $CACHED_COURSE_ENTITY_ALIAS.'.'.CachedCourse::UID_COLUMN_NAME,
                 'code' => $CACHED_COURSE_ENTITY_ALIAS.'.'.CachedCourse::COURSE_CODE_COLUMN_NAME,
@@ -652,7 +724,7 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
                 $pathMapping[$columnName] = $CACHED_COURSE_TITLE_ENTITY_ALIAS.'.'.$columnName;
             }
 
-            $filter->mapConditionNodes(
+            $combinedFilter->mapConditionNodes(
                 function (ConditionNode $node) use ($pathMapping, $CACHED_COURSE_TITLE_ENTITY_ALIAS, $options): Node {
                     if (isset($pathMapping[$node->getPath()])) {
                         $node->setPath($pathMapping[$node->getPath()]);
@@ -668,56 +740,53 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
                     return $node;
                 });
 
-            try {
-                $combinedFilter = $combinedFilter ?
-                    $combinedFilter->combineWith($filter) : $filter;
-            } catch (FilterException $filterException) {
-                $this->logger->error('failed to combine filters for course query: '.$filterException->getMessage(), [$filterException]);
-                throw new \RuntimeException('failed to combine filters for course query');
+            $queryBuilder = $this->entityManager->createQueryBuilder();
+            $queryBuilder
+                ->select($CACHED_COURSE_ENTITY_ALIAS)
+                ->from(CachedCourse::class, $CACHED_COURSE_ENTITY_ALIAS)
+                ->innerJoin(CachedCourseTitle::class, $CACHED_COURSE_TITLE_ENTITY_ALIAS, Join::WITH,
+                    $CACHED_COURSE_ENTITY_ALIAS.'.'.CachedCourse::UID_COLUMN_NAME." = $CACHED_COURSE_TITLE_ENTITY_ALIAS.course");
+
+            QueryHelper::addFilter($queryBuilder, $combinedFilter);
+
+            $paginator = new Paginator($queryBuilder->getQuery());
+            $paginator->getQuery()
+                ->setFirstResult($firstItemIndex)
+                ->setMaxResults($maxNumItems);
+
+            $courseAndExtraDataPage = [];
+            /** @var CachedCourse $cachedCourse */
+            foreach ($paginator as $cachedCourse) {
+                $this->currentResponseCourseIdentifierCache[] = $cachedCourse->getUid();
+                $courseAndExtraDataPage[] = self::createCourseAndExtraDataFromCachedCourse($cachedCourse, $options);
             }
-        }
 
-        $queryBuilder = $this->entityManager->createQueryBuilder();
-        $queryBuilder
-            ->select($CACHED_COURSE_ENTITY_ALIAS)
-            ->from(CachedCourse::class, $CACHED_COURSE_ENTITY_ALIAS)
-            ->innerJoin(CachedCourseTitle::class, $CACHED_COURSE_TITLE_ENTITY_ALIAS, Join::WITH,
-                $CACHED_COURSE_ENTITY_ALIAS.'.'.CachedCourse::UID_COLUMN_NAME." = $CACHED_COURSE_TITLE_ENTITY_ALIAS.course");
-
-        if ($combinedFilter !== null) {
-            try {
-                QueryHelper::addFilter($queryBuilder, $combinedFilter);
-            } catch (\Exception $exception) {
-                $this->logger->error('failed to apply filter to course query: '.$exception->getMessage(), [$exception]);
-                throw new \RuntimeException('failed to apply filter to course query');
-            }
-        }
-
-        $paginator = new Paginator($queryBuilder->getQuery());
-        $paginator->getQuery()
-            ->setFirstResult(Pagination::getFirstItemIndex($currentPageNumber, $maxNumItemsPerPage))
-            ->setMaxResults($maxNumItemsPerPage);
-
-        /** @var CachedCourse $cachedCourse */
-        foreach ($paginator as $cachedCourse) {
-            yield self::createCourseAndExtraDataFromCachedCourse($cachedCourse, $options);
+            return $courseAndExtraDataPage;
+        } catch (\Throwable $throwable) {
+            throw $this->dispatchException($throwable, 'failed to get courses from cache');
         }
     }
 
     private function postProcessCourse(CourseAndExtraData $courseAndExtraData, array $options): Course
     {
+        $eventDispatcher = new LocalDataEventDispatcher('', $this->eventDispatcher);
+        $eventDispatcher->onNewOperation($options);
+
         $postEvent = new CoursePostEvent(
             $courseAndExtraData->getCourse(), $courseAndExtraData->getExtraData(), $this, $options);
-        $this->eventDispatcher->dispatch($postEvent);
+        $eventDispatcher->dispatch($postEvent);
 
         return $courseAndExtraData->getCourse();
     }
 
     private function postProcessCourseEvent(CourseEventAndExtraData $courseEventAndExtraData, array $options): CourseEvent
     {
+        $eventDispatcher = new LocalDataEventDispatcher('', $this->eventDispatcher);
+        $eventDispatcher->onNewOperation($options);
+
         $postEvent = new CourseEventPostEvent(
             $courseEventAndExtraData->getCourseEvent(), $courseEventAndExtraData->getExtraData(), $this, $options);
-        $this->eventDispatcher->dispatch($postEvent);
+        $eventDispatcher->dispatch($postEvent);
 
         return $courseEventAndExtraData->getCourseEvent();
     }
@@ -744,50 +813,166 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
         return $courseEvent;
     }
 
-    private function getFirstOrNullDescriptionResource(string $courseIdentifier): ?CourseDescriptionResource
+    private function getCourseDescriptionResourceCached(string $courseIdentifier): ?CourseDescriptionResource
     {
-        $courseDescriptionApi = new CourseDescriptionApi($this->getCourseApi()->getConnection());
-        /** @var CourseDescriptionResource $courseDescription */
-        $courseDescription = iterator_to_array(
-            $courseDescriptionApi->getCourseDescriptionsByCourseUid($courseIdentifier)
-        )[0] ?? null;
+        $courseIdsToGetDescriptionFor = [];
+        if (null === $this->courseDescriptionRequestCache) {
+            // descriptions of current course results have not been cached yey
+            $courseIdsToGetDescriptionFor = array_merge([$courseIdentifier], $this->currentResponseCourseIdentifierCache);
+            $this->courseDescriptionRequestCache = array_fill_keys($courseIdsToGetDescriptionFor, null);
+        } elseif (false === array_key_exists($courseIdentifier, $this->courseDescriptionRequestCache)) {
+            // requested course is not part of the current course results
+            $courseIdsToGetDescriptionFor[] = $courseIdentifier;
+            $this->courseDescriptionRequestCache[$courseIdentifier] = null;
+        }
 
-        return $courseDescription;
+        if ($courseIdsToGetDescriptionFor !== []) {
+            $courseDescriptionApi = new CourseDescriptionApi($this->getCourseApi()->getConnection());
+            try {
+                foreach ($courseDescriptionApi->getCourseDescriptionsFor($courseIdsToGetDescriptionFor) as $courseDescriptionResource) {
+                    // NOTE: courses and their respective descriptions have the same id
+                    $this->courseDescriptionRequestCache[$courseDescriptionResource->getUid()] = $courseDescriptionResource;
+                }
+            } catch (ApiException $apiException) {
+                throw $this->dispatchException($apiException, 'failed to get course descriptions for course with id '.$courseIdentifier);
+            }
+        }
+
+        return $this->courseDescriptionRequestCache[$courseIdentifier];
     }
 
     /**
-     * Provides the $numSemesters most recent semester keys, where the most recent one is at index 0 of the array.
-     *
-     * @param \DateTimeImmutable|null $now For testing purposes
-     *
-     * @return string[]
+     * @return CourseRegistrationResource[]
      */
-    public static function getMostRecentSemesterKeys(int $numSemesters, ?\DateTimeImmutable $now = null): array
+    private function getCourseRegistrationResourcesCached(string $courseIdentifier): array
     {
-        if ($numSemesters < 0) {
-            throw new \InvalidArgumentException('number of semesters must be non-negative');
+        $courseIdsToGetRegistrationsFor = [];
+        if (null === $this->courseRegistrationsRequestCache) {
+            // registrations of current course results have not been cached yey
+            $courseIdsToGetRegistrationsFor = array_merge([$courseIdentifier], $this->currentResponseCourseIdentifierCache);
+            $this->courseRegistrationsRequestCache = array_fill_keys($courseIdsToGetRegistrationsFor, []);
+        } elseif (false === array_key_exists($courseIdentifier, $this->courseRegistrationsRequestCache)) {
+            // requested course is not part of the current course results
+            $courseIdsToGetRegistrationsFor = [$courseIdentifier];
+            $this->courseRegistrationsRequestCache[$courseIdentifier] = [];
         }
 
-        $now ??= new \DateTimeImmutable(timezone: new \DateTimeZone('UTC'));
-        $currentMonth = (int) $now->format('n');
-        $currentYear = (int) $now->format('Y');
-
-        if ($currentMonth >= 10 || $currentMonth <= 2) { // in winter
-            $currentSemesterYear = ($currentMonth >= 10 && $currentMonth <= 12) ? $currentYear + 1 : $currentYear;
-            $currentSemesterSeason = 'S';
-        } else { // in summer
-            $currentSemesterYear = $currentYear;
-            $currentSemesterSeason = 'W';
+        if ([] !== $courseIdsToGetRegistrationsFor) {
+            $courseRegistrationApi = new CourseRegistrationApi($this->getConnection());
+            try {
+                foreach ($courseRegistrationApi->getCourseRegistrationsFor($courseIdsToGetRegistrationsFor) as $courseRegistrationResource) {
+                    $this->courseRegistrationsRequestCache[$courseRegistrationResource->getCourseUid()][] = $courseRegistrationResource;
+                }
+            } catch (ApiException $apiException) {
+                throw $this->dispatchException($apiException, 'failed to get course registrations for course with id '.$courseIdentifier);
+            }
         }
 
-        $semesterKeys = [];
-        for ($semesterCounter = 0; $semesterCounter < $numSemesters; ++$semesterCounter) {
-            $semesterKeys[] = $currentSemesterYear.$currentSemesterSeason;
-            $currentSemesterYear = ($currentSemesterSeason === 'W') ? $currentSemesterYear : $currentSemesterYear - 1;
-            $currentSemesterSeason = ($currentSemesterSeason === 'W') ? 'S' : 'W';
+        return $this->courseRegistrationsRequestCache[$courseIdentifier];
+    }
+
+    /**
+     * @return LectureshipResource[]
+     */
+    private function getLectureshipResourcesCached(string $courseIdentifier): array
+    {
+        $courseIdsToGetLectureshipsFor = [];
+        if (null === $this->lectureshipRequestCache) {
+            // lectureships of current course results have not been cached yey
+            $courseIdsToGetLectureshipsFor = array_merge([$courseIdentifier], $this->currentResponseCourseIdentifierCache);
+            $this->lectureshipRequestCache = array_fill_keys($courseIdsToGetLectureshipsFor, []);
+        } elseif (false === array_key_exists($courseIdentifier, $this->lectureshipRequestCache)) {
+            // requested course is not part of the current course results
+            $courseIdsToGetLectureshipsFor = [$courseIdentifier];
+            $this->lectureshipRequestCache[$courseIdentifier] = [];
         }
 
-        return $semesterKeys;
+        if ([] !== $courseIdsToGetLectureshipsFor) {
+            $lectureshipApi = new LectureshipApi($this->getConnection());
+            try {
+                foreach ($lectureshipApi->getLectureshipsFor($courseIdsToGetLectureshipsFor) as $lectureshipResource) {
+                    $this->lectureshipRequestCache[$lectureshipResource->getCourseUid()][] = $lectureshipResource;
+                }
+            } catch (ApiException $apiException) {
+                throw $this->dispatchException($apiException, 'failed to get lectureships for course with id '.$courseIdentifier);
+            }
+        }
+
+        return $this->lectureshipRequestCache[$courseIdentifier];
+    }
+
+    /**
+     * @return CourseGroupResource[]
+     */
+    private function getCourseGroupResourcesCached(string $courseIdentifier): array
+    {
+        $courseIdsToGetCourseGroupsFor = [];
+        if (null === $this->courseGroupRequestCache) {
+            // course groups of current course results have not been cached yey
+            $courseIdsToGetCourseGroupsFor = array_merge([$courseIdentifier], $this->currentResponseCourseIdentifierCache);
+            $this->courseGroupRequestCache = array_fill_keys($courseIdsToGetCourseGroupsFor, []);
+        } elseif (false === array_key_exists($courseIdentifier, $this->courseGroupRequestCache)) {
+            // requested course is not part of the current course results
+            $courseIdsToGetCourseGroupsFor = [$courseIdentifier];
+            $this->courseGroupRequestCache[$courseIdentifier] = [];
+        }
+
+        if ([] !== $courseIdsToGetCourseGroupsFor) {
+            $courseGroupApi = new CourseGroupApi($this->getConnection());
+            try {
+                foreach ($courseGroupApi->getCourseGroupsFor($courseIdsToGetCourseGroupsFor) as $courseGroupResource) {
+                    $this->courseGroupRequestCache[$courseGroupResource->getCourseUid()][] = $courseGroupResource;
+                }
+            } catch (ApiException $apiException) {
+                throw $this->dispatchException($apiException, 'failed to get course groups for course with id '.$courseIdentifier);
+            }
+        }
+
+        return $this->courseGroupRequestCache[$courseIdentifier];
+    }
+
+    private function getConnection(): Connection
+    {
+        return $this->getCourseApi()->getConnection();
+    }
+
+    private function preProcessCourseOptions(array $options): array
+    {
+        $preEvent = new CoursePreEvent($options);
+        $this->eventDispatcher->dispatch($preEvent);
+
+        return $preEvent->getOptions();
+    }
+
+    private function preProcessCourseEventOptions(array $options): array
+    {
+        $preEvent = new CourseEventPreEvent($options);
+        $this->eventDispatcher->dispatch($preEvent);
+
+        return $preEvent->getOptions();
+    }
+
+    /**
+     * @throws ApiError
+     */
+    private function dispatchException(\Throwable $throwable, ?string $logMessage = null): ApiError
+    {
+        $apiError = null;
+        if ($throwable instanceof ApiException) {
+            if ($throwable->isHttpResponseCode()) {
+                if ($throwable->getCode() === Response::HTTP_NOT_FOUND) {
+                    $apiError = new ApiError(Response::HTTP_NOT_FOUND, sprintf('item not be found'));
+                    $logMessage = null; // don't log 404s
+                } elseif ($throwable->getCode() >= 500) {
+                    $apiError = new ApiError(Response::HTTP_BAD_GATEWAY, 'failed to get item(s)');
+                }
+            }
+        }
+        if (null !== $logMessage) {
+            $this->logger->error($logMessage.': '.$throwable->getMessage(), [$throwable]);
+        }
+
+        return $apiError ?? new ApiError(Response::HTTP_INTERNAL_SERVER_ERROR, 'failed to get item(s)');
     }
 
     private static function createCourseAndExtraDataFromCachedCourse(CachedCourse $cachedCourse, array $options): CourseAndExtraData
@@ -809,91 +994,5 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
             CachedCourse::SEMESTER_HOURS_COLUMN_NAME => $cachedCourse->getSemesterHours(),
             CachedCourse::MAIN_LANGUAGE_OF_INSTRUCTION_COLUMN_NAME => $cachedCourse->getMainLanguageOfInstruction(),
         ]);
-    }
-
-    /**
-     * NOTE: Campusonline returns '401 unauthorized' for some resources that are not found. So we can't
-     * safely return '404' in all cases because '401' is also returned by CO if e.g. the token is not valid.
-     *
-     * @throws ApiError
-     * @throws ApiException
-     */
-    private static function dispatchException(ApiException $apiException, ?string $identifier = null): ApiError
-    {
-        if ($apiException->isHttpResponseCode()) {
-            switch ($apiException->getCode()) {
-                case Response::HTTP_NOT_FOUND:
-                    if ($identifier !== null) {
-                        return new ApiError(Response::HTTP_NOT_FOUND, sprintf("Id '%s' could not be found!", $identifier));
-                    }
-                    break;
-                case Response::HTTP_UNAUTHORIZED:
-                    return new ApiError(Response::HTTP_UNAUTHORIZED, sprintf("Id '%s' could not be found or access denied!", $identifier));
-            }
-            if ($apiException->getCode() >= 500) {
-                return new ApiError(Response::HTTP_BAD_GATEWAY, 'failed to get organizations from Campusonline');
-            }
-        }
-
-        return new ApiError(Response::HTTP_INTERNAL_SERVER_ERROR, 'failed to get course(s): '.$apiException->getMessage());
-    }
-
-    /**
-     * @return CourseRegistrationResource[]
-     */
-    private function getCourseRegistrationResourcesCached(string $courseId): array
-    {
-        if (null === ($courseRegistrationResources = $this->courseRegistrationsRequestCache[$courseId] ?? null)) {
-            $courseRegistrationApi = new CourseRegistrationApi($this->getConnection());
-            try {
-                $courseRegistrationResources = iterator_to_array($courseRegistrationApi->getCourseRegistrationsByCourseUid($courseId));
-                $this->courseRegistrationsRequestCache[$courseId] = $courseRegistrationResources;
-            } catch (ApiException $apiException) {
-                throw self::dispatchException($apiException);
-            }
-        }
-
-        return $courseRegistrationResources;
-    }
-
-    /**
-     * @return LectureshipResource[]
-     */
-    private function getLectureshipResourcesCached(string $courseIdentifier): array
-    {
-        if (null === ($lectureshipResources = $this->lectureshipRequestCache[$courseIdentifier] ?? null)) {
-            $lectureshipApi = new LectureshipApi($this->getConnection());
-            try {
-                $lectureshipResources = iterator_to_array($lectureshipApi->getLectureshipsByCourseUid($courseIdentifier));
-                $this->lectureshipRequestCache[$courseIdentifier] = $lectureshipResources;
-            } catch (ApiException $apiException) {
-                throw self::dispatchException($apiException);
-            }
-        }
-
-        return $lectureshipResources;
-    }
-
-    /**
-     * @return CourseGroupResource[]
-     */
-    private function getCourseGroupResourcesCached(string $courseIdentifier): array
-    {
-        if (null === ($courseGroupResources = $this->courseGroupRequestCache[$courseIdentifier] ?? null)) {
-            $courseGroupApi = new CourseGroupApi($this->getConnection());
-            try {
-                $courseGroupResources = iterator_to_array($courseGroupApi->getCourseGroupsByCourseUid($courseIdentifier));
-                $this->courseGroupRequestCache[$courseIdentifier] = $courseGroupResources;
-            } catch (ApiException $apiException) {
-                throw self::dispatchException($apiException);
-            }
-        }
-
-        return $courseGroupResources;
-    }
-
-    private function getConnection(): Connection
-    {
-        return $this->getCourseApi()->getConnection();
     }
 }

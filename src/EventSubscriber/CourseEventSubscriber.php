@@ -46,55 +46,57 @@ class CourseEventSubscriber extends AbstractLocalDataEventSubscriber
     {
         $course = $postEvent->getEntity();
         assert($course instanceof Course);
+        $courseIdentifier = $course->getIdentifier();
+        assert($courseIdentifier !== null);
 
         switch ($attributeMapEntry[self::SOURCE_ATTRIBUTE_KEY]) {
             case self::LECTURERS_SOURCE_DATA_ATTRIBUTE:
                 return $this->courseProvider->getLecturersByCourse(
-                    $course->getIdentifier(), $postEvent->getOptions());
+                    $courseIdentifier, $postEvent->getOptions());
 
             case self::ATTENDEES_SOURCE_DATA_ATTRIBUTE:
                 return $this->courseProvider->getAttendeesByCourse(
-                    $course->getIdentifier(), CourseRegistrationResource::REGISTRATION_STATUS_FIXED);
+                    $courseIdentifier, CourseRegistrationResource::REGISTRATION_STATUS_FIXED);
 
             case self::ATTENDEE_WAITING_LIST_SOURCE_DATA_ATTRIBUTE:
                 return $this->courseProvider->getAttendeesByCourse(
-                    $course->getIdentifier(), CourseRegistrationResource::REGISTRATION_STATUS_WAITING_LIST);
+                    $courseIdentifier, CourseRegistrationResource::REGISTRATION_STATUS_WAITING_LIST);
 
             case self::COURSE_GROUPS_SOURCE_DATA_ATTRIBUTE:
                 return $this->courseProvider->getCourseGroupsByCourse(
-                    $course->getIdentifier(), $postEvent->getOptions());
+                    $courseIdentifier, $postEvent->getOptions());
 
             case self::COURSE_GROUP_REGISTRATIONS_SOURCE_DATA_ATTRIBUTE:
                 return $this->courseProvider->getCourseGroupRegistrationsByCourse(
-                    $course->getIdentifier());
+                    $courseIdentifier);
 
             case self::DESCRIPTION_SOURCE_DATA_ATTRIBUTE:
                 return $this->courseProvider->getDescriptionByCourse(
-                    $course->getIdentifier(), $postEvent->getOptions());
+                    $courseIdentifier, $postEvent->getOptions());
 
             case self::OBJECTIVE_SOURCE_DATA_ATTRIBUTE:
                 return $this->courseProvider->getObjectiveByCourse(
-                    $course->getIdentifier(), $postEvent->getOptions());
+                    $courseIdentifier, $postEvent->getOptions());
 
             case self::TEACHING_METHOD_KEY_SOURCE_DATA_ATTRIBUTE:
                 return $this->courseProvider->getTeachingMethodKeyByCourse(
-                    $course->getIdentifier());
+                    $courseIdentifier);
 
             case self::TEACHING_METHOD_DESCRIPTION_SOURCE_DATA_ATTRIBUTE:
                 return $this->courseProvider->getTeachingMethodDescriptionByCourse(
-                    $course->getIdentifier(), $postEvent->getOptions());
+                    $courseIdentifier, $postEvent->getOptions());
 
             case self::EXPECTED_PREVIOUS_KNOWLEDGE_SOURCE_DATA_ATTRIBUTE:
                 return $this->courseProvider->getExpectedPreviousKnowledgeByCourse(
-                    $course->getIdentifier(), $postEvent->getOptions());
+                    $courseIdentifier, $postEvent->getOptions());
 
             case self::STATUS_WITHIN_CURRICULUM_URL_SOURCE_DATA_ATTRIBUTE:
                 return $this->courseProvider->getCampusOnlineWebBaseUrl().
-                    'ee/rest/pages/slc.tm.cp/course-position-in-curriculum/'.$course->getIdentifier();
+                    'ee/rest/pages/slc.tm.cp/course-position-in-curriculum/'.$courseIdentifier;
 
             case self::ATTENDEE_GROUP_LIST_URL_SOURCE_DATA_ATTRIBUTE:
                 return $this->courseProvider->getCampusOnlineWebBaseUrl().
-                    'ee/rest/pages/slc.tm.cp/course-registration/'.$course->getIdentifier();
+                    'ee/rest/pages/slc.tm.cp/course-registration/'.$courseIdentifier;
 
             case self::TYPE_NAME_SOURCE_DATA_ATTRIBUTE:
                 return ($courseTypeKey = $postEvent->getSourceData()[self::COURSE_TYPE_KEY_SOURCE_ATTRIBUTE] ?? null) !== null ?

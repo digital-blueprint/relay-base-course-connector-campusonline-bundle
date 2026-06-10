@@ -1,0 +1,15 @@
+{
+  "uid": "1",
+  "applicationTypeKey": "LEH",
+  "courseGroupUid": "1",
+  "courseUid": "42",
+  "endAt": "2026-03-11T11:45:00",
+  "eventTypeKey": "REGULAR",
+  "externalObjectUid": "76",
+  "resourceUId": "121",
+  "resourceUrl": "https://campusonline.at/ee/rest/pages/slc.cp.apt/resource/4207",
+  "roomUid": "2",
+  "startAt": "2026-03-11T10:15:00",
+  "statusTypeKey": "CONFIRMED",
+  "comment": "First class"
+}
