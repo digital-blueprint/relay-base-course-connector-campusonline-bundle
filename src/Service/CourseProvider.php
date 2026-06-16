@@ -59,8 +59,6 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
 
     private ?CourseApi $courseApi = null;
     private array $config = [];
-    private ?CacheItemPoolInterface $cachePool = null;
-    private int $cacheTTL = 0;
     private ?CacheItemPoolInterface $campusonlineApiCacheItemPool = null;
     /**
      * @var string[]
@@ -173,6 +171,7 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
         }
 
         $this->campusonlineApiCacheItemPool = $coCacheItemPool;
+        $this->courseApi?->getConnection()->setCache($coCacheItemPool);
     }
 
     private function getEventTimeZone(): \DateTimeZone
