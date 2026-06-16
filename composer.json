@@ -5,20 +5,20 @@
     "require": {
         "php": ">=8.2",
         "ext-json": "*",
-        "dbp/campusonline-api": "^0.3.44",
+        "dbp/campusonline-api": "^0.3.45",
         "dbp/relay-base-course-bundle": "^0.2.20",
         "dbp/relay-core-bundle": "^0.1.228",
         "doctrine/dbal": "^4.2",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/migrations": "^3.9",
         "doctrine/orm": "^3.4",
-        "symfony/event-dispatcher": "^6.4 || ^7.4",
-        "symfony/http-kernel": "^6.4 || ^7.4",
-        "symfony/http-foundation": "^6.4 || ^7.4",
-        "symfony/dependency-injection": "^6.4 || ^7.4",
+        "psr/log": "^1.1.4 || ^2.0 || ^3.0",
         "symfony/config": "^6.4 || ^7.4",
+        "symfony/dependency-injection": "^6.4 || ^7.4",
+        "symfony/event-dispatcher": "^6.4 || ^7.4",
         "symfony/framework-bundle": "^6.4 || ^7.4",
-        "psr/log": "^1.1.4 || ^2.0 || ^3.0"
+        "symfony/http-foundation": "^6.4 || ^7.4",
+        "symfony/http-kernel": "^6.4 || ^7.4"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.50",

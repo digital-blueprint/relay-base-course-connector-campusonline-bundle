@@ -25,6 +25,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Psr\Log\NullLogger;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CourseProviderTest extends ApiTestCase
@@ -1771,6 +1772,28 @@ class CourseProviderTest extends ApiTestCase
         $this->assertEquals(new \DateTimeImmutable('2026-03-11T10:15:00', new \DateTimeZone('Europe/Vienna')), $courseEvent->getStartAt());
         $this->assertEquals(new \DateTimeImmutable('2026-03-11T11:45:00', new \DateTimeZone('Europe/Vienna')), $courseEvent->getEndAt());
         $this->assertSame('CLASS', $courseEvent->getTypeKey());
+    }
+
+    public function testCampusononlineApiTokenCache(): void
+    {
+        $this->courseProvider->setCampusonlineApiCacheItemPool(new ArrayAdapter());
+
+        $this->mockResponses([
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'],
+                file_get_contents(__DIR__.'/appointment_api_item_response.json')),
+        ]);
+        $courseEvent = $this->courseProvider->getCourseEventById('1');
+        $this->assertSame('1', $courseEvent->getIdentifier());
+
+        $this->courseProvider->reset(); // reset request (in-memory) cache
+
+        $this->mockResponses([
+            new Response(200, ['Content-Type' => 'application/json;charset=utf-8'],
+                file_get_contents(__DIR__.'/appointment_api_item_response.json')),
+        ], mockAuthServerResponses: false
+        );
+        $courseEvent = $this->courseProvider->getCourseEventById('1');
+        $this->assertSame('1', $courseEvent->getIdentifier());
     }
 
     public function testGetCourseEventByIdentifierNotFound(): void
