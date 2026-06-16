@@ -48,6 +48,8 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Cache\NamespacedPoolInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
 {
@@ -59,7 +61,7 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
     private array $config = [];
     private ?CacheItemPoolInterface $cachePool = null;
     private int $cacheTTL = 0;
-
+    private ?CacheItemPoolInterface $campusonlineApiCacheItemPool = null;
     /**
      * @var string[]
      */
@@ -161,6 +163,16 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
         $this->config = $config;
         $this->eventTimeZone = new \DateTimeZone(
             $this->config[Configuration::CAMPUS_ONLINE_NODE][Configuration::EVENT_TIME_ZONE_NODE]);
+    }
+
+    #[Required]
+    public function setCampusonlineApiCacheItemPool(?CacheItemPoolInterface $coCacheItemPool): void
+    {
+        if ($coCacheItemPool instanceof NamespacedPoolInterface) {
+            $coCacheItemPool = $coCacheItemPool->withSubNamespace(Connection::CACHE_SUBNAMESPACE);
+        }
+
+        $this->campusonlineApiCacheItemPool = $coCacheItemPool;
     }
 
     private function getEventTimeZone(): \DateTimeZone
@@ -663,13 +675,14 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
     private function getCourseApi(): CourseApi
     {
         if ($this->courseApi === null) {
-            $this->courseApi = new CourseApi(
-                new Connection(
-                    $this->config[Configuration::CAMPUS_ONLINE_NODE][Configuration::BASE_URL_NODE] ?? '',
-                    $this->config[Configuration::CAMPUS_ONLINE_NODE][Configuration::CLIENT_ID_NODE] ?? '',
-                    $this->config[Configuration::CAMPUS_ONLINE_NODE][Configuration::CLIENT_SECRET_NODE] ?? ''
-                )
+            $connection = new Connection(
+                $this->config[Configuration::CAMPUS_ONLINE_NODE][Configuration::BASE_URL_NODE] ?? '',
+                $this->config[Configuration::CAMPUS_ONLINE_NODE][Configuration::CLIENT_ID_NODE] ?? '',
+                $this->config[Configuration::CAMPUS_ONLINE_NODE][Configuration::CLIENT_SECRET_NODE] ?? ''
             );
+            $connection->setCache($this->campusonlineApiCacheItemPool);
+
+            $this->courseApi = new CourseApi($connection);
             $this->courseApi->setLogger($this->logger);
         }
 
