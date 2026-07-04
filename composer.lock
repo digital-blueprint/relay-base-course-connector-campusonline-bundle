@@ -984,16 +984,16 @@
         },
         {
             "name": "dbp/campusonline-api",
-            "version": "v0.3.45",
+            "version": "v0.3.46",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digital-blueprint/campusonline-api.git",
-                "reference": "eae021b31e5b9a16075366033cd70fec08fc8edd"
+                "reference": "bc2c3c3e778712de9f6690130cca38f9b7a858b1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/eae021b31e5b9a16075366033cd70fec08fc8edd",
-                "reference": "eae021b31e5b9a16075366033cd70fec08fc8edd",
+                "url": "https://api.github.com/repos/digital-blueprint/campusonline-api/zipball/bc2c3c3e778712de9f6690130cca38f9b7a858b1",
+                "reference": "bc2c3c3e778712de9f6690130cca38f9b7a858b1",
                 "shasum": ""
             },
             "require": {
@@ -1028,9 +1028,9 @@
             ],
             "support": {
                 "issues": "https://github.com/digital-blueprint/campusonline-api/issues",
-                "source": "https://github.com/digital-blueprint/campusonline-api/tree/v0.3.45"
+                "source": "https://github.com/digital-blueprint/campusonline-api/tree/v0.3.46"
             },
-            "time": "2026-06-15T07:54:28+00:00"
+            "time": "2026-06-29T12:07:09+00:00"
         },
         {
             "name": "dbp/relay-base-course-bundle",
