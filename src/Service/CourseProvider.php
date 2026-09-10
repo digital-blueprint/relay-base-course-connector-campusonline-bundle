@@ -103,6 +103,8 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
      * @param \DateTimeImmutable|null $now For testing purposes
      *
      * @return string[]
+     *
+     * @throws \Exception
      */
     public static function getMostRecentSemesterKeys(int $numSemesters, ?\DateTimeImmutable $now = null): array
     {

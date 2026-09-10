@@ -28,6 +28,8 @@ class CourseEventSubscriber extends AbstractLocalDataEventSubscriber
     public const TEACHING_METHOD_KEY_SOURCE_DATA_ATTRIBUTE = 'teachingMethodKey';
     public const TEACHING_METHOD_DESCRIPTION_SOURCE_DATA_ATTRIBUTE = 'teachingMethodDescription';
     public const EXPECTED_PREVIOUS_KNOWLEDGE_SOURCE_DATA_ATTRIBUTE = 'expectedPreviousKnowledge';
+    public const CURRENT_SEMESTER_KEY_SOURCE_DATA_ATTRIBUTE = 'currentSemesterKey';
+    public const NEXT_SEMESTER_KEY_SOURCE_DATA_ATTRIBUTE = 'nextSemesterKey';
 
     protected static function getSubscribedEventNames(): array
     {
@@ -42,6 +44,9 @@ class CourseEventSubscriber extends AbstractLocalDataEventSubscriber
         parent::__construct('BaseCourse');
     }
 
+    /**
+     * @throws \Throwable
+     */
     protected function getAttributeValue(LocalDataPostEvent $postEvent, array $attributeMapEntry): mixed
     {
         $course = $postEvent->getEntity();
@@ -101,6 +106,12 @@ class CourseEventSubscriber extends AbstractLocalDataEventSubscriber
             case self::TYPE_NAME_SOURCE_DATA_ATTRIBUTE:
                 return ($courseTypeKey = $postEvent->getSourceData()[self::COURSE_TYPE_KEY_SOURCE_ATTRIBUTE] ?? null) !== null ?
                     $this->courseProvider->getLocalizedTypeNameByKey($courseTypeKey, $postEvent->getOptions()) : null;
+
+            case self::CURRENT_SEMESTER_KEY_SOURCE_DATA_ATTRIBUTE:
+                return CourseProvider::getMostRecentSemesterKeys(2)[1];
+
+            case self::NEXT_SEMESTER_KEY_SOURCE_DATA_ATTRIBUTE:
+                return CourseProvider::getMostRecentSemesterKeys(2)[0];
         }
 
         return parent::getAttributeValue($postEvent, $attributeMapEntry);

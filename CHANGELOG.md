@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add currentSemesterKey and nextSemesterKey local data attributes to BaseCourse entity
+
 ## v0.2.11
 
 - Apply filters to the get course item operation as well

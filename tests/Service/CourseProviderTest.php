@@ -48,6 +48,8 @@ class CourseProviderTest extends ApiTestCase
     private const WAITING_LIST_LOCAL_DATA_ATTRIBUTE_NAME = 'waitingList';
     private const COURSE_GROUPS_LOCAL_DATA_ATTRIBUTE_NAME = 'courseGroups';
     private const COURSE_GROUP_REGISTRATIONS_LOCAL_DATA_ATTRIBUTE_NAME = 'courseGroupRegistrations';
+    private const CURRENT_SEMESTER_KEY_LOCAL_DATA_ATTRIBUTE_NAME = 'currentSemester';
+    private const NEXT_SEMESTER_KEY_LOCAL_DATA_ATTRIBUTE_NAME = 'nextSemester';
 
     /**
      * @var CourseEvent local data attributes:
@@ -1923,6 +1925,22 @@ class CourseProviderTest extends ApiTestCase
         $this->assertSame('CLASS', $courseEvent->getTypeKey());
     }
 
+    public function testCurrentAndNextSemesterLocalDataAttributes(): void
+    {
+        $options = [];
+        Options::requestLocalDataAttributes($options, [
+            self::CURRENT_SEMESTER_KEY_LOCAL_DATA_ATTRIBUTE_NAME,
+            self::NEXT_SEMESTER_KEY_LOCAL_DATA_ATTRIBUTE_NAME,
+        ]);
+
+        $course = $this->courseProvider->getCourseById('1', $options);
+        $mostRecentSemesterKeys = CourseProvider::getMostRecentSemesterKeys(2);
+        $this->assertSame($mostRecentSemesterKeys[1],
+            $course->getLocalDataValue(self::CURRENT_SEMESTER_KEY_LOCAL_DATA_ATTRIBUTE_NAME));
+        $this->assertSame($mostRecentSemesterKeys[0],
+            $course->getLocalDataValue(self::NEXT_SEMESTER_KEY_LOCAL_DATA_ATTRIBUTE_NAME));
+    }
+
     private static function createMockAuthServerResponses(): array
     {
         return [
@@ -2109,6 +2127,16 @@ class CourseProviderTest extends ApiTestCase
             [
                 'local_data_attribute' => self::COURSE_GROUP_REGISTRATIONS_LOCAL_DATA_ATTRIBUTE_NAME,
                 'source_attribute' => CourseEventSubscriber::COURSE_GROUP_REGISTRATIONS_SOURCE_DATA_ATTRIBUTE,
+                'entity_short_name' => 'BaseCourse',
+            ],
+            [
+                'local_data_attribute' => self::CURRENT_SEMESTER_KEY_LOCAL_DATA_ATTRIBUTE_NAME,
+                'source_attribute' => CourseEventSubscriber::CURRENT_SEMESTER_KEY_SOURCE_DATA_ATTRIBUTE,
+                'entity_short_name' => 'BaseCourse',
+            ],
+            [
+                'local_data_attribute' => self::NEXT_SEMESTER_KEY_LOCAL_DATA_ATTRIBUTE_NAME,
+                'source_attribute' => CourseEventSubscriber::NEXT_SEMESTER_KEY_SOURCE_DATA_ATTRIBUTE,
                 'entity_short_name' => 'BaseCourse',
             ],
             [
