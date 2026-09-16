@@ -496,10 +496,10 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
                     ];
                     $courseGroupPeopleMap[$courseGroupIdentifier] = $courseGroupPeople;
                 }
-                switch ($registrationResource->getRegistrationStatus()) {
-                    case CourseRegistrationResource::REGISTRATION_STATUS_FIXED:
-                        $courseGroupPeopleMap[$courseGroupIdentifier][$ATTENDEE_PERSON_IDENTIFIERS_KEY][] = $registrationResource->getPersonUid();
-                        break;
+                if (CourseRegistrationResource::REGISTRATION_STATUS_FIXED ===
+                    $registrationResource->getRegistrationStatus()) {
+                    $courseGroupPeopleMap[$courseGroupIdentifier][$ATTENDEE_PERSON_IDENTIFIERS_KEY][] =
+                        $registrationResource->getPersonUid();
                 }
             }
             foreach ($this->getLectureshipResourcesCached($courseIdentifier) as $lectureshipResource) {
@@ -519,12 +519,12 @@ class CourseProvider implements CourseProviderInterface, LoggerAwareInterface
             foreach ($this->getCourseGroupResourcesCached($courseIdentifier) as $courseGroupResource) {
                 $courseGroups[] = [
                     'identifier' => $courseGroupResource->getUid(),
-                    'name' => $courseGroupResource->getName(Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG),
-                    $LECTURER_PERSON_IDENTIFIERS_KEY => $courseGroupPeopleMap[$courseGroupResource->getUid()][$LECTURER_PERSON_IDENTIFIERS_KEY] ?? [],
-                    /*
-                     * @deprecated Replaced by course group registrations. Left for backward compatibility.
-                     */
-                    $ATTENDEE_PERSON_IDENTIFIERS_KEY => $courseGroupPeopleMap[$courseGroupResource->getUid()][$ATTENDEE_PERSON_IDENTIFIERS_KEY] ?? [],
+                    'name' => $courseGroupResource->getNameLocalized(Options::getLanguage($options) ?? self::DEFAULT_LANGUAGE_TAG),
+                    'lecturerIdentifiers' => $courseGroupPeopleMap[$courseGroupResource->getUid()][$LECTURER_PERSON_IDENTIFIERS_KEY] ?? [],
+                    'availablePlaces' => max(0,
+                        $courseGroupResource->getMaxNumberOfParticipants() -
+                        count($courseGroupPeopleMap[$courseGroupResource->getUid()][$ATTENDEE_PERSON_IDENTIFIERS_KEY] ?? []),
+                    ),
                 ];
             }
 

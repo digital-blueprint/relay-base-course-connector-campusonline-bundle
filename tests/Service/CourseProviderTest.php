@@ -1048,11 +1048,9 @@ class CourseProviderTest extends ApiTestCase
         $courseGroup = $courseGroups[0];
         $this->assertSame('group1', $courseGroup['identifier']);
         $this->assertSame('Gruppe 1', $courseGroup['name']);
-        $this->assertSame(['p1', 'p2'], $courseGroup['attendeeIdentifiers']);
         $courseGroup = $courseGroups[1];
         $this->assertSame('group2', $courseGroup['identifier']);
         $this->assertSame(null, $courseGroup['name']);
-        $this->assertSame(['p4'], $courseGroup['attendeeIdentifiers']);
         $courseGroupRegistrations = $course->getLocalDataValue(self::COURSE_GROUP_REGISTRATIONS_LOCAL_DATA_ATTRIBUTE_NAME);
         $this->assertCount(2, $courseGroupRegistrations);
         $courseGroupRegistration = $courseGroupRegistrations[0];
@@ -1070,7 +1068,6 @@ class CourseProviderTest extends ApiTestCase
         $courseGroup = $courseGroups[0];
         $this->assertSame('group3', $courseGroup['identifier']);
         $this->assertSame('Gruppe 3', $courseGroup['name']);
-        $this->assertSame(['p5'], $courseGroup['attendeeIdentifiers']);
         $courseGroupRegistrations = $course->getLocalDataValue(self::COURSE_GROUP_REGISTRATIONS_LOCAL_DATA_ATTRIBUTE_NAME);
         $this->assertCount(1, $courseGroupRegistrations);
         $courseGroupRegistration = $courseGroupRegistrations[0];
@@ -1230,11 +1227,9 @@ class CourseProviderTest extends ApiTestCase
         $courseGroup = $courseGroups[0];
         $this->assertSame('group1', $courseGroup['identifier']);
         $this->assertSame(null, $courseGroup['name']);
-        $this->assertSame(['p1', 'p2'], $courseGroup['attendeeIdentifiers']);
         $courseGroup = $courseGroups[1];
         $this->assertSame('group2', $courseGroup['identifier']);
         $this->assertSame('Group 2', $courseGroup['name']);
-        $this->assertSame(['p4'], $courseGroup['attendeeIdentifiers']);
         $courseGroupRegistrations = $course->getLocalDataValue(self::COURSE_GROUP_REGISTRATIONS_LOCAL_DATA_ATTRIBUTE_NAME);
         $this->assertCount(2, $courseGroupRegistrations);
         $courseGroupRegistration = $courseGroupRegistrations[0];
@@ -1252,7 +1247,6 @@ class CourseProviderTest extends ApiTestCase
         $courseGroup = $courseGroups[0];
         $this->assertSame('group3', $courseGroup['identifier']);
         $this->assertSame('Group 3', $courseGroup['name']);
-        $this->assertSame(['p5'], $courseGroup['attendeeIdentifiers']);
         $courseGroupRegistrations = $course->getLocalDataValue(self::COURSE_GROUP_REGISTRATIONS_LOCAL_DATA_ATTRIBUTE_NAME);
         $this->assertCount(1, $courseGroupRegistrations);
         $courseGroupRegistration = $courseGroupRegistrations[0];
@@ -1371,11 +1365,9 @@ class CourseProviderTest extends ApiTestCase
         $courseGroup = $courseGroups[0];
         $this->assertSame('group1', $courseGroup['identifier']);
         $this->assertSame('Gruppe 1', $courseGroup['name']);
-        $this->assertSame(['p1'], $courseGroup['attendeeIdentifiers']); // deprecate
         $courseGroup = $courseGroups[1];
         $this->assertSame('group2', $courseGroup['identifier']);
         $this->assertSame(null, $courseGroup['name']);
-        $this->assertSame(['p2'], $courseGroup['attendeeIdentifiers']); // deprecate
         $courseGroupRegistrations = $course->getLocalDataValue(self::COURSE_GROUP_REGISTRATIONS_LOCAL_DATA_ATTRIBUTE_NAME);
         $this->assertCount(2, $courseGroupRegistrations);
         $courseGroupRegistration = $courseGroupRegistrations[0];
@@ -1494,11 +1486,9 @@ class CourseProviderTest extends ApiTestCase
         $courseGroup = $courseGroups[0];
         $this->assertSame('group1', $courseGroup['identifier']);
         $this->assertSame(null, $courseGroup['name']);
-        $this->assertSame(['p1'], $courseGroup['attendeeIdentifiers']); // deprecate
         $courseGroup = $courseGroups[1];
         $this->assertSame('group2', $courseGroup['identifier']);
         $this->assertSame('Group 2', $courseGroup['name']);
-        $this->assertSame(['p2'], $courseGroup['attendeeIdentifiers']); // deprecate
         $courseGroupRegistrations = $course->getLocalDataValue(self::COURSE_GROUP_REGISTRATIONS_LOCAL_DATA_ATTRIBUTE_NAME);
         $this->assertCount(2, $courseGroupRegistrations);
         $courseGroupRegistration = $courseGroupRegistrations[0];

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Remove deprecate attendeeIdentifiers from courseGroups source attribute
+- Add availablePlaces to courseGroups source attribute
 - Add currentSemesterKey and nextSemesterKey local data attributes to BaseCourse entity
 
 ## v0.2.11
