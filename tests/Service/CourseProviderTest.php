@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Dbp\Relay\BaseCourseConnectorCampusonlineBundle\Tests\Service;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use Dbp\CampusonlineApi\PublicRestApi\Appointments\AppointmentResource;
 use Dbp\Relay\BaseCourseBundle\Entity\Course;
 use Dbp\Relay\BaseCourseBundle\Entity\CourseEvent;
@@ -25,10 +24,11 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Psr\Log\NullLogger;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class CourseProviderTest extends ApiTestCase
+class CourseProviderTest extends KernelTestCase
 {
     private const COURSE_TYPE_LOCAL_DATA_ATTRIBUTE_NAME = 'type';
     private const COURSE_TYPE_SOURCE_ATTRIBUTE_NAME = 'courseTypeKey';
